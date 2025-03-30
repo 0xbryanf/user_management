@@ -1,0 +1,32 @@
+{
+  "compilerOptions": {
+    "esModuleInterop": true, // Enables compatibility between CommonJS and ES Modules.
+    "module": "CommonJS", // Sets module code generation to CommonJS for Node.js.
+    "target": "ES6", // Specifies ECMAScript 6 as the output language.
+    "moduleResolution": "node", // Mimics Node.js module resolution strategy.
+    "noImplicitAny": true, // Throws errors for variables without explicit 'any' type.
+    "outDir": "dist", // Redirects output structure to the 'dist' directory.
+    "preserveConstEnums": true, // Keeps 'const enum' declarations.
+    "removeComments": true, // Strips out comments from the output.
+    "baseUrl": "./src", // Sets base directory for resolving non-relative module names.
+    "paths": {
+      "lib/*": ["lib/*"],
+      "utils/*": ["utils/*"],
+      "helpers/*": ["lib/helpers/*"],
+      "schema/*": ["schema/*"],
+      "functions/*": ["functions/*"]
+    },
+    "skipLibCheck": true, // Skips type checking of all declaration files for faster compilation.
+    "resolveJsonModule": true, // Allows importing '.json' files as modules.
+    "strict": true, // Enables all strict type-checking options.
+    "strictNullChecks": true, // Ensures that null values are handled explicitly.
+    "strictPropertyInitialization": true, // Ensures class properties are initialized in the constructor.
+    "noUnusedLocals": true, // Reports errors on unused local variables.
+    "noUnusedParameters": true, // Reports errors on unused parameters in functions.
+    "noImplicitReturns": true, // Ensures all code paths in a function return a value.
+    "forceConsistentCasingInFileNames": true // Ensures consistent file naming.
+  },
+  "include": ["**/*.ts", "src/**/*"], // Includes all TypeScript files in the project directory.
+  "exclude": ["node_modules", "dist"], // Excludes the 'node_modules' and 'dist' directories.
+  "typeRoots": ["node_modules/@types"] // Specifies directories for type definitions.
+}
