@@ -1,3 +1,5 @@
+import { assignRole } from "functions/assignRole";
+import { checkUsername } from "functions/checkUsername";
 import { createRole } from "functions/createRole";
 import { createUser } from "functions/createUser";
 import { verifyUser } from "functions/verifyUser";
@@ -39,20 +41,19 @@ export const SchemaUserManagement = {
     relation: {},
     actions: {
       createUser,
-      verifyUser
+      verifyUser,
+      checkUsername
     }
   },
   Roles: {
     descriptor: {
       role_id: {
         type: DataTypes.UUID,
-        allowNull: false,
         primaryKey: true,
         defaultValue: DataTypes.UUIDV4
       },
       role_name: {
-        type: DataTypes.TEXT,
-        allowNull: false
+        type: DataTypes.TEXT
       },
       created_at: {
         type: DataTypes.DATE,
@@ -71,7 +72,8 @@ export const SchemaUserManagement = {
     },
     relation: {},
     actions: {
-      createRole
+      createRole,
+      assignRole
     }
   },
   UserRoles: {
