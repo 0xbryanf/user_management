@@ -2,7 +2,7 @@ import React from "react";
 import Input from "@/components/atoms/input";
 import Label from "@/components/atoms/label";
 
-const EmailField = () => (
+const EmailField = ({ ...props }) => (
   <div>
     <Label htmlFor="email">Email address</Label>
     <div className="mt-2">

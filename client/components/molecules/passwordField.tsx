@@ -15,7 +15,7 @@ const PasswordField = () => {
         <Label htmlFor="password">Password</Label>
         <a
           href="#"
-          className="text-sm font-semibold text-indigo-600 hover:text-indigo-500"
+          className="text-sm font-semibold text-blue-600 hover:text-blue-500"
         >
           Forgot password?
         </a>
