@@ -14,7 +14,9 @@
       "utils/*": ["utils/*"],
       "helpers/*": ["lib/helpers/*"],
       "schema/*": ["schema/*"],
-      "functions/*": ["functions/*"]
+      "functions/*": ["functions/*"],
+      "controller/*": ["controller/*"],
+      "services/*": ["services/*"]
     },
     "skipLibCheck": true, // Skips type checking of all declaration files for faster compilation.
     "resolveJsonModule": true, // Allows importing '.json' files as modules.
@@ -27,6 +29,6 @@
     "forceConsistentCasingInFileNames": true // Ensures consistent file naming.
   },
   "include": ["**/*.ts", "src/**/*"], // Includes all TypeScript files in the project directory.
-  "exclude": ["node_modules", "dist"], // Excludes the 'node_modules' and 'dist' directories.
+  "exclude": ["node_modules", "dist", "client"], // Excludes the 'node_modules' and 'dist' directories.
   "typeRoots": ["node_modules/@types"] // Specifies directories for type definitions.
 }

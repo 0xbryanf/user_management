@@ -16,28 +16,29 @@ export default function LoginPage() {
 
     const formData = new FormData(event.currentTarget);
     const email = formData.get("email") as string;
-
+    const password = formData.get("password") as string;
     try {
       const response = await axios.post("/api/basicAuth", {
-        email
+        email,
+        password
       });
 
       if (response.status === 200) {
         toast.success("Credentials accepted. Continue to verify your identity.", {
-          duration: 1000,
+          duration: 1500,
           style: { fontSize: "16px" },
           icon: null
         });
 
-        // Delay for better UX before redirect
         setTimeout(() => {
           router.push("/validate/123");
-        }, 2000);
+        }, 2500);
       } else {
         toast.error("Invalid credentials. Please try again.", {
           duration: 1000,
           style: { fontSize: "16px" }
         });
+        setLoading(false);
       }
     } catch (error) {
       const err = error as AxiosError<{ message?: string }>;
@@ -63,7 +64,7 @@ export default function LoginPage() {
           style: { fontSize: "16px" }
         });
       }
-    } finally {
+
       setLoading(false);
     }
   }

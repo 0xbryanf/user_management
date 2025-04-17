@@ -1,16 +1,15 @@
 import { verifyPassword } from "lib/helpers/verifyPassword";
-import { Op } from "sequelize";
 import { loadSchemaModel } from "utils/loadSchemaModel";
 
 export interface VerifyUser {
-  account: string;
+  email: string;
   password: string;
 }
 
 export const verifyUser = async (values: VerifyUser) => {
-  const { account, password } = values;
+  const { email, password } = values;
 
-  if (!account || !password) {
+  if (!email || !password) {
     return {
       status: 404,
       message: "All required fields must be provided to verify a user."
@@ -20,15 +19,15 @@ export const verifyUser = async (values: VerifyUser) => {
   const UsersModel = await loadSchemaModel("User_Management", "Users");
 
   const user = await UsersModel.findOne({
-    where: {
-      [Op.or]: [{ username: account }, { email: account }]
-    }
+    where: { email }
   });
+
+  console.log("user: " + user);
 
   if (!user) {
     return {
       status: 404,
-      message: "User not verified."
+      message: "Invalid credentials"
     };
   }
 
@@ -40,14 +39,14 @@ export const verifyUser = async (values: VerifyUser) => {
   if (!isPasswordValid) {
     return {
       status: 401,
-      message: "User not verified.",
+      message: "Invalid credentials",
       data: isPasswordValid
     };
   }
 
   return {
     status: 200,
-    message: "User verified successfully.",
+    message: "User verified successfully",
     data: isPasswordValid
   };
 };

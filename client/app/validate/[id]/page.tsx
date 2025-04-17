@@ -15,11 +15,11 @@ export default function LoginPage() {
     setLoading(true);
 
     const formData = new FormData(event.currentTarget);
-    const password = formData.get("password") as string;
+    const otp = formData.get("otp") as string;
 
     try {
       const response = await axios.post("/api/basicAuth", {
-        password
+        otp
       });
 
       if (response.status === 200) {

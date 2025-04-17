@@ -1,0 +1,26 @@
+import { createUser } from "functions/createUser";
+import { CreateUser } from "types/createUser";
+
+export default async function createUserService({
+  username,
+  email,
+  password
+}: CreateUser) {
+  if (!username || !email || !password) {
+    return {
+      status: 400,
+      message: "All required fields must be provided to create a user."
+    };
+  }
+
+  try {
+    const result = await createUser({ username, email, password });
+    return result;
+  } catch (error: unknown) {
+    return {
+      status: 500,
+      message: "Error creating user",
+      error: error instanceof Error ? error.message : String(error)
+    };
+  }
+}

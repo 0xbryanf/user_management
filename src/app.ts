@@ -72,6 +72,9 @@ class App {
   private initializeMiddleware(): void {
     this.express.use(express.json());
     this.express.use(express.urlencoded({ extended: false }));
+    this.express.get("/health", (_req: Request, res: Response) => {
+      res.status(200).json({ status: "ok", message: "Server is running" });
+    });
     this.express.use(
       helmet.contentSecurityPolicy({
         directives: {
@@ -114,7 +117,7 @@ class App {
    */
   private initializeControllers(controllers: Controller[]): void {
     controllers.forEach((controller: Controller) => {
-      this.express.use("/v1", controller.router);
+      this.express.use(controller.router);
     });
   }
 

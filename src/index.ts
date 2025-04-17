@@ -3,6 +3,7 @@ import App from "./app";
 import "dotenv/config";
 import { validateEnv } from "utils/validateEnv";
 import { runCommand } from "utils/runCommand";
+import AppController from "./controller";
 
 export const main = async () => {
   if (process.argv[2] === "run") {
@@ -17,7 +18,10 @@ export const main = async () => {
           );
         }
         validateEnv();
-        const app = new App([], Number((process.env.PORT as string) || 8080));
+        const app = new App(
+          [new AppController()],
+          Number((process.env.PORT as string) || 8080)
+        );
         app.listen();
         break;
     }

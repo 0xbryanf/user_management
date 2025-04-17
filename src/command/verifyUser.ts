@@ -3,9 +3,8 @@ export default {
     {
       schema: "User_Management",
       model: "Users",
-      action: "createUser",
+      action: "verifyUser",
       values: {
-        username: "0xbryanf",
         email: "0xbryanf@gmail.com",
         password: "password"
       }
