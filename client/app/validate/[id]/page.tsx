@@ -4,7 +4,7 @@ import { FormEvent, useState } from "react";
 import axios, { AxiosError } from "axios";
 import { useRouter } from "next/navigation";
 import { toast, Toaster } from "react-hot-toast";
-import LoginForm from "@/components/organisms/loginForm";
+import ValidationForm from "@/components/organisms/validationForm";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -15,24 +15,23 @@ export default function LoginPage() {
     setLoading(true);
 
     const formData = new FormData(event.currentTarget);
-    const email = formData.get("email") as string;
+    const password = formData.get("password") as string;
 
     try {
       const response = await axios.post("/api/basicAuth", {
-        email
+        password
       });
 
       if (response.status === 200) {
-        toast.success("Credentials accepted. Continue to verify your identity.", {
+        toast.success("Login successful!", {
           duration: 1000,
-          style: { fontSize: "16px" },
-          icon: null
+          style: { fontSize: "16px" }
         });
 
         // Delay for better UX before redirect
         setTimeout(() => {
-          router.push("/validate/123");
-        }, 2000);
+          router.push("/home");
+        }, 1000);
       } else {
         toast.error("Invalid credentials. Please try again.", {
           duration: 1000,
@@ -73,22 +72,12 @@ export default function LoginPage() {
       <div className="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8">
         <div className="sm:mx-auto sm:w-full sm:max-w-sm">
           <h2 className="mt-10 text-center text-2xl font-bold tracking-tight text-gray-900">
-            Sign in to your account
+            Verify your identity
           </h2>
         </div>
 
         <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
-          <LoginForm onSubmit={basicAuthLogin} loading={loading} />
-
-          <p className="mt-10 text-center text-sm text-gray-500">
-            Not a member?{" "}
-            <a
-              href="#"
-              className="font-semibold text-blue-600 hover:text-blue-500"
-            >
-              Sign up now while it's still free!
-            </a>
-          </p>
+          <ValidationForm onSubmit={basicAuthLogin} loading={loading} />
         </div>
       </div>
       <Toaster position="top-center" />

@@ -2,9 +2,8 @@ import React from "react";
 import PasswordField from "@/components/molecules/passwordField";
 import Button from "@/components/atoms/button";
 import {FcGoogle} from "react-icons/fc";
-import EmailField from "../molecules/emailField";
 
-const LoginForm = ({
+const ValidationForm = ({
   onSubmit,
   loading,
 }: {
@@ -13,7 +12,7 @@ const LoginForm = ({
 }) => (
   <>
     <form className="space-y-6" onSubmit={onSubmit}>
-    <EmailField />
+    <PasswordField />
     <Button
       disabled={loading}
       className={`flex w-full justify-center rounded-md bg-gradient-to-r from-blue-600 via-indigo-500 to-sky-400 bg-opacity-60 backdrop-blur-md px-3 py-2 text-base font-semibold text-white shadow-md transition duration-200 ease-in-out focus-visible:outline focus-visible:outline-offset-2 focus-visible:outline-sky-500 ${
@@ -23,7 +22,7 @@ const LoginForm = ({
       }`}
       type="submit"
     >
-      Sign in
+      Confirm
     </Button>
     </form>
     <div className="flex items-center gap-4 my-10">
@@ -41,12 +40,12 @@ const LoginForm = ({
       }`}
     >
       <FcGoogle className="text-xl" />
-      <span>Continue with Google</span>
+      <span>Confirm identity with Google</span>
     </Button>
   </>
 
 );
 
 
-export default LoginForm;
+export default ValidationForm;
 
