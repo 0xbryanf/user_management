@@ -14,31 +14,34 @@ class AppController implements Controller {
   }
 
   private initializeRoutes() {
-    this.router.get(
-      `${this.path}/${this.version}/check-connection`,
-      this.checkConnectionHandler.bind(this)
-    );
     this.router.post(
       `${this.path}/${this.version}/create-user`,
       this.createUserHandler.bind(this)
     );
-  }
 
-  private async checkConnectionHandler(_req: Request, res: Response) {
-    try {
-      const result = await this.appServices.checkConnectionService();
-      res.status(result.status).json(result);
-    } catch (error: any) {
-      res
-        .status(500)
-        .json({ message: "Error checking connection", error: error.message });
-    }
+    this.router.post(
+      `${this.path}/${this.version}/verify-user`,
+      this.verifyUserHandler.bind(this)
+    );
   }
 
   private async createUserHandler(req: Request, res: Response) {
     try {
       const userData: CreateUser = req.body;
       const result = await this.appServices.createUserService(userData);
+      res.status(result.status).json(result);
+    } catch (error: unknown) {
+      res.status(500).json({
+        message: "Error creating user",
+        error: error instanceof Error ? error.message : "Unknown error"
+      });
+    }
+  }
+
+  private async verifyUserHandler(req: Request, res: Response) {
+    try {
+      const { email, password } = req.body;
+      const result = await this.appServices.verifyUserService(email, password);
       res.status(result.status).json(result);
     } catch (error: unknown) {
       res.status(500).json({

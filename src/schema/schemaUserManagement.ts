@@ -2,6 +2,7 @@ import { assignRole } from "functions/assignRole";
 import { checkUsername } from "functions/checkUsername";
 import { createRole } from "functions/createRole";
 import { createUser } from "functions/createUser";
+import { sendOTPEmail } from "functions/sendOTPEmail";
 import { verifyUser } from "functions/verifyUser";
 import { DataTypes } from "sequelize";
 
@@ -42,7 +43,8 @@ export const SchemaUserManagement = {
     actions: {
       createUser,
       verifyUser,
-      checkUsername
+      checkUsername,
+      sendOTPEmail
     }
   },
   Roles: {

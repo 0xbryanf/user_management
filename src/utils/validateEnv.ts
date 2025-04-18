@@ -17,6 +17,12 @@ export const validateEnv = (): void => {
     DB_PASSWORD: str(),
     DB_DATABASE: str(),
     DB_HOST: str(),
-    DB_PORT: port()
+    DB_PORT: port(),
+    POSTGRES_DB: str(),
+    POSTGRES_HOST: str(),
+    POSTGRES_USER: str(),
+    POSTGRES_PASSWORD: str(),
+    POSTGRES_PORT: port(),
+    SENDGRID_API_KEY: str()
   });
 };
