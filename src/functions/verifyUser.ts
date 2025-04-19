@@ -22,8 +22,6 @@ export const verifyUser = async (values: VerifyUser) => {
     where: { email }
   });
 
-  console.log("user: " + user);
-
   if (!user) {
     return {
       status: 404,
@@ -39,14 +37,13 @@ export const verifyUser = async (values: VerifyUser) => {
   if (!isPasswordValid) {
     return {
       status: 401,
-      message: "Invalid credentials",
-      data: isPasswordValid
+      message: "Invalid credentials"
     };
   }
 
   return {
     status: 200,
     message: "User verified successfully",
-    data: isPasswordValid
+    data: user.dataValues.user_id
   };
 };

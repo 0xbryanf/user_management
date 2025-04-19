@@ -1,11 +1,5 @@
 import sgMail from "@sendgrid/mail";
-
-export interface SendEmailInput {
-  to: string;
-  from: string;
-  subject: string;
-  html: string;
-}
+import { SendEmailInput } from "types/sendEmailInput";
 
 export const sendOTPEmail = async (values: SendEmailInput) => {
   const { to, from, subject, html } = values;
@@ -31,7 +25,7 @@ export const sendOTPEmail = async (values: SendEmailInput) => {
     const response = await sgMail.send(message);
     return {
       status: 200,
-      message: "Email sent successfully",
+      message: "OTP Email sent successfully",
       data: response
     };
   } catch (error: unknown) {

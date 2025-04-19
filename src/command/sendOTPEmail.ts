@@ -7,12 +7,12 @@ export default {
       model: "Users",
       action: "sendOTPEmail",
       values: {
-        to: "0xbryanf@gmail.com",
-        from: "bjfactor041789@gmail.com",
-        subject: "Your OTP Code",
+        to: "bjfactor041789@gmail.com",
+        from: "otp@factorinnovations.com",
+        subject: `Your One Time OTP Code - ${otp}`,
         html: `
-          <!DOCTYPE html>
-          <html>
+        <!doctype html>
+        <html>
           <head>
             <title>OTP Email</title>
             <style>
@@ -20,24 +20,24 @@ export default {
                 font-family: Arial, sans-serif;
                 margin: 0;
                 padding: 0;
-                background-color: #f9f9f9;
-                color: #333333;
+                background-color: #ffffff;
+                color: #000000;
               }
               .container {
                 width: 100%;
                 max-width: 600px;
                 margin: 20px auto;
                 background: #ffffff;
-                border: 1px solid #dddddd;
+                border: 1px solid #000000;
                 border-radius: 8px;
                 overflow: hidden;
-                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
               }
               .header {
-                background-color: #0047FF;
-                color: #ffffff;
+                color: #000000;
                 padding: 20px;
                 text-align: center;
+                background: #ffffff;
+                border-bottom: 1px solid #000000;
                 font-size: 24px;
                 font-weight: bold;
               }
@@ -48,39 +48,42 @@ export default {
               .otp {
                 font-size: 30px;
                 font-weight: bold;
-                color: #0047FF;
+                color: #000000;
                 margin: 20px 0;
               }
               .expiry {
                 font-size: 14px;
-                color: #555555;
+                color: #000000;
               }
               .footer {
                 text-align: center;
-                padding: 10px;
                 font-size: 12px;
-                color: #777777;
-                border-top: 1px solid #dddddd;
+                color: #000000;
+                background: #ffffff;
+                border-top: 1px solid #000000;
               }
             </style>
           </head>
           <body>
             <div class="container">
-              <div class="header">
-                Your OTP Code
-              </div>
+              <div class="header">Your One-Time Verification Code</div>
               <div class="content">
-                <p>Please use the following OTP code to complete your action:</p>
+                <p>Please use the following One-Time Passcode to confirm your email:</p>
                 <div class="otp">${otp}</div>
-                <p class="expiry">This code will expire in 5 minutes.</p>
+                <p class="expiry">This code will expire in 15 minutes.</p>
+                <p class="expiry">Please do not share your OTP.</p>
               </div>
               <div class="footer">
-                <p>&copy; 2025 Your Company. All Rights Reserved.</p>
+                <p>If you did not make this request,</p>
+                <p>
+                  please visit our <a href="https://factorinnovations.com/help-center" style="text-decoration: underline;">Help Center</a> for more information.
+                </p>
+                <p>&copy; 2025 Factor Innovations. All Rights Reserved.</p>
               </div>
             </div>
           </body>
-          </html>
-        `
+        </html>
+      `
       }
     }
   ]
