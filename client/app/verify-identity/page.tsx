@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { toast, Toaster } from "react-hot-toast";
 import ValidationForm from "@/components/organisms/validationForm";
 
-export default function LoginPage() {
+export default function VerifyIdentityPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
 
@@ -18,7 +18,7 @@ export default function LoginPage() {
     const otp = formData.get("otp") as string;
 
     try {
-      const response = await axios.post("/api/basicAuth", {
+      const response = await axios.post("/api/verify-identity", {
         otp
       });
 
@@ -42,7 +42,8 @@ export default function LoginPage() {
       const err = error as AxiosError<{ message?: string }>;
 
       const status = err.response?.status;
-      const message = err.response?.data?.message || "An error occurred. Please try again.";
+      const message =
+        err.response?.data?.message || "An error occurred. Please try again.";
 
       console.error("Login error:", err);
 

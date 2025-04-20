@@ -2,6 +2,7 @@ import { CreateUser } from "types/createUser";
 import createUserService from "./createUserService";
 import verifyUserService from "./verifyUserService";
 import sendOTPEmailService from "./sendOtpEmailService";
+import verifyOTPEmailService from "./verifyOTPEmailService";
 
 class AppServices {
   public async createUserService(values: CreateUser) {
@@ -14,6 +15,10 @@ class AppServices {
 
   public async sendOTPEmailService(to: string) {
     return await sendOTPEmailService(to);
+  }
+
+  public async verifyOTPEmailService(email: string, to: number) {
+    return await verifyOTPEmailService(email, to);
   }
 }
 

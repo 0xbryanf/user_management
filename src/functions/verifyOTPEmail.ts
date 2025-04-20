@@ -1,4 +1,4 @@
-import { hashValue } from "lib/helpers/hashValue"; // Ensure secure, cryptographic hashing here
+import { hashValue } from "lib/helpers/hashValue";
 import { redisClient } from "utils/redisClient";
 
 export const verifyOTPEmail = async (values: { to: string; otp: number }) => {
@@ -21,13 +21,15 @@ export const verifyOTPEmail = async (values: { to: string; otp: number }) => {
     }
 
     const hashedOtp = hashValue(`otp_value:${values.otp}`);
+
     if (storedValue !== hashedOtp) {
-      await redisClient.del(redisKey);
       return {
         status: 400,
         message: "Invalid OTP."
       };
     }
+
+    await redisClient.del(redisKey);
 
     return {
       status: 200,
@@ -39,7 +41,5 @@ export const verifyOTPEmail = async (values: { to: string; otp: number }) => {
       message: "Error sending email",
       error: error instanceof Error ? error.message : String(error)
     };
-  } finally {
-    await redisClient.quit();
   }
 };

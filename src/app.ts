@@ -5,8 +5,12 @@ import cors, { CorsOptions } from "cors";
 import "dotenv/config";
 import compression from "compression";
 import { errorHandler } from "helpers/errorHandler";
-import { sequelizeConnectionUp } from "utils/sequelizeConnection";
+import {
+  sequelizeConnectionDown,
+  sequelizeConnectionUp
+} from "utils/sequelizeConnection";
 import { initializeAssociations } from "utils/initializeAssociations";
+import { redisConnectionDown, redisConnectionUp } from "utils/redisConnection";
 
 const { ORIGIN, MAXAGE } = process.env;
 
@@ -139,6 +143,7 @@ class App {
     try {
       await sequelizeConnectionUp();
       await initializeAssociations();
+      await redisConnectionUp();
     } catch (error) {
       console.error("Failed to connect to the database:", error);
       process.exit(1);
@@ -150,8 +155,10 @@ class App {
    * @private
    * @returns {void}
    */
-  private shutdown(): void {
+  private async shutdown(): Promise<void> {
     try {
+      await sequelizeConnectionDown();
+      await redisConnectionDown();
       console.log("Shutting down server...");
       process.exit(0);
     } catch (error) {

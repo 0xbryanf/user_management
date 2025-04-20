@@ -5,6 +5,7 @@ import { redisClient } from "utils/redisClient";
 
 export const sendOTPEmail = async (values: { to: string }) => {
   const { to } = values;
+
   if (!to) {
     return {
       status: 400,
@@ -50,7 +51,5 @@ export const sendOTPEmail = async (values: { to: string }) => {
       message: "Error sending email",
       error: error instanceof Error ? error.message : String(error)
     };
-  } finally {
-    await redisClient.quit();
   }
 };

@@ -18,20 +18,23 @@ export default function LoginPage() {
     const email = formData.get("email") as string;
     const password = formData.get("password") as string;
     try {
-      const response = await axios.post("/api/basicAuth", {
+      const response = await axios.post("/api/basic-auth", {
         email,
         password
       });
 
       if (response.status === 200) {
-        toast.success("Credentials accepted. Continue to verify your identity.", {
-          duration: 1500,
-          style: { fontSize: "16px" },
-          icon: null
-        });
+        toast.success(
+          "Credentials accepted. Continue to verify your identity.",
+          {
+            duration: 1500,
+            style: { fontSize: "16px" },
+            icon: null
+          }
+        );
 
         setTimeout(() => {
-          router.push("/validate/123");
+          router.push("/verify-identity");
         }, 2500);
       } else {
         toast.error("Invalid credentials. Please try again.", {
@@ -44,7 +47,8 @@ export default function LoginPage() {
       const err = error as AxiosError<{ message?: string }>;
 
       const status = err.response?.status;
-      const message = err.response?.data?.message || "An error occurred. Please try again.";
+      const message =
+        err.response?.data?.message || "An error occurred. Please try again.";
 
       console.error("Login error:", err);
 

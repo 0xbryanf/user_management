@@ -5,6 +5,9 @@ import { CreateUser } from "types/createUser";
 import "dotenv/config";
 import { generateToken } from "utils/generateToken";
 import { authenticateToken } from "lib/middleware/authenticateToken";
+import { JwtPayload } from "jsonwebtoken";
+import { checkUserId } from "functions/checkUserId";
+import { authTokenFromHeader } from "lib/middleware/authTokenFromHeader";
 
 class AppController implements Controller {
   public path = "/api";
@@ -31,6 +34,12 @@ class AppController implements Controller {
       `${this.path}/${this.version}/send-otp-email`,
       authenticateToken,
       this.sendOTPEmail.bind(this)
+    );
+
+    this.router.post(
+      `${this.path}/${this.version}/verify-otp-email`,
+      authenticateToken,
+      this.verifyOTPEmail.bind(this)
     );
   }
 
@@ -63,7 +72,7 @@ class AppController implements Controller {
       return;
     } catch (error: unknown) {
       res.status(500).json({
-        message: "Error creating user",
+        message: "Error verifying user",
         error: error instanceof Error ? error.message : "Unknown error"
       });
       return;
@@ -72,12 +81,41 @@ class AppController implements Controller {
 
   private async sendOTPEmail(req: Request, res: Response): Promise<void> {
     try {
-      const { email } = req.body;
+      const decoded = authTokenFromHeader(req, res) as JwtPayload;
+      const userId = decoded.userId;
+      const user = await checkUserId(userId);
+      if (!user.data) {
+        res.status(404).json({ message: "User data not found" });
+        return;
+      }
+      const email = (user.data as unknown as { email: string }).email;
       const result = await this.appServices.sendOTPEmailService(email);
       res.status(result.status).json(result);
     } catch (error: unknown) {
+      console.log(error);
       res.status(500).json({
-        message: "Error creating user",
+        message: "Error sending OTP email",
+        error: error instanceof Error ? error.message : "Unknown error"
+      });
+    }
+  }
+
+  private async verifyOTPEmail(req: Request, res: Response): Promise<void> {
+    try {
+      const { otp } = req.body;
+      const decoded = authTokenFromHeader(req, res) as JwtPayload;
+      const userId = decoded.userId;
+      const user = await checkUserId(userId);
+      if (!user.data) {
+        res.status(404).json({ message: "User data not found" });
+      }
+      const email = (user.data as unknown as { email: string }).email;
+      const result = await this.appServices.verifyOTPEmailService(email, otp);
+      res.status(result.status).json(result);
+    } catch (error: unknown) {
+      console.log(error);
+      res.status(500).json({
+        message: "Error verifying OTP email",
         error: error instanceof Error ? error.message : "Unknown error"
       });
     }
