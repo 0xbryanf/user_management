@@ -3,6 +3,8 @@ import { checkUsername } from "functions/checkUsername";
 import { createRole } from "functions/createRole";
 import { createUser } from "functions/createUser";
 import { sendOTPEmail } from "functions/sendOTPEmail";
+import { testRedisConnection } from "functions/testRedisConnection";
+import { verifyOTPEmail } from "functions/verifyOTPEmail";
 import { verifyUser } from "functions/verifyUser";
 import { DataTypes } from "sequelize";
 
@@ -44,7 +46,9 @@ export const SchemaUserManagement = {
       createUser,
       verifyUser,
       checkUsername,
-      sendOTPEmail
+      sendOTPEmail,
+      testRedisConnection,
+      verifyOTPEmail
     }
   },
   Roles: {

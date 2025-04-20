@@ -3,7 +3,6 @@ import AppServices from "./services/appServices";
 import { Controller } from "types/controller";
 import { CreateUser } from "types/createUser";
 import "dotenv/config";
-import { generateOtpEmailHtml } from "utils/otpTemplate";
 import { generateToken } from "utils/generateToken";
 import { authenticateToken } from "lib/middleware/authenticateToken";
 
@@ -74,19 +73,7 @@ class AppController implements Controller {
   private async sendOTPEmail(req: Request, res: Response): Promise<void> {
     try {
       const { email } = req.body;
-      const { SENDGRID_OTP_EMAIL: from } = process.env;
-
-      const otp = Math.floor(100000 + Math.random() * 900000).toString();
-      const subject = `Your One Time OTP Code - ${otp}`;
-      const html = generateOtpEmailHtml(otp);
-
-      const result = await this.appServices.sendOTPEmailService(
-        email,
-        from!,
-        subject,
-        html
-      );
-
+      const result = await this.appServices.sendOTPEmailService(email);
       res.status(result.status).json(result);
     } catch (error: unknown) {
       res.status(500).json({

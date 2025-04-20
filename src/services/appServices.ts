@@ -12,19 +12,8 @@ class AppServices {
     return await verifyUserService(email, password);
   }
 
-  public async sendOTPEmailService(
-    to: string,
-    from: string,
-    subject: string,
-    html: string
-  ) {
-    const values = {
-      to,
-      from,
-      subject,
-      html
-    };
-    return await sendOTPEmailService(values);
+  public async sendOTPEmailService(to: string) {
+    return await sendOTPEmailService(to);
   }
 }
 

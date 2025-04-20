@@ -3,4 +3,5 @@ export interface SendEmailInput {
   from: string;
   subject: string;
   html: string;
+  otp?: string;
 }

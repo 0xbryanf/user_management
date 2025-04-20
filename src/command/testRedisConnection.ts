@@ -3,9 +3,10 @@ export default {
     {
       schema: "User_Management",
       model: "Users",
-      action: "sendOTPEmail",
+      action: "testRedis",
       values: {
-        to: "bjfactor041789@gmail.com"
+        key: "otp:test@getMaxListeners.com",
+        value: "123456"
       }
     }
   ]
