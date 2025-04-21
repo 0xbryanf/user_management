@@ -1,29 +1,44 @@
 "use client";
 
-import { FormEvent, useState } from "react";
+import { FormEvent, useState, useEffect } from "react";
 import axios, { AxiosError } from "axios";
 import { useRouter } from "next/navigation";
 import { toast, Toaster } from "react-hot-toast";
 import LoginForm from "@/components/organisms/loginForm";
+import { signIn } from "next-auth/react";
 
 export default function LoginPage() {
   const router = useRouter();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const [csrfToken, setCsrfToken] = useState(""); // Added state for csrfToken
 
-  async function basicAuthLogin(event: FormEvent<HTMLFormElement>) {
+  useEffect(() => {
+    const fetchCsrfToken = async () => {
+      try {
+        const res = await axios.get("/api/auth/csrf");
+        setCsrfToken(res.data.csrfToken);
+      } catch (error) {
+        throw new Error("Failed to fetch CSRF token");
+      }
+    };
+
+    fetchCsrfToken();
+  }, []);
+
+  const handleCredentialsLogin = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setLoading(true);
 
-    const formData = new FormData(event.currentTarget);
-    const email = formData.get("email") as string;
-    const password = formData.get("password") as string;
     try {
-      const response = await axios.post("/api/basic-auth", {
+      const response = await signIn("credentials", {
         email,
-        password
+        password,
+        redirect: false
       });
 
-      if (response.status === 200) {
+      if (response) {
         toast.success(
           "Credentials accepted. Continue to verify your identity.",
           {
@@ -50,8 +65,6 @@ export default function LoginPage() {
       const message =
         err.response?.data?.message || "An error occurred. Please try again.";
 
-      console.error("Login error:", err);
-
       if (status === 401) {
         toast.error("Invalid credentials. Please try again.", {
           duration: 1000,
@@ -71,7 +84,7 @@ export default function LoginPage() {
 
       setLoading(false);
     }
-  }
+  };
 
   return (
     <>
@@ -83,7 +96,15 @@ export default function LoginPage() {
         </div>
 
         <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
-          <LoginForm onSubmit={basicAuthLogin} loading={loading} />
+          <LoginForm
+            onSubmit={handleCredentialsLogin}
+            loading={loading}
+            email={email}
+            password={password}
+            setEmail={setEmail}
+            setPassword={setPassword}
+            csrfToken={csrfToken} // Pass csrfToken to LoginForm
+          />
 
           <p className="mt-10 text-center text-sm text-gray-500">
             Not a member?{" "}

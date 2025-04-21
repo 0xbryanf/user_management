@@ -3,9 +3,13 @@ import Input from "@/components/atoms/input";
 import Label from "@/components/atoms/label";
 import IconToggle from "@/components/atoms/iconToggle";
 
-const PasswordField = () => {
+type PasswordFieldProps = {
+  value: string;
+  onChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
+};
+
+const PasswordField = ({ value, onChange }: PasswordFieldProps) => {
   const [showPassword, setShowPassword] = useState(false);
-  const [passwordValue, setPasswordValue] = useState("");
 
   const toggleVisibility = () => setShowPassword(!showPassword);
 
@@ -25,12 +29,12 @@ const PasswordField = () => {
           id="password"
           name="password"
           type={showPassword ? "text" : "password"}
-          value={passwordValue}
-          onChange={(e) => setPasswordValue(e.target.value)}
+          value={value}
+          onChange={onChange}
           autoComplete="current-password"
           required
         />
-        {passwordValue && (
+        {value && (
           <IconToggle isVisible={showPassword} onClick={toggleVisibility} />
         )}
       </div>

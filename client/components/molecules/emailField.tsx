@@ -2,7 +2,12 @@ import React from "react";
 import Input from "@/components/atoms/input";
 import Label from "@/components/atoms/label";
 
-const EmailField = ({ ...props }) => (
+type EmailFieldProps = {
+  value: string;
+  onChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
+};
+
+const EmailField = ({ value, onChange }: EmailFieldProps) => (
   <div>
     <Label htmlFor="email">Email address</Label>
     <div className="mt-2">
@@ -12,6 +17,8 @@ const EmailField = ({ ...props }) => (
         type="email"
         autoComplete="email"
         required
+        value={value}
+        onChange={onChange}
       />
     </div>
   </div>

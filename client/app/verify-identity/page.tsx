@@ -44,9 +44,6 @@ export default function VerifyIdentityPage() {
       const status = err.response?.status;
       const message =
         err.response?.data?.message || "An error occurred. Please try again.";
-
-      console.error("Login error:", err);
-
       if (status === 401) {
         toast.error("Invalid credentials. Please try again.", {
           duration: 1000,
