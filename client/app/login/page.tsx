@@ -6,13 +6,43 @@ import { useRouter } from "next/navigation";
 import { toast, Toaster } from "react-hot-toast";
 import LoginForm from "@/components/organisms/loginForm";
 import { signIn } from "next-auth/react";
+import Button from "@/components/atoms/button";
+import { FcGoogle } from "react-icons/fc";
 
 export default function LoginPage() {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
-  const [csrfToken, setCsrfToken] = useState(""); // Added state for csrfToken
+  const [csrfToken, setCsrfToken] = useState("");
+
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const callbackUrl = urlParams.get("callbackUrl");
+    const error = urlParams.get("error");
+
+    if (error) {
+      let message = "Something went wrong. Please try again.";
+
+      if (error === "Callback") {
+        message = "Login failed. Please verify your account.";
+      } else if (error === "OAuthAccountNotLinked") {
+        message = "Email already exists. Please sign in using the same method.";
+      }
+
+      toast.error(message, {
+        duration: 2000,
+        style: { fontSize: "16px" }
+      });
+    }
+
+    // Optionally, remove query params if needed
+    if (callbackUrl) {
+      const url = new URL(window.location.href);
+      url.searchParams.delete("error");
+      window.history.replaceState({}, "", url.toString());
+    }
+  }, []);
 
   useEffect(() => {
     const fetchCsrfToken = async () => {
@@ -38,7 +68,7 @@ export default function LoginPage() {
         redirect: false
       });
 
-      if (response) {
+      if (response?.ok) {
         toast.success(
           "Credentials accepted. Continue to verify your identity.",
           {
@@ -86,6 +116,12 @@ export default function LoginPage() {
     }
   };
 
+  const handleGoogleLogin = () => {
+    signIn("google", {
+      callbackUrl: "/"
+    });
+  };
+
   return (
     <>
       <div className="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8">
@@ -105,6 +141,25 @@ export default function LoginPage() {
             setPassword={setPassword}
             csrfToken={csrfToken} // Pass csrfToken to LoginForm
           />
+
+          <div className="flex items-center gap-4 my-10">
+            <hr className="flex-grow border-gray-300" />
+            <span className="text-gray-500 text-sm">or</span>
+            <hr className="flex-grow border-gray-300" />
+          </div>
+
+          <Button
+            disabled={loading}
+            onClick={() => handleGoogleLogin()}
+            className={`flex w-full justify-center gap-2 px-4 py-2 rounded-md bg-white text-black border border-gray-300 hover:bg-gray-100 transition text-base ${
+              loading
+                ? "opacity-50 cursor-not-allowed"
+                : "hover:bg-opacity-80 hover:shadow-lg hover:cursor-pointer"
+            }`}
+          >
+            <FcGoogle className="text-xl" />
+            <span>Continue with Google</span>
+          </Button>
 
           <p className="mt-10 text-center text-sm text-gray-500">
             Not a member?{" "}

@@ -4,6 +4,7 @@ import Button from "@/components/atoms/button";
 import { FcGoogle } from "react-icons/fc";
 import EmailField from "../molecules/emailField";
 import CsrfTokenField from "../molecules/csrfTokenField";
+import { signIn } from "next-auth/react";
 
 type LoginFormProps = {
   onSubmit: (event: React.FormEvent<HTMLFormElement>) => void;
@@ -44,25 +45,6 @@ const LoginForm = ({
         Sign in
       </Button>
     </form>
-
-    <div className="flex items-center gap-4 my-10">
-      <hr className="flex-grow border-gray-300" />
-      <span className="text-gray-500 text-sm">or</span>
-      <hr className="flex-grow border-gray-300" />
-    </div>
-
-    <Button
-      disabled={loading}
-      // onClick={() => signIn("google")}
-      className={`flex w-full justify-center gap-2 px-4 py-2 rounded-md bg-white text-black border border-gray-300 hover:bg-gray-100 transition text-base ${
-        loading
-          ? "opacity-50 cursor-not-allowed"
-          : "hover:bg-opacity-80 hover:shadow-lg hover:cursor-pointer"
-      }`}
-    >
-      <FcGoogle className="text-xl" />
-      <span>Continue with Google</span>
-    </Button>
   </>
 );
 

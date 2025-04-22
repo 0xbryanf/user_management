@@ -30,7 +30,7 @@ export default function VerifyIdentityPage() {
 
         // Delay for better UX before redirect
         setTimeout(() => {
-          router.push("/home");
+          router.push("/");
         }, 1000);
       } else {
         toast.error("Invalid credentials. Please try again.", {

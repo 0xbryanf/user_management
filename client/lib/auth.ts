@@ -51,33 +51,62 @@ export const authOptions: AuthOptions = {
       }
     }),
     GoogleProvider({
-      clientId: process.env.GOOGLE_CLIENT_ID!,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET!
+      clientId: process.env.GOOGLE_CLIENT_ID as string,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
+      authorization: {
+        params: {
+          prompt: "consent",
+          access_type: "offline",
+          response_type: "code",
+          scope: [
+            "openid",
+            "https://www.googleapis.com/auth/userinfo.profile",
+            "https://www.googleapis.com/auth/userinfo.email"
+          ].join(" ")
+        }
+      }
     }),
     GitHubProvider({
-      clientId: process.env.GITHUB_CLIENT_ID!,
-      clientSecret: process.env.GITHUB_CLIENT_SECRET!
+      clientId: process.env.GITHUB_CLIENT_ID as string,
+      clientSecret: process.env.GITHUB_CLIENT_SECRET as string
     })
   ],
   session: {
     maxAge: 12 * 60 * 60, // 12 hours in seconds
-    strategy: "jwt" // Use JWT-based session strategy
+    strategy: "jwt"
+  },
+  pages: {
+    signIn: "/login",
+    error: "/login"
   },
   callbacks: {
-    async jwt({ token, user }) {
-      if (user?.id) {
+    async jwt({ token, user, account }) {
+      if (account && user) {
         token.id = user.id;
-        token.accessToken = user.id;
+        token.email = user.email;
+        if (account.provider === "google" && user.email) {
+          try {
+            const verifyRes = await fetch(VERIFY_USER_URL, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ email: user.email })
+            });
+            if (!verifyRes.ok) {
+              throw new Error("User verification failed");
+            }
+          } catch (error) {
+            return Promise.reject("OAuth user verification failed");
+          }
+        }
       }
       return token;
     },
     async session({ session, token }) {
-      if (token?.accessToken) {
-        return {
-          ...session,
-          accessToken: token.accessToken
-        };
+      if (session.user) {
+        (session.user as any).id = token.id as string;
+        session.user.email = token.email as string;
       }
+      (session as any).accessToken = token.accessToken as string;
       return session;
     }
   }
