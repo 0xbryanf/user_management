@@ -58,7 +58,9 @@ export const SchemaUserManagement = {
       verifyOTPEmail
     }
   },
+
   Credentials: {},
+
   Roles: {
     descriptor: {
       role_id: {
@@ -100,6 +102,7 @@ export const SchemaUserManagement = {
       assignRole
     }
   },
+
   UserRoles: {
     descriptor: {
       user_role_id: {
@@ -116,14 +119,17 @@ export const SchemaUserManagement = {
         type: DataTypes.UUID,
         allowNull: false
       },
-      crated_by: {
-        type: DataTypes.UUID
+      created_by: {
+        type: DataTypes.UUID,
+        allowNull: true
       },
       updated_by: {
-        type: DataTypes.UUID
+        type: DataTypes.UUID,
+        allowNull: true
       },
       deleted_by: {
-        type: DataTypes.UUID
+        type: DataTypes.UUID,
+        allowNull: true
       }
     },
     modelOptions: {
@@ -133,7 +139,14 @@ export const SchemaUserManagement = {
       updatedAt: "updated_at",
       paranoid: true,
       deletedAt: "deleted_at",
-      underscored: true
+      underscored: true,
+      indexes: [
+        {
+          unique: true,
+          fields: ["user_id", "role_id"],
+          name: "uq_user_roles_user_id_role_id"
+        }
+      ]
     },
     relation: {},
     actions: {}
