@@ -17,29 +17,29 @@ export const SchemaUserManagement = {
         primaryKey: true,
         defaultValue: DataTypes.UUIDV4
       },
-      username: {
-        type: DataTypes.TEXT,
-        allowNull: false
-      },
-      password_hash: {
-        type: DataTypes.TEXT,
-        allowNull: false
-      },
-      email: {
-        type: DataTypes.TEXT,
-        allowNull: false
-      },
-      created_at: {
-        type: DataTypes.DATE,
-        defaultValue: DataTypes.NOW
-      },
-      updated_at: {
-        type: DataTypes.DATE,
-        defaultValue: DataTypes.NOW
+      is_active: {
+        type: DataTypes.BOOLEAN,
+        allowNull: false,
+        defaultValue: true
       },
       last_login: {
-        type: DataTypes.DATE
+        type: DataTypes.DATE,
+        allowNull: true
+      },
+      updated_by: {
+        type: DataTypes.UUID
+      },
+      deleted_by: {
+        type: DataTypes.UUID
       }
+    },
+    modelOptions: {
+      tableName: "users",
+      timestamps: true,
+      updatedAt: "updated_at",
+      paranoid: true,
+      deletedAt: "deleted_at",
+      underscored: true
     },
     relation: {},
     actions: {
@@ -51,30 +51,41 @@ export const SchemaUserManagement = {
       verifyOTPEmail
     }
   },
+  Credentials: {},
   Roles: {
     descriptor: {
       role_id: {
         type: DataTypes.UUID,
+        allowNull: false,
         primaryKey: true,
         defaultValue: DataTypes.UUIDV4
       },
       role_name: {
-        type: DataTypes.TEXT
-      },
-      created_at: {
-        type: DataTypes.DATE,
-        defaultValue: DataTypes.NOW
+        type: DataTypes.STRING(100),
+        allowNull: false,
+        unique: true
       },
       created_by: {
-        type: DataTypes.UUID
-      },
-      updated_at: {
-        type: DataTypes.DATE,
-        defaultValue: DataTypes.NOW
+        type: DataTypes.UUID,
+        allowNull: true
       },
       updated_by: {
-        type: DataTypes.UUID
+        type: DataTypes.UUID,
+        allowNull: true
+      },
+      deleted_by: {
+        type: DataTypes.UUID,
+        allowNull: true
       }
+    },
+    modelOptions: {
+      tableName: "roles",
+      timestamps: true,
+      createdAt: "created_at",
+      updatedAt: "updated_at",
+      paranoid: true,
+      deletedAt: "deleted_at",
+      underscored: true
     },
     relation: {},
     actions: {
