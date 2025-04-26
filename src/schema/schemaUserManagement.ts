@@ -58,63 +58,6 @@ export const SchemaUserManagement = {
       verifyOTPEmail
     }
   },
-  Credentials: {
-    descriptor: {
-      credential_id: {
-        type: DataTypes.UUID,
-        allowNull: false,
-        primaryKey: true,
-        defaultValue: DataTypes.UUIDV4
-      },
-      user_id: {
-        type: DataTypes.UUID,
-        allowNull: false
-      },
-      email: {
-        type: DataTypes.STRING(254),
-        allowNull: false,
-        unique: true
-      },
-      password_hash: {
-        type: DataTypes.STRING(255),
-        allowNull: false
-      },
-      created_by: {
-        type: DataTypes.UUID,
-        allowNull: true
-      },
-      updated_by: {
-        type: DataTypes.UUID,
-        allowNull: true
-      },
-      deleted_by: {
-        type: DataTypes.UUID,
-        allowNull: true
-      }
-    },
-    modelOptions: {
-      tableName: "credentials",
-      timestamps: true, // adds created_at & updated_at
-      createdAt: "created_at",
-      updatedAt: "updated_at",
-      paranoid: true, // adds deleted_at
-      deletedAt: "deleted_at",
-      underscored: true, // snake_case columns
-      indexes: [
-        {
-          unique: true,
-          fields: ["email"],
-          name: "uq_credentials_email"
-        },
-        {
-          fields: ["user_id"],
-          name: "idx_credentials_user_id"
-        }
-      ]
-    },
-    relation: {},
-    actions: {}
-  },
   Roles: {
     descriptor: {
       role_id: {
@@ -198,6 +141,128 @@ export const SchemaUserManagement = {
           unique: true,
           fields: ["user_id", "role_id"],
           name: "uq_user_roles_user_id_role_id"
+        }
+      ]
+    },
+    relation: {},
+    actions: {}
+  },
+  OAuthProviders: {
+    descriptor: {
+      oauth_provider_id: {
+        type: DataTypes.UUID,
+        allowNull: false,
+        primaryKey: true,
+        defaultValue: DataTypes.UUIDV4
+      },
+      user_id: {
+        type: DataTypes.UUID,
+        allowNull: false
+      },
+      email: {
+        type: DataTypes.STRING(254),
+        allowNull: false
+      },
+      provider: {
+        type: DataTypes.STRING(50),
+        allowNull: false
+      },
+      provider_user_id: {
+        type: DataTypes.STRING(255),
+        allowNull: false
+      },
+      email_verified: {
+        type: DataTypes.BOOLEAN,
+        allowNull: false,
+        defaultValue: false
+      },
+      created_by: {
+        type: DataTypes.UUID,
+        allowNull: true
+      },
+      updated_by: {
+        type: DataTypes.UUID,
+        allowNull: true
+      },
+      deleted_by: {
+        type: DataTypes.UUID,
+        allowNull: true
+      }
+    },
+    modelOptions: {
+      tableName: "oauth_providers",
+      timestamps: true,
+      createdAt: "created_at",
+      updatedAt: "updated_at",
+      paranoid: true,
+      deletedAt: "deleted_at",
+      underscored: true,
+      indexes: [
+        {
+          unique: true,
+          fields: ["provider", "provider_user_id"],
+          name: "uq_oauth_providers_provider_user"
+        },
+        {
+          fields: ["user_id"],
+          name: "idx_oauth_providers_user_id"
+        }
+      ]
+    },
+    relation: {},
+    actions: {}
+  },
+  Credentials: {
+    descriptor: {
+      credential_id: {
+        type: DataTypes.UUID,
+        allowNull: false,
+        primaryKey: true,
+        defaultValue: DataTypes.UUIDV4
+      },
+      user_id: {
+        type: DataTypes.UUID,
+        allowNull: false
+      },
+      email: {
+        type: DataTypes.STRING(254),
+        allowNull: false,
+        unique: true
+      },
+      password_hash: {
+        type: DataTypes.STRING(255),
+        allowNull: false
+      },
+      created_by: {
+        type: DataTypes.UUID,
+        allowNull: true
+      },
+      updated_by: {
+        type: DataTypes.UUID,
+        allowNull: true
+      },
+      deleted_by: {
+        type: DataTypes.UUID,
+        allowNull: true
+      }
+    },
+    modelOptions: {
+      tableName: "credentials",
+      timestamps: true,
+      createdAt: "created_at",
+      updatedAt: "updated_at",
+      paranoid: true,
+      deletedAt: "deleted_at",
+      underscored: true,
+      indexes: [
+        {
+          unique: true,
+          fields: ["email"],
+          name: "uq_credentials_email"
+        },
+        {
+          fields: ["user_id"],
+          name: "idx_credentials_user_id"
         }
       ]
     },

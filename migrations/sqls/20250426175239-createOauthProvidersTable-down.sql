@@ -1,0 +1,1 @@
+DROP TABLE IF EXISTS user_management.oauth_providers;
