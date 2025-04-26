@@ -26,16 +26,23 @@ export const SchemaUserManagement = {
         type: DataTypes.DATE,
         allowNull: true
       },
+      created_by: {
+        type: DataTypes.UUID,
+        allowNull: true
+      },
       updated_by: {
-        type: DataTypes.UUID
+        type: DataTypes.UUID,
+        allowNull: true
       },
       deleted_by: {
-        type: DataTypes.UUID
+        type: DataTypes.UUID,
+        allowNull: true
       }
     },
     modelOptions: {
       tableName: "users",
       timestamps: true,
+      createdAt: "created_at",
       updatedAt: "updated_at",
       paranoid: true,
       deletedAt: "deleted_at",
@@ -95,7 +102,7 @@ export const SchemaUserManagement = {
   },
   UserRoles: {
     descriptor: {
-      id: {
+      user_role_id: {
         type: DataTypes.UUID,
         allowNull: false,
         primaryKey: true,
@@ -109,14 +116,24 @@ export const SchemaUserManagement = {
         type: DataTypes.UUID,
         allowNull: false
       },
-      created_at: {
-        type: DataTypes.DATE,
-        defaultValue: DataTypes.NOW
+      crated_by: {
+        type: DataTypes.UUID
       },
-      updated_at: {
-        type: DataTypes.DATE,
-        defaultValue: DataTypes.NOW
+      updated_by: {
+        type: DataTypes.UUID
+      },
+      deleted_by: {
+        type: DataTypes.UUID
       }
+    },
+    modelOptions: {
+      tableName: "user_roles",
+      timestamps: true,
+      createdAt: "created_at",
+      updatedAt: "updated_at",
+      paranoid: true,
+      deletedAt: "deleted_at",
+      underscored: true
     },
     relation: {},
     actions: {}
