@@ -268,5 +268,53 @@ export const SchemaUserManagement = {
     },
     relation: {},
     actions: {}
+  },
+  PasswordHistory: {
+    descriptor: {
+      password_history_id: {
+        type: DataTypes.UUID,
+        allowNull: false,
+        primaryKey: true,
+        defaultValue: DataTypes.UUIDV4
+      },
+      user_id: {
+        type: DataTypes.UUID,
+        allowNull: false
+      },
+      credential_id: {
+        type: DataTypes.UUID,
+        allowNull: false
+      },
+      password_hash: {
+        type: DataTypes.STRING(255),
+        allowNull: false
+      },
+      changed_by: {
+        type: DataTypes.UUID,
+        allowNull: true
+      },
+      changed_at: {
+        type: DataTypes.DATE,
+        allowNull: false,
+        defaultValue: DataTypes.NOW
+      }
+    },
+    modelOptions: {
+      tableName: "password_history",
+      timestamps: false,
+      underscored: true,
+      indexes: [
+        {
+          fields: ["user_id"],
+          name: "idx_password_history_user_id"
+        },
+        {
+          fields: ["credential_id"],
+          name: "idx_password_history_credential_id"
+        }
+      ]
+    },
+    relation: {},
+    actions: {}
   }
 };
