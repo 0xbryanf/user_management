@@ -58,9 +58,63 @@ export const SchemaUserManagement = {
       verifyOTPEmail
     }
   },
-
-  Credentials: {},
-
+  Credentials: {
+    descriptor: {
+      credential_id: {
+        type: DataTypes.UUID,
+        allowNull: false,
+        primaryKey: true,
+        defaultValue: DataTypes.UUIDV4
+      },
+      user_id: {
+        type: DataTypes.UUID,
+        allowNull: false
+      },
+      email: {
+        type: DataTypes.STRING(254),
+        allowNull: false,
+        unique: true
+      },
+      password_hash: {
+        type: DataTypes.STRING(255),
+        allowNull: false
+      },
+      created_by: {
+        type: DataTypes.UUID,
+        allowNull: true
+      },
+      updated_by: {
+        type: DataTypes.UUID,
+        allowNull: true
+      },
+      deleted_by: {
+        type: DataTypes.UUID,
+        allowNull: true
+      }
+    },
+    modelOptions: {
+      tableName: "credentials",
+      timestamps: true, // adds created_at & updated_at
+      createdAt: "created_at",
+      updatedAt: "updated_at",
+      paranoid: true, // adds deleted_at
+      deletedAt: "deleted_at",
+      underscored: true, // snake_case columns
+      indexes: [
+        {
+          unique: true,
+          fields: ["email"],
+          name: "uq_credentials_email"
+        },
+        {
+          fields: ["user_id"],
+          name: "idx_credentials_user_id"
+        }
+      ]
+    },
+    relation: {},
+    actions: {}
+  },
   Roles: {
     descriptor: {
       role_id: {
@@ -102,7 +156,6 @@ export const SchemaUserManagement = {
       assignRole
     }
   },
-
   UserRoles: {
     descriptor: {
       user_role_id: {
