@@ -56,7 +56,7 @@ export const registerInitCredentials = async (
   const newUser = await UsersModel.create({
     user_id: userId,
     is_active: false,
-    created_by: userId
+    created_by: values.createdBy ? values.createdBy : userId
   });
 
   if (!newUser) {
@@ -70,7 +70,7 @@ export const registerInitCredentials = async (
     user_id: newUser.dataValues.user_id,
     email: values.email,
     password_hash: password_hash,
-    created_by: userId
+    created_by: values.createdBy ? values.createdBy : userId
   });
 
   await UserRolesModel.create({
