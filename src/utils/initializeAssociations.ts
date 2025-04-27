@@ -2,7 +2,7 @@ import { loadSchemaModel } from "./loadSchemaModel";
 
 export const initializeAssociations = async () => {
   // load from the lowercase schema (Postgres is case-sensitive for unquoted identifiers)
-  const schema = "user_management";
+  const schema = "User_Management";
 
   const UsersModel = await loadSchemaModel(schema, "Users");
   const CredentialsModel = await loadSchemaModel(schema, "Credentials");

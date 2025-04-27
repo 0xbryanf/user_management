@@ -3,3 +3,8 @@ export interface CreateUser {
   email: string;
   password: string;
 }
+
+export interface RegisterCredentialsInitUser {
+  email: string;
+  password: string;
+}

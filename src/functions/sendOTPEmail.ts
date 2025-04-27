@@ -32,11 +32,17 @@ export const sendOTPEmail = async (values: { to: string }) => {
 
     if (response[0].statusCode === 202) {
       const redisKey = hashValue(`otp_key:${to}`);
+
+      const otpData = {
+        otp: hashValue(`otp_value:${otp}`),
+        retries: 0
+      };
+
       await redisClient.set(
         redisKey,
-        hashValue(`otp_value:${otp}`),
+        JSON.stringify(otpData),
         "EX",
-        15 * 60 // 15 minutes expiration
+        5 * 60 // 5 minutes expiration
       );
     }
 

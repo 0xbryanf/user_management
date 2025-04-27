@@ -1,24 +1,20 @@
 import axios from "axios";
 import { NextRequest, NextResponse } from "next/server";
-import { getToken } from "next-auth/jwt";
 
-const NEXTAUTH_SECRET = process.env.NEXTAUTH_SECRET as string;
+const REGISTER_INIT_URL = `${process.env.BASE_URL}/register-init`;
 
 export async function POST(request: NextRequest) {
-  const { otp } = await request.json();
-  const token = await getToken({ req: request, secret: NEXTAUTH_SECRET });
-  const payloadref = token?.id;
-  if (!payloadref) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  const { email, password } = await request.json();
+  if (!email || !password) {
+    return NextResponse.json({ error: "Missing credentials" }, { status: 401 });
   }
   try {
     const res = await axios.post(
-      "http://localhost:8080/api/v1/verify-otp-email",
-      { otp },
+      REGISTER_INIT_URL,
+      { email, password },
       {
         headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${payloadref}`
+          "Content-Type": "application/json"
         }
       }
     );

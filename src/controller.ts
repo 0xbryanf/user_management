@@ -1,7 +1,7 @@
 import { Router, Request, Response } from "express";
 import AppServices from "./services/appServices";
 import { Controller } from "types/controller";
-import { CreateUser } from "types/createUser";
+import { CreateUser, RegisterCredentialsInitUser } from "types/createUser";
 import "dotenv/config";
 import { generateToken } from "utils/generateToken";
 import { authenticateToken } from "lib/middleware/authenticateToken";
@@ -23,6 +23,11 @@ class AppController implements Controller {
     this.router.post(
       `${this.path}/${this.version}/create-user`,
       this.createUserHandler.bind(this)
+    );
+
+    this.router.post(
+      `${this.path}/${this.version}/register-init-credentials`,
+      this.registerInitCredentialsHandler.bind(this)
     );
 
     this.router.post(
@@ -51,6 +56,23 @@ class AppController implements Controller {
     } catch (error: unknown) {
       res.status(500).json({
         message: "Error creating user",
+        error: error instanceof Error ? error.message : "Unknown error"
+      });
+    }
+  }
+
+  private async registerInitCredentialsHandler(
+    req: Request,
+    res: Response
+  ): Promise<void> {
+    try {
+      const userData: RegisterCredentialsInitUser = req.body;
+      const result =
+        await this.appServices.registerInitCredentialService(userData);
+      res.status(result.status).json(result);
+    } catch (error: unknown) {
+      res.status(500).json({
+        message: "Error initial registration of user",
         error: error instanceof Error ? error.message : "Unknown error"
       });
     }
