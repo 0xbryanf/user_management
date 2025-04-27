@@ -4,15 +4,16 @@ import { FormEvent, useState, useEffect } from "react";
 import axios, { AxiosError } from "axios";
 import { useRouter } from "next/navigation";
 import { toast, Toaster } from "react-hot-toast";
-import LoginForm from "@/components/organisms/loginForm";
 import { signIn } from "next-auth/react";
 import Button from "@/components/atoms/button";
 import { FcGoogle } from "react-icons/fc";
+import SignUpForm from "@/components/organisms/signUpForm";
 
-export default function LoginPage() {
+export default function SignUpPage() {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [csrfToken, setCsrfToken] = useState("");
 
@@ -127,27 +128,14 @@ export default function LoginPage() {
       <div className="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8">
         <div className="sm:mx-auto sm:w-full sm:max-w-sm">
           <h2 className="mt-10 text-center text-2xl font-bold tracking-tight text-gray-900">
-            Sign in to your account
+            Create Your Account!
           </h2>
+          <div className="text-center text-sm tracking-tight text-gray-600">
+            It's free and take only a minute.
+          </div>
         </div>
 
-        <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
-          <LoginForm
-            onSubmit={handleCredentialsLogin}
-            loading={loading}
-            email={email}
-            password={password}
-            setEmail={setEmail}
-            setPassword={setPassword}
-            csrfToken={csrfToken} // Pass csrfToken to LoginForm
-          />
-
-          <div className="flex items-center gap-4 my-10">
-            <hr className="flex-grow border-gray-300" />
-            <span className="text-gray-500 text-sm">or</span>
-            <hr className="flex-grow border-gray-300" />
-          </div>
-
+        <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-sm">
           <Button
             disabled={loading}
             onClick={() => handleGoogleLogin()}
@@ -158,16 +146,34 @@ export default function LoginPage() {
             }`}
           >
             <FcGoogle className="text-xl" />
-            <span>Continue with Google</span>
+            <span>Sign-up with Google</span>
           </Button>
 
+          <div className="flex items-center gap-4 my-8">
+            <hr className="flex-grow border-gray-300" />
+            <span className="text-gray-500 text-sm">or</span>
+            <hr className="flex-grow border-gray-300" />
+          </div>
+
+          <SignUpForm
+            onSubmit={handleCredentialsLogin}
+            loading={loading}
+            email={email}
+            password={password}
+            confirmPassword={confirmPassword}
+            setEmail={setEmail}
+            setPassword={setPassword}
+            setConfirmPassword={setConfirmPassword}
+            csrfToken={csrfToken} // Pass csrfToken to LoginForm
+          />
+
           <p className="mt-10 text-center text-sm text-gray-500">
-            Not a member?{" "}
+            Got an account?{" "}
             <a
-              href="/sign-up"
+              href="/login"
               className="font-semibold text-blue-600 hover:text-blue-500"
             >
-              Sign up now while it's still free!
+              Sign in now
             </a>
           </p>
         </div>

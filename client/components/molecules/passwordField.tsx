@@ -3,7 +3,7 @@ import Input from "@/components/atoms/input";
 import Label from "@/components/atoms/label";
 import IconToggle from "@/components/atoms/iconToggle";
 
-type PasswordFieldProps = {
+export type PasswordFieldProps = {
   value: string;
   onChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
 };
@@ -15,16 +15,7 @@ const PasswordField = ({ value, onChange }: PasswordFieldProps) => {
 
   return (
     <div>
-      <div className="flex items-center justify-between">
-        <Label htmlFor="password">Password</Label>
-        <a
-          href="#"
-          className="text-sm font-semibold text-blue-600 hover:text-blue-500"
-        >
-          Forgot password?
-        </a>
-      </div>
-      <div className="mt-2 relative">
+      <div className="mt-1 relative">
         <Input
           id="password"
           name="password"
@@ -32,6 +23,7 @@ const PasswordField = ({ value, onChange }: PasswordFieldProps) => {
           value={value}
           onChange={onChange}
           autoComplete="current-password"
+          placeholder="Password"
           required
         />
         {value && (

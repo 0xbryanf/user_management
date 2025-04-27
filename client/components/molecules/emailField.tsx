@@ -9,8 +9,7 @@ type EmailFieldProps = {
 
 const EmailField = ({ value, onChange }: EmailFieldProps) => (
   <div>
-    <Label htmlFor="email">Email address</Label>
-    <div className="mt-2">
+    <div className="mt-1">
       <Input
         id="email"
         name="email"
@@ -18,6 +17,7 @@ const EmailField = ({ value, onChange }: EmailFieldProps) => (
         autoComplete="email"
         required
         value={value}
+        placeholder="Email"
         onChange={onChange}
       />
     </div>
