@@ -9,7 +9,7 @@ import { signIn } from "next-auth/react";
 import Button from "@/components/atoms/button";
 import { FcGoogle } from "react-icons/fc";
 
-export default function LoginPage() {
+export default function SignInPage() {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -57,7 +57,7 @@ export default function LoginPage() {
     fetchCsrfToken();
   }, []);
 
-  const handleCredentialsLogin = async (event: FormEvent<HTMLFormElement>) => {
+  const handleCredentialsSignIn = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setLoading(true);
 
@@ -131,16 +131,19 @@ export default function LoginPage() {
           </h2>
         </div>
 
-        <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
-          <LoginForm
-            onSubmit={handleCredentialsLogin}
-            loading={loading}
-            email={email}
-            password={password}
-            setEmail={setEmail}
-            setPassword={setPassword}
-            csrfToken={csrfToken} // Pass csrfToken to LoginForm
-          />
+        <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-sm">
+          <Button
+            disabled={loading}
+            onClick={() => handleGoogleLogin()}
+            className={`flex w-full justify-center gap-2 px-4 py-2 rounded-md bg-white text-black border border-gray-300 hover:bg-gray-50 transition text-base ${
+              loading
+                ? "opacity-50 cursor-not-allowed"
+                : "hover:bg-opacity-30 hover:shadow-sm hover:cursor-pointer"
+            }`}
+          >
+            <FcGoogle className="text-xl" />
+            <span>Continue with Google</span>
+          </Button>
 
           <div className="flex items-center gap-4 my-10">
             <hr className="flex-grow border-gray-300" />
@@ -148,18 +151,15 @@ export default function LoginPage() {
             <hr className="flex-grow border-gray-300" />
           </div>
 
-          <Button
-            disabled={loading}
-            onClick={() => handleGoogleLogin()}
-            className={`flex w-full justify-center gap-2 px-4 py-2 rounded-md bg-white text-black border border-gray-300 hover:bg-gray-100 transition text-base ${
-              loading
-                ? "opacity-50 cursor-not-allowed"
-                : "hover:bg-opacity-80 hover:shadow-lg hover:cursor-pointer"
-            }`}
-          >
-            <FcGoogle className="text-xl" />
-            <span>Continue with Google</span>
-          </Button>
+          <LoginForm
+            onSubmit={handleCredentialsSignIn}
+            loading={loading}
+            email={email}
+            password={password}
+            setEmail={setEmail}
+            setPassword={setPassword}
+            csrfToken={csrfToken} // Pass csrfToken to LoginForm
+          />
 
           <p className="mt-10 text-center text-sm text-gray-500">
             Not a member?{" "}

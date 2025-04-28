@@ -8,6 +8,9 @@ import { signIn } from "next-auth/react";
 import Button from "@/components/atoms/button";
 import { FcGoogle } from "react-icons/fc";
 import SignUpForm from "@/components/organisms/signUpForm";
+import { calculatePasswordStrength } from "@/lib/calculatePasswordStrength";
+import { validatePasswordLive } from "@/lib/validatePassword";
+import { PasswordValidationResult } from "@/lib/type/passwordValidation";
 
 export default function SignUpPage() {
   const router = useRouter();
@@ -16,6 +19,15 @@ export default function SignUpPage() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [csrfToken, setCsrfToken] = useState("");
+  const [passwordStrength, setPasswordStrength] = useState(0);
+  const [passwordValidation, setPasswordValidation] =
+    useState<PasswordValidationResult>({
+      minLength: false,
+      hasLowercase: false,
+      hasUppercase: false,
+      hasNumber: false,
+      hasSpecialChar: false
+    });
 
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
@@ -58,8 +70,17 @@ export default function SignUpPage() {
     fetchCsrfToken();
   }, []);
 
-  const handleCredentialsLogin = async (event: FormEvent<HTMLFormElement>) => {
+  const handleCredentialsSignUp = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+
+    if (password !== confirmPassword) {
+      toast.error("Passwords do not match. Please try again.", {
+        duration: 2000,
+        style: { fontSize: "16px" }
+      });
+      return;
+    }
+
     setLoading(true);
 
     try {
@@ -117,10 +138,20 @@ export default function SignUpPage() {
     }
   };
 
-  const handleGoogleLogin = () => {
+  const handleGoogleSignUp = () => {
     signIn("google", {
       callbackUrl: "/"
     });
+  };
+
+  const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setPassword(value);
+    const strength = calculatePasswordStrength(value);
+    setPasswordStrength(strength);
+
+    const validation = validatePasswordLive(value);
+    setPasswordValidation(validation);
   };
 
   return (
@@ -138,11 +169,11 @@ export default function SignUpPage() {
         <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-sm">
           <Button
             disabled={loading}
-            onClick={() => handleGoogleLogin()}
-            className={`flex w-full justify-center gap-2 px-4 py-2 rounded-md bg-white text-black border border-gray-300 hover:bg-gray-100 transition text-base ${
+            onClick={() => handleGoogleSignUp()}
+            className={`flex w-full justify-center gap-2 px-4 py-2 rounded-md bg-white text-black border border-gray-300 hover:bg-gray-50 transition text-base ${
               loading
                 ? "opacity-50 cursor-not-allowed"
-                : "hover:bg-opacity-80 hover:shadow-lg hover:cursor-pointer"
+                : "hover:bg-opacity-30 hover:shadow-sm hover:cursor-pointer"
             }`}
           >
             <FcGoogle className="text-xl" />
@@ -156,24 +187,26 @@ export default function SignUpPage() {
           </div>
 
           <SignUpForm
-            onSubmit={handleCredentialsLogin}
+            onSubmit={handleCredentialsSignUp}
             loading={loading}
             email={email}
             password={password}
             confirmPassword={confirmPassword}
             setEmail={setEmail}
-            setPassword={setPassword}
             setConfirmPassword={setConfirmPassword}
-            csrfToken={csrfToken} // Pass csrfToken to LoginForm
+            handlePasswordChange={handlePasswordChange}
+            csrfToken={csrfToken}
+            passwordStrength={passwordStrength}
+            passwordValidation={passwordValidation}
           />
 
           <p className="mt-10 text-center text-sm text-gray-500">
-            Got an account?{" "}
+            Have an account already?{" "}
             <a
-              href="/login"
+              href="/sign-in"
               className="font-semibold text-blue-600 hover:text-blue-500"
             >
-              Sign in now
+              Log in here.
             </a>
           </p>
         </div>

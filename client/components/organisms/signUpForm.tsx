@@ -1,11 +1,12 @@
 import React from "react";
 import PasswordField from "@/components/molecules/passwordField";
 import Button from "@/components/atoms/button";
-import { FcGoogle } from "react-icons/fc";
 import EmailField from "../molecules/emailField";
 import CsrfTokenField from "../molecules/csrfTokenField";
-import { signIn } from "next-auth/react";
 import ConfirmPasswordField from "../molecules/confirmPasswordField";
+import { PasswordValidationResult } from "@/lib/type/passwordValidation";
+import PasswordRequirements from "../molecules/passwordRequirements";
+import PasswordStrengthBar from "../molecules/passwordStrengthBar";
 
 type SignUpFormProps = {
   onSubmit: (event: React.FormEvent<HTMLFormElement>) => void;
@@ -13,10 +14,12 @@ type SignUpFormProps = {
   email: string;
   setEmail: (value: string) => void;
   password: string;
-  setPassword: (value: string) => void;
   confirmPassword: string;
   setConfirmPassword: (value: string) => void;
   csrfToken: string;
+  passwordStrength: number;
+  handlePasswordChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  passwordValidation: PasswordValidationResult;
 };
 
 const SignUpForm = ({
@@ -27,21 +30,25 @@ const SignUpForm = ({
   password,
   confirmPassword,
   setConfirmPassword,
-  setPassword,
-  csrfToken
+  passwordStrength,
+  handlePasswordChange,
+  csrfToken,
+  passwordValidation
 }: SignUpFormProps) => (
   <>
     <form className="space-y-4" onSubmit={onSubmit}>
       <CsrfTokenField value={csrfToken} />
       <EmailField value={email} onChange={(e) => setEmail(e.target.value)} />
-      <PasswordField
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
+      <PasswordField value={password} onChange={handlePasswordChange} />
+      <PasswordRequirements
+        password={password}
+        validation={passwordValidation}
       />
       <ConfirmPasswordField
         value={confirmPassword}
         onChange={(e) => setConfirmPassword(e.target.value)}
       />
+      <PasswordStrengthBar passwordStrength={passwordStrength} />
       <Button
         disabled={loading}
         className={`flex w-full justify-center rounded-md bg-gradient-to-r from-blue-600 via-indigo-500 to-sky-400 bg-opacity-60 backdrop-blur-md px-3 py-2 text-base font-semibold text-white shadow-md transition duration-200 ease-in-out focus-visible:outline focus-visible:outline-offset-2 focus-visible:outline-sky-500 ${

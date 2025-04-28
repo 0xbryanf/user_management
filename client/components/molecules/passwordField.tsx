@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import Input from "@/components/atoms/input";
-import Label from "@/components/atoms/label";
 import IconToggle from "@/components/atoms/iconToggle";
+import { calculatePasswordStrength } from "@/lib/calculatePasswordStrength";
 
 export type PasswordFieldProps = {
   value: string;
