@@ -50,7 +50,6 @@ export const registerInitCredentials = async (
   }
 
   const userId = UUIDV4();
-  console.log("userId: ", userId);
   const password_hash = await hashPassword(values.password);
 
   const newUser = await UsersModel.create({
@@ -61,7 +60,7 @@ export const registerInitCredentials = async (
 
   if (!newUser) {
     return {
-      status: 409,
+      status: 408,
       message: "User identity is not present, create the user identity first."
     };
   }
@@ -75,7 +74,8 @@ export const registerInitCredentials = async (
 
   await UserRolesModel.create({
     user_id: newUser.dataValues.user_id,
-    role_id: defaultRole.dataValues.role_id
+    role_id: defaultRole.dataValues.role_id,
+    created_by: values.createdBy ? values.createdBy : userId
   });
 
   const token = generateToken(newUser.dataValues.user_id);

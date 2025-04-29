@@ -10,37 +10,28 @@ const PasswordRequirements = ({
   password,
   validation
 }: PasswordRequirementsProps) => {
-  if (!password) return null; // Don't show if password is empty
+  const requirements = [
+    { met: validation.minLength, label: "At least 8 characters" },
+    { met: validation.hasLowercase, label: "Contains a lowercase letter" },
+    { met: validation.hasUppercase, label: "Contains an uppercase letter" },
+    { met: validation.hasNumber, label: "Contains a number" },
+    { met: validation.hasSpecialChar, label: "Contains a special character" }
+  ];
+
+  // Check if all requirements are met
+  const allRequirementsMet = requirements.every((req) => req.met);
+
+  if (!password.trim() || allRequirementsMet) return null; // Hide if password empty or all valid
 
   return (
     <div className="mt-4 space-y-1 text-[10px] text-gray-600">
-      <div
-        className={validation.minLength ? "text-green-600" : "text-gray-400"}
-      >
-        {validation.minLength ? "✓" : "✗"} At least 8 characters
-      </div>
-      <div
-        className={validation.hasLowercase ? "text-green-600" : "text-gray-400"}
-      >
-        {validation.hasLowercase ? "✓" : "✗"} Contains a lowercase letter
-      </div>
-      <div
-        className={validation.hasUppercase ? "text-green-600" : "text-gray-400"}
-      >
-        {validation.hasUppercase ? "✓" : "✗"} Contains an uppercase letter
-      </div>
-      <div
-        className={validation.hasNumber ? "text-green-600" : "text-gray-400"}
-      >
-        {validation.hasNumber ? "✓" : "✗"} Contains a number
-      </div>
-      <div
-        className={
-          validation.hasSpecialChar ? "text-green-600" : "text-gray-400"
-        }
-      >
-        {validation.hasSpecialChar ? "✓" : "✗"} Contains a special character
-      </div>
+      {requirements
+        .filter((req) => !req.met) // Only show unmet requirements
+        .map((req, index) => (
+          <div key={index} className="text-gray-400">
+            ✗ {req.label}
+          </div>
+        ))}
     </div>
   );
 };

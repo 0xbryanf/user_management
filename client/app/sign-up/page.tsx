@@ -18,7 +18,6 @@ export default function SignUpPage() {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
-  const [csrfToken, setCsrfToken] = useState("");
   const [passwordStrength, setPasswordStrength] = useState(0);
   const [passwordValidation, setPasswordValidation] =
     useState<PasswordValidationResult>({
@@ -49,7 +48,6 @@ export default function SignUpPage() {
       });
     }
 
-    // Optionally, remove query params if needed
     if (callbackUrl) {
       const url = new URL(window.location.href);
       url.searchParams.delete("error");
@@ -57,24 +55,11 @@ export default function SignUpPage() {
     }
   }, []);
 
-  useEffect(() => {
-    const fetchCsrfToken = async () => {
-      try {
-        const res = await axios.get("/api/auth/csrf");
-        setCsrfToken(res.data.csrfToken);
-      } catch (error) {
-        throw new Error("Failed to fetch CSRF token");
-      }
-    };
-
-    fetchCsrfToken();
-  }, []);
-
   const handleCredentialsSignUp = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
     if (password !== confirmPassword) {
-      toast.error("Passwords do not match. Please try again.", {
+      toast.error("Passwords don't match. Please double-check and try again.", {
         duration: 2000,
         style: { fontSize: "16px" }
       });
@@ -84,15 +69,14 @@ export default function SignUpPage() {
     setLoading(true);
 
     try {
-      const response = await signIn("credentials", {
+      const response = await axios.post("/api/auth/register", {
         email,
-        password,
-        redirect: false
+        password
       });
 
-      if (response?.ok) {
+      if (response.status === 200) {
         toast.success(
-          "Credentials accepted. Continue to verify your identity.",
+          "Credentials accepted. Let's verify your identity next.",
           {
             duration: 1500,
             style: { fontSize: "16px" },
@@ -104,7 +88,7 @@ export default function SignUpPage() {
           router.push("/verify-identity");
         }, 2500);
       } else {
-        toast.error("Invalid credentials. Please try again.", {
+        toast.error("Something went wrong. Please try again.", {
           duration: 1000,
           style: { fontSize: "16px" }
         });
@@ -112,21 +96,28 @@ export default function SignUpPage() {
       }
     } catch (error) {
       const err = error as AxiosError<{ message?: string }>;
-
       const status = err.response?.status;
       const message =
-        err.response?.data?.message || "An error occurred. Please try again.";
-
+        err.response?.data?.message ||
+        "Something went wrong. Please try again.";
       if (status === 401) {
         toast.error("Invalid credentials. Please try again.", {
           duration: 1000,
           style: { fontSize: "16px" }
         });
       } else if (status === 405) {
-        toast.error("Method not allowed.", {
+        toast.error("Action not allowed. Please refresh and try again.", {
           duration: 1000,
           style: { fontSize: "16px" }
         });
+      } else if (status === 409) {
+        toast.error(
+          "If this email is already in use, we'll send you the next steps shortly.",
+          {
+            duration: 1000,
+            style: { fontSize: "16px" }
+          }
+        );
       } else {
         toast.error(message, {
           duration: 1000,
@@ -195,7 +186,6 @@ export default function SignUpPage() {
             setEmail={setEmail}
             setConfirmPassword={setConfirmPassword}
             handlePasswordChange={handlePasswordChange}
-            csrfToken={csrfToken}
             passwordStrength={passwordStrength}
             passwordValidation={passwordValidation}
           />

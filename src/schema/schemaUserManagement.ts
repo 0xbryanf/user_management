@@ -31,23 +31,26 @@ export const SchemaUserManagement = {
         type: DataTypes.UUID,
         allowNull: true
       },
+      created_at: {
+        type: DataTypes.DATE,
+        allowNull: true
+      },
       updated_by: {
         type: DataTypes.UUID,
+        allowNull: true
+      },
+      updated_at: {
+        type: DataTypes.DATE,
         allowNull: true
       },
       deleted_by: {
         type: DataTypes.UUID,
         allowNull: true
+      },
+      deleted_at: {
+        type: DataTypes.DATE,
+        allowNull: true
       }
-    },
-    modelOptions: {
-      tableName: "users",
-      timestamps: true,
-      createdAt: "created_at",
-      updatedAt: "updated_at",
-      paranoid: true,
-      deletedAt: "deleted_at",
-      underscored: true
     },
     relation: {},
     actions: {
@@ -76,23 +79,26 @@ export const SchemaUserManagement = {
         type: DataTypes.UUID,
         allowNull: true
       },
+      created_at: {
+        type: DataTypes.DATE,
+        allowNull: true
+      },
       updated_by: {
         type: DataTypes.UUID,
+        allowNull: true
+      },
+      updated_at: {
+        type: DataTypes.DATE,
         allowNull: true
       },
       deleted_by: {
         type: DataTypes.UUID,
         allowNull: true
+      },
+      deleted_at: {
+        type: DataTypes.DATE,
+        allowNull: true
       }
-    },
-    modelOptions: {
-      tableName: "roles",
-      timestamps: true,
-      createdAt: "created_at",
-      updatedAt: "updated_at",
-      paranoid: true,
-      deletedAt: "deleted_at",
-      underscored: true
     },
     relation: {},
     actions: {
@@ -120,22 +126,29 @@ export const SchemaUserManagement = {
         type: DataTypes.UUID,
         allowNull: true
       },
+      created_at: {
+        type: DataTypes.DATE,
+        allowNull: true
+      },
       updated_by: {
         type: DataTypes.UUID,
+        allowNull: true
+      },
+      updated_at: {
+        type: DataTypes.DATE,
         allowNull: true
       },
       deleted_by: {
         type: DataTypes.UUID,
         allowNull: true
+      },
+      deleted_at: {
+        type: DataTypes.DATE,
+        allowNull: true
       }
     },
     modelOptions: {
       tableName: "user_roles",
-      timestamps: true,
-      createdAt: "created_at",
-      updatedAt: "updated_at",
-      paranoid: true,
-      deletedAt: "deleted_at",
       underscored: true,
       indexes: [
         {
@@ -181,22 +194,29 @@ export const SchemaUserManagement = {
         type: DataTypes.UUID,
         allowNull: true
       },
+      created_at: {
+        type: DataTypes.DATE,
+        allowNull: true
+      },
       updated_by: {
         type: DataTypes.UUID,
+        allowNull: true
+      },
+      updated_at: {
+        type: DataTypes.DATE,
         allowNull: true
       },
       deleted_by: {
         type: DataTypes.UUID,
         allowNull: true
+      },
+      deleted_at: {
+        type: DataTypes.DATE,
+        allowNull: true
       }
     },
     modelOptions: {
       tableName: "oauth_providers",
-      timestamps: true,
-      createdAt: "created_at",
-      updatedAt: "updated_at",
-      paranoid: true,
-      deletedAt: "deleted_at",
       underscored: true,
       indexes: [
         {
@@ -238,22 +258,29 @@ export const SchemaUserManagement = {
         type: DataTypes.UUID,
         allowNull: true
       },
+      created_at: {
+        type: DataTypes.DATE,
+        allowNull: true
+      },
       updated_by: {
         type: DataTypes.UUID,
+        allowNull: true
+      },
+      updated_at: {
+        type: DataTypes.DATE,
         allowNull: true
       },
       deleted_by: {
         type: DataTypes.UUID,
         allowNull: true
+      },
+      deleted_at: {
+        type: DataTypes.DATE,
+        allowNull: true
       }
     },
     modelOptions: {
       tableName: "credentials",
-      timestamps: true,
-      createdAt: "created_at",
-      updatedAt: "updated_at",
-      paranoid: true,
-      deletedAt: "deleted_at",
       underscored: true,
       indexes: [
         {
@@ -304,7 +331,6 @@ export const SchemaUserManagement = {
     },
     modelOptions: {
       tableName: "password_history",
-      timestamps: false,
       underscored: true,
       indexes: [
         {

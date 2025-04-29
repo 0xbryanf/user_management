@@ -1,7 +1,7 @@
 services:
   db:
     image: postgres
-    container_name: intellebeast_local
+    container_name: user_management
     restart: always
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
