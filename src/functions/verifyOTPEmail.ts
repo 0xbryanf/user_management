@@ -11,8 +11,10 @@ export const verifyOTPEmail = async (values: { to: string; otp: number }) => {
 
   try {
     const redisKey = hashValue(`otp_key:${values.to}`);
-    const storedValue = await redisClient.get(redisKey);
-
+    const storedValueStr = await redisClient.get(redisKey);
+    const storedValue = storedValueStr
+      ? (JSON.parse(storedValueStr) as { otp: string; retries: number })
+      : null;
     if (!storedValue) {
       return {
         status: 400,
@@ -21,8 +23,23 @@ export const verifyOTPEmail = async (values: { to: string; otp: number }) => {
     }
 
     const hashedOtp = hashValue(`otp_value:${values.otp}`);
+    const ttl = await redisClient.ttl(redisKey);
 
-    if (storedValue !== hashedOtp) {
+    if (storedValue.otp !== hashedOtp) {
+      if (storedValue.retries >= 3) {
+        await redisClient.del(redisKey);
+        return {
+          status: 400,
+          message: "OTP verification failed too many times."
+        };
+      }
+
+      const otpData = {
+        otp: storedValue.otp,
+        retries: storedValue.retries + 1
+      };
+
+      await redisClient.set(redisKey, JSON.stringify(otpData), "EX", ttl);
       return {
         status: 400,
         message: "Invalid OTP."

@@ -6,7 +6,7 @@ import "dotenv/config";
 import { generateToken } from "utils/generateToken";
 import { authenticateToken } from "lib/middleware/authenticateToken";
 import { JwtPayload } from "jsonwebtoken";
-import { checkUserId } from "functions/checkUserId";
+import { getUserByUserId } from "functions/getUserByUserId";
 import { authTokenFromHeader } from "lib/middleware/authTokenFromHeader";
 
 class AppController implements Controller {
@@ -105,7 +105,7 @@ class AppController implements Controller {
     try {
       const decoded = authTokenFromHeader(req, res) as JwtPayload;
       const userId = decoded.userId;
-      const user = await checkUserId(userId);
+      const user = await getUserByUserId({ userId });
       if (!user.data) {
         res.status(404).json({ message: "User data not found" });
         return;
@@ -127,7 +127,7 @@ class AppController implements Controller {
       const { otp } = req.body;
       const decoded = authTokenFromHeader(req, res) as JwtPayload;
       const userId = decoded.userId;
-      const user = await checkUserId(userId);
+      const user = await getUserByUserId({ userId });
       if (!user.data) {
         res.status(404).json({ message: "User data not found" });
       }
@@ -135,7 +135,6 @@ class AppController implements Controller {
       const result = await this.appServices.verifyOTPEmailService(email, otp);
       res.status(result.status).json(result);
     } catch (error: unknown) {
-      console.log(error);
       res.status(500).json({
         message: "Error verifying OTP email",
         error: error instanceof Error ? error.message : "Unknown error"

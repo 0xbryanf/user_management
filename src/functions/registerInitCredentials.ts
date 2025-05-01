@@ -3,6 +3,7 @@ import { RegisterCredentialsInitUser } from "types/createUser";
 import { generateToken } from "utils/generateToken";
 import { loadSchemaModel } from "utils/loadSchemaModel";
 import { v4 as UUIDV4 } from "uuid";
+import { confirmEmail } from "./confirmEmail";
 
 export const registerInitCredentials = async (
   values: RegisterCredentialsInitUser
@@ -43,6 +44,7 @@ export const registerInitCredentials = async (
   });
 
   if (existingUser) {
+    await confirmEmail({ email: values.email });
     return {
       status: 409,
       message: "User already exists."

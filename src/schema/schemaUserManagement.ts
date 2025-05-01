@@ -1,7 +1,9 @@
 import { assignRole } from "functions/assignRole";
 import { checkUsername } from "functions/checkUsername";
+import { confirmEmail } from "functions/confirmEmail";
 import { createRole } from "functions/createRole";
 import { createUser } from "functions/createUser";
+import { getUserByEmail } from "functions/getUserByEmail";
 import { registerInitCredentials } from "functions/registerInitCredentials";
 import { sendOTPEmail } from "functions/sendOTPEmail";
 import { testRedisConnection } from "functions/testRedisConnection";
@@ -296,7 +298,9 @@ export const SchemaUserManagement = {
     },
     relation: {},
     actions: {
-      registerInitCredentials
+      registerInitCredentials,
+      getUserByEmail,
+      confirmEmail
     }
   },
   PasswordHistory: {

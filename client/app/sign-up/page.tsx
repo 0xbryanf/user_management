@@ -95,35 +95,14 @@ export default function SignUpPage() {
         setLoading(false);
       }
     } catch (error) {
-      const err = error as AxiosError<{ message?: string }>;
-      const status = err.response?.status;
+      const err = error as AxiosError<{ error?: string }>;
       const message =
-        err.response?.data?.message ||
-        "Something went wrong. Please try again.";
-      if (status === 401) {
-        toast.error("Invalid credentials. Please try again.", {
-          duration: 1000,
-          style: { fontSize: "16px" }
-        });
-      } else if (status === 405) {
-        toast.error("Action not allowed. Please refresh and try again.", {
-          duration: 1000,
-          style: { fontSize: "16px" }
-        });
-      } else if (status === 409) {
-        toast.error(
-          "If this email is already in use, we'll send you the next steps shortly.",
-          {
-            duration: 1000,
-            style: { fontSize: "16px" }
-          }
-        );
-      } else {
-        toast.error(message, {
-          duration: 1000,
-          style: { fontSize: "16px" }
-        });
-      }
+        err.response?.data?.error || "An error occurred. Please try again.";
+
+      toast.error(message, {
+        duration: 1000,
+        style: { fontSize: "16px" }
+      });
 
       setLoading(false);
     }

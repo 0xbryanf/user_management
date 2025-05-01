@@ -1,6 +1,6 @@
 import sgMail from "@sendgrid/mail";
 import { hashValue } from "lib/helpers/hashValue";
-import { generateOtpEmailHtml } from "utils/otpTemplate";
+import { generateOtpEmailHtml } from "utils/emails/otpTemplate";
 import { redisClient } from "utils/redisClient";
 
 export const sendOTPEmail = async (values: { to: string }) => {
@@ -9,8 +9,7 @@ export const sendOTPEmail = async (values: { to: string }) => {
   if (!to) {
     return {
       status: 400,
-      message:
-        "All required fields (to, subject, html) must be provided to send an email."
+      message: "Email destination must be provided."
     };
   }
 

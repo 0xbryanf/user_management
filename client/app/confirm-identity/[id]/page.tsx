@@ -1,16 +1,26 @@
 "use client";
-
-import { FormEvent, useState } from "react";
+import ConfirmIdentityForm from "@/components/organisms/confirmIdentityForm";
 import axios, { AxiosError } from "axios";
-import { useRouter } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
+import { FormEvent, useEffect, useState } from "react";
 import { toast, Toaster } from "react-hot-toast";
-import ValidationForm from "@/components/organisms/validationForm";
 
-export default function VerifyIdentityPage() {
+export default function ConfirmIdentity() {
   const router = useRouter();
+  const params = useParams();
   const [loading, setLoading] = useState(false);
+  const [token, setToken] = useState("");
 
-  async function handleVerification(event: FormEvent<HTMLFormElement>) {
+  const id = params?.id as string;
+
+  useEffect(() => {
+    if (!id) return;
+    const base64 = id.replace(/-/g, "+").replace(/_/g, "/");
+    const decoded = atob(base64);
+    setToken(decoded);
+  }, [token]);
+
+  const handleConfirmation = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setLoading(true);
 
@@ -19,7 +29,8 @@ export default function VerifyIdentityPage() {
 
     try {
       const response = await axios.post("/api/verify-identity", {
-        otp
+        otp,
+        token
       });
 
       if (response.status === 200) {
@@ -50,19 +61,22 @@ export default function VerifyIdentityPage() {
     } finally {
       setLoading(false);
     }
-  }
+  };
 
   return (
     <>
       <div className="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8">
         <div className="sm:mx-auto sm:w-full sm:max-w-sm">
           <h2 className="mt-10 text-center text-2xl font-bold tracking-tight text-gray-900">
-            Verify your identity
+            Confirm your identity
           </h2>
         </div>
 
         <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
-          <ValidationForm onSubmit={handleVerification} loading={loading} />
+          <ConfirmIdentityForm
+            onSubmit={handleConfirmation}
+            loading={loading}
+          />
         </div>
       </div>
       <Toaster position="top-center" />

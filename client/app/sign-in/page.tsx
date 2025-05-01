@@ -89,28 +89,14 @@ export default function SignInPage() {
         setLoading(false);
       }
     } catch (error) {
-      const err = error as AxiosError<{ message?: string }>;
-
-      const status = err.response?.status;
+      const err = error as AxiosError<{ error?: string }>;
       const message =
-        err.response?.data?.message || "An error occurred. Please try again.";
+        err.response?.data?.error || "An error occurred. Please try again.";
 
-      if (status === 401) {
-        toast.error("Invalid credentials. Please try again.", {
-          duration: 1000,
-          style: { fontSize: "16px" }
-        });
-      } else if (status === 405) {
-        toast.error("Method not allowed.", {
-          duration: 1000,
-          style: { fontSize: "16px" }
-        });
-      } else {
-        toast.error(message, {
-          duration: 1000,
-          style: { fontSize: "16px" }
-        });
-      }
+      toast.error(message, {
+        duration: 1000,
+        style: { fontSize: "16px" }
+      });
 
       setLoading(false);
     }
