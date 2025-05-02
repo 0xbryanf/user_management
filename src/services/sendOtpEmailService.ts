@@ -1,7 +1,7 @@
 import { sendOTPEmail } from "functions/sendOTPEmail";
 
-export default async function sendOTPEmailService(to: string) {
-  if (!to) {
+export default async function sendOTPEmailService(email: string) {
+  if (!email) {
     return {
       status: 400,
       message: "Missing required information to send OTP email."
@@ -9,7 +9,7 @@ export default async function sendOTPEmailService(to: string) {
   }
 
   try {
-    const result = await sendOTPEmail({ to });
+    const result = await sendOTPEmail({ email });
     return result;
   } catch (error: unknown) {
     return {

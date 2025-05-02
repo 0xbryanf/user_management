@@ -1,10 +1,5 @@
+import { AssignRoleInput } from "types/assignRoleInput";
 import { loadSchemaModel } from "utils/loadSchemaModel";
-
-interface AssignRoleInput {
-  email_address: string;
-  role_name: string;
-  created_by: string;
-}
 
 export const assignRole = async (values: AssignRoleInput) => {
   const { email_address, role_name, created_by } = values;
@@ -22,7 +17,7 @@ export const assignRole = async (values: AssignRoleInput) => {
     loadSchemaModel("User_Management", "UserRoles")
   ]);
 
-  const user: any = await UsersModel.findOne({
+  const user = await UsersModel.findOne({
     where: { email: email_address },
     raw: true
   });
@@ -34,7 +29,7 @@ export const assignRole = async (values: AssignRoleInput) => {
     };
   }
 
-  const availableRole: any = await RolesModel.findOne({
+  const availableRole = await RolesModel.findOne({
     where: { role_name },
     raw: true
   });
@@ -48,8 +43,8 @@ export const assignRole = async (values: AssignRoleInput) => {
 
   const existingUserRole = await UserRolesModel.findOne({
     where: {
-      user_id: user.user_id,
-      role_id: availableRole.role_id
+      user_id: user.dataValues.user_id,
+      role_id: availableRole.dataValues.role_id
     },
     raw: true
   });
@@ -62,8 +57,8 @@ export const assignRole = async (values: AssignRoleInput) => {
   }
 
   const newUserRole = await UserRolesModel.create({
-    user_id: user.user_id,
-    role_id: availableRole.role_id,
+    user_id: user.dataValues.user_id,
+    role_id: availableRole.dataValues.role_id,
     created_by: created_by
   });
 

@@ -1,6 +1,25 @@
-import { loadSchemaModel } from "utils/loadSchemaModel";
+import { findOneCredential } from "lib/helpers/findOneCredential";
+import { CredentialResponse } from "types/credentialResponse";
+import { ReturnResponse } from "types/returnResponse";
 
-export const getUserByEmail = async (values: { email: string }) => {
+/**
+ * Retrieves a user credential by their email address.
+ *
+ * This function checks if the email is provided, then queries for the user using the provided email.
+ * It returns a structured response including HTTP status, message, and user data if found.
+ *
+ * @param values - An object containing the email address to search for.
+ * @param values.email - The email address of the user to retrieve.
+ *
+ * @returns A `ReturnResponse` object containing:
+ * - `status`: HTTP status code (e.g., 200, 400, 404)
+ * - `message`: Description of the operation result
+ * - `data` (optional): The `CredentialResponse` object if the user was found
+ * }
+ */
+export const getUserByEmail = async (values: {
+  email: string;
+}): Promise<ReturnResponse<CredentialResponse>> => {
   const { email } = values;
   if (!email) {
     return {
@@ -8,45 +27,16 @@ export const getUserByEmail = async (values: { email: string }) => {
       message: "Email must be provided."
     };
   }
-
-  const CredentialsModel = await loadSchemaModel(
-    "User_Management",
-    "Credentials"
-  );
-  const UsersModel = await loadSchemaModel("User_Management", "Users");
-  const UserRolesModel = await loadSchemaModel("User_Management", "UserRoles");
-
-  if (!CredentialsModel || !UsersModel || !UserRolesModel) {
-    throw new Error("Failed to load models.");
-  }
-
-  const user = await CredentialsModel.findOne({
-    where: { email },
-    include: [
-      {
-        model: UsersModel,
-        as: "user",
-        include: [
-          {
-            model: UserRolesModel,
-            as: "userRoles"
-          }
-        ]
-      }
-    ],
-    raw: true
-  });
-
+  const user: CredentialResponse | null = await findOneCredential({ email });
   if (!user) {
     return {
       status: 404,
       message: "User not found."
     };
   }
-
   return {
     status: 200,
     message: "User found",
-    data: user
+    data: user as CredentialResponse
   };
 };

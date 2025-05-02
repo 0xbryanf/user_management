@@ -1,12 +1,10 @@
 import { assignRole } from "functions/assignRole";
-import { checkUsername } from "functions/checkUsername";
-import { confirmEmail } from "functions/confirmEmail";
 import { createRole } from "functions/createRole";
-import { createUser } from "functions/createUser";
 import { getUserByEmail } from "functions/getUserByEmail";
+import { getUserByUserId } from "functions/getUserByUserId";
 import { registerInitCredentials } from "functions/registerInitCredentials";
+import { requestEmailConfirmation } from "functions/requestEmailConfirmation";
 import { sendOTPEmail } from "functions/sendOTPEmail";
-import { testRedisConnection } from "functions/testRedisConnection";
 import { verifyOTPEmail } from "functions/verifyOTPEmail";
 import { verifyUser } from "functions/verifyUser";
 import { DataTypes } from "sequelize";
@@ -23,7 +21,7 @@ export const SchemaUserManagement = {
       is_active: {
         type: DataTypes.BOOLEAN,
         allowNull: false,
-        defaultValue: true
+        defaultValue: false
       },
       last_login: {
         type: DataTypes.DATE,
@@ -56,11 +54,8 @@ export const SchemaUserManagement = {
     },
     relation: {},
     actions: {
-      createUser,
       verifyUser,
-      checkUsername,
       sendOTPEmail,
-      testRedisConnection,
       verifyOTPEmail
     }
   },
@@ -300,7 +295,8 @@ export const SchemaUserManagement = {
     actions: {
       registerInitCredentials,
       getUserByEmail,
-      confirmEmail
+      getUserByUserId,
+      requestEmailConfirmation
     }
   },
   PasswordHistory: {

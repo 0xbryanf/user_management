@@ -1,15 +1,10 @@
-import { CreateUser, RegisterCredentialsInitUser } from "types/createUser";
-import createUserService from "./createUserService";
 import verifyUserService from "./verifyUserService";
 import sendOTPEmailService from "./sendOtpEmailService";
 import verifyOTPEmailService from "./verifyOTPEmailService";
 import registerInitCredentialService from "./registerInitCredentialService";
+import { RegisterCredentialsInitUser } from "types/registerCredentialsInitUser";
 
 class AppServices {
-  public async createUserService(values: CreateUser) {
-    return await createUserService(values);
-  }
-
   public async registerInitCredentialService(
     values: RegisterCredentialsInitUser
   ) {
@@ -20,8 +15,8 @@ class AppServices {
     return await verifyUserService(email, password);
   }
 
-  public async sendOTPEmailService(to: string) {
-    return await sendOTPEmailService(to);
+  public async sendOTPEmailService(email: string) {
+    return await sendOTPEmailService(email);
   }
 
   public async verifyOTPEmailService(email: string, to: number) {

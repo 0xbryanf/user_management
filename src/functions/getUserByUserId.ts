@@ -1,6 +1,23 @@
-import { loadSchemaModel } from "utils/loadSchemaModel";
-
-export const getUserByUserId = async (values: { userId: string }) => {
+import { findOneCredential } from "lib/helpers/findOneCredential";
+import { CredentialResponse } from "types/credentialResponse";
+import { ReturnResponse } from "types/returnResponse";
+/**
+ * Retrieves a user credential by their user ID.
+ *
+ * Validates the input, attempts to find the user using the provided user ID,
+ * and returns a standardized response containing the result.
+ *
+ * @param values - An object containing the user ID to search for.
+ * @param values.userId - The unique identifier of the user.
+ *
+ * @returns A `ReturnResponse` object containing:
+ * - `status`: HTTP status code (e.g., 200, 400, 404)
+ * - `message`: Description of the operation result
+ * - `data` (optional): The `CredentialResponse` if the user is found
+ */
+export const getUserByUserId = async (values: {
+  userId: string;
+}): Promise<ReturnResponse<CredentialResponse>> => {
   const { userId } = values;
   if (!userId) {
     return {
@@ -8,45 +25,16 @@ export const getUserByUserId = async (values: { userId: string }) => {
       message: "UserId must be provided."
     };
   }
-
-  const CredentialsModel = await loadSchemaModel(
-    "User_Management",
-    "Credentials"
-  );
-  const UsersModel = await loadSchemaModel("User_Management", "Users");
-  const UserRolesModel = await loadSchemaModel("User_Management", "UserRoles");
-
-  if (!CredentialsModel || !UsersModel || !UserRolesModel) {
-    throw new Error("Failed to load models.");
-  }
-
-  const user = await CredentialsModel.findOne({
-    where: { user_id: userId },
-    include: [
-      {
-        model: UsersModel,
-        as: "user",
-        include: [
-          {
-            model: UserRolesModel,
-            as: "userRoles"
-          }
-        ]
-      }
-    ],
-    raw: true
-  });
-
+  const user: CredentialResponse | null = await findOneCredential({ userId });
   if (!user) {
     return {
       status: 404,
       message: "User not found."
     };
   }
-
   return {
     status: 200,
     message: "User found",
-    data: user
+    data: user as CredentialResponse
   };
 };

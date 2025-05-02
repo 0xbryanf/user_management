@@ -1,5 +1,5 @@
 import { registerInitCredentials } from "functions/registerInitCredentials";
-import { RegisterCredentialsInitUser } from "types/createUser";
+import { RegisterCredentialsInitUser } from "types/registerCredentialsInitUser";
 
 export default async function registerInitCredentialService({
   email,

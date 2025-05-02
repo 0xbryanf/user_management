@@ -13,7 +13,7 @@ import { redisClient } from "utils/redisClient";
  * - Sends an email with a verification link
  * - Handles various error scenarios like missing email or user not found
  */
-export const confirmEmail = async (values: { email: string }) => {
+export const requestEmailConfirmation = async (values: { email: string }) => {
   const { email } = values;
   if (!email) {
     return {
@@ -30,7 +30,6 @@ export const confirmEmail = async (values: { email: string }) => {
     };
   }
   const token = generateToken(userId.toString());
-  console.log("token", token);
   const link = `http://localhost:3000/confirm-identity/${Buffer.from(token).toString("base64")}`;
   const otp = Math.floor(100000 + Math.random() * 900000).toString();
   const subject = "Confirm Your Email Address";

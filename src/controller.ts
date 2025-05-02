@@ -1,13 +1,13 @@
 import { Router, Request, Response } from "express";
 import AppServices from "./services/appServices";
 import { Controller } from "types/controller";
-import { CreateUser, RegisterCredentialsInitUser } from "types/createUser";
 import "dotenv/config";
 import { generateToken } from "utils/generateToken";
 import { authenticateToken } from "lib/middleware/authenticateToken";
 import { JwtPayload } from "jsonwebtoken";
 import { getUserByUserId } from "functions/getUserByUserId";
 import { authTokenFromHeader } from "lib/middleware/authTokenFromHeader";
+import { RegisterCredentialsInitUser } from "types/registerCredentialsInitUser";
 
 class AppController implements Controller {
   public path = "/api";
@@ -20,11 +20,6 @@ class AppController implements Controller {
   }
 
   private initializeRoutes() {
-    this.router.post(
-      `${this.path}/${this.version}/create-user`,
-      this.createUserHandler.bind(this)
-    );
-
     this.router.post(
       `${this.path}/${this.version}/register-init-credentials`,
       this.registerInitCredentialsHandler.bind(this)
@@ -46,19 +41,6 @@ class AppController implements Controller {
       authenticateToken,
       this.verifyOTPEmail.bind(this)
     );
-  }
-
-  private async createUserHandler(req: Request, res: Response): Promise<void> {
-    try {
-      const userData: CreateUser = req.body;
-      const result = await this.appServices.createUserService(userData);
-      res.status(result.status).json(result);
-    } catch (error: unknown) {
-      res.status(500).json({
-        message: "Error creating user",
-        error: error instanceof Error ? error.message : "Unknown error"
-      });
-    }
   }
 
   private async registerInitCredentialsHandler(

@@ -3,10 +3,10 @@ import { hashValue } from "lib/helpers/hashValue";
 import { generateOtpEmailHtml } from "utils/emails/otpTemplate";
 import { redisClient } from "utils/redisClient";
 
-export const sendOTPEmail = async (values: { to: string }) => {
-  const { to } = values;
+export const sendOTPEmail = async (values: { email: string }) => {
+  const { email } = values;
 
-  if (!to) {
+  if (!email) {
     return {
       status: 400,
       message: "Email destination must be provided."
@@ -20,7 +20,7 @@ export const sendOTPEmail = async (values: { to: string }) => {
   sgMail.setApiKey(process.env.SENDGRID_API_KEY!);
 
   const message: sgMail.MailDataRequired = {
-    to,
+    to: email,
     from: process.env.SENDGRID_OTP_EMAIL!,
     subject,
     html
@@ -30,7 +30,7 @@ export const sendOTPEmail = async (values: { to: string }) => {
     const response = await sgMail.send(message);
 
     if (response[0].statusCode === 202) {
-      const redisKey = hashValue(`otp_key:${to}`);
+      const redisKey = hashValue(`otp_key:${email}`);
 
       const otpData = {
         otp: hashValue(`otp_value:${otp}`),
