@@ -5,7 +5,7 @@ export default {
       model: "Users",
       action: "sendOTPEmail",
       values: {
-        to: "bjfactor041789@gmail.com"
+        email: "0xbryanf@gmail.com"
       }
     }
   ]

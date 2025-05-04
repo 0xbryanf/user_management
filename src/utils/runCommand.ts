@@ -12,7 +12,6 @@ export const command = async () => {
 
   if (flag === "-c" && commandName) {
     try {
-      console.log("commandName: ", commandName);
       await sequelizeConnectionUp();
       await initializeAssociations();
       const functionResponses = await runFunction(commandName);

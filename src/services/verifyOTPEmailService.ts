@@ -9,7 +9,7 @@ export default async function verifyUserService(email: string, otp: number) {
   }
 
   try {
-    const result = await verifyOTPEmail({ to: email, otp });
+    const result = await verifyOTPEmail({ email, otp });
     return result;
   } catch (error: unknown) {
     return {

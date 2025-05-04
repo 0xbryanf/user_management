@@ -5,8 +5,8 @@ export default {
       model: "Roles",
       action: "createRole",
       values: {
-        role_name: "trainer",
-        created_by: "aff7ff95-e86d-437f-ad94-1ef685394c9b"
+        role_name: "developer",
+        created_by: "a5388ee0-e8f5-4843-9223-a30d06a36376"
       }
     }
   ]

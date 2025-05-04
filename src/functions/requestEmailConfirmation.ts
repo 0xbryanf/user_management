@@ -1,73 +1,79 @@
-import sgMail from "@sendgrid/mail";
-import { generateSignupAttemptEmail } from "utils/emails/signUpAttempt";
-import { getUserByEmail } from "./getUserByEmail";
+import { emailConfirmationTemplate } from "utils/emails/emailConfirmationTemplate";
 import { generateToken } from "utils/generateToken";
 import { hashValue } from "lib/helpers/hashValue";
-import { redisClient } from "utils/redisClient";
+import { findOneCredential } from "lib/helpers/findOneCredential";
+import { sendEmail } from "lib/helpers/sendEmail";
+import { RedisHelper } from "lib/helpers/Redis";
+import { ReturnResponse } from "types/returnResponse";
+import sgMail from "@sendgrid/mail";
 
 /**
- * Confirms and sends an email verification to a user
- * @param values - Object containing the user's email
- * @returns An object with status, message, and optional data or error
- * - Generates a verification token and OTP
- * - Sends an email with a verification link
- * - Handles various error scenarios like missing email or user not found
+ * Sends a confirmation email with a verification link and one-time password (OTP).
+ *
+ * @param values - Object containing the user's email address.
+ * @returns A standardized response object indicating success or failure.
  */
-export const requestEmailConfirmation = async (values: { email: string }) => {
-  const { email } = values;
-  if (!email) {
-    return {
-      status: 400,
-      message: "Email destination must be provided."
-    };
-  }
-  const { data } = await getUserByEmail({ email });
-  const userId = data && "user_id" in data ? data.user_id : undefined;
-  if (!userId) {
-    return {
-      status: 401,
-      message: "No user found"
-    };
-  }
-  const token = generateToken(userId.toString());
-  const link = `http://localhost:3000/confirm-identity/${Buffer.from(token).toString("base64")}`;
-  const otp = Math.floor(100000 + Math.random() * 900000).toString();
-  const subject = "Confirm Your Email Address";
-  const html = generateSignupAttemptEmail(link, otp);
-  sgMail.setApiKey(process.env.SENDGRID_API_KEY!);
-  const message: sgMail.MailDataRequired = {
-    to: email,
-    from: process.env.SENDGRID_OTP_EMAIL!,
-    subject,
-    html
-  };
+export const requestEmailConfirmation = async (values: {
+  email: string;
+}): Promise<ReturnResponse<[sgMail.ClientResponse, {}]>> => {
   try {
-    const response = await sgMail.send(message);
-    if (response[0].statusCode === 202) {
-      const redisKey = hashValue(`otp_key:${email}`);
+    const { email } = values;
 
-      const otpData = {
-        otp: hashValue(`otp_value:${otp}`),
-        retries: 0
+    if (!email) {
+      return {
+        status: 400,
+        message: "Email destination must be provided."
       };
-
-      await redisClient.set(
-        redisKey,
-        JSON.stringify(otpData),
-        "EX",
-        60 * 60 // 5 minutes expiration
-      );
     }
+
+    const user = await findOneCredential({ email });
+    if (!user) {
+      return {
+        status: 404,
+        message: "User not found."
+      };
+    }
+
+    const token = generateToken(user.user_id);
+    const encodedToken = Buffer.from(token).toString("base64url");
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+
+    const emailResponse = await sendEmail({
+      to: email,
+      from: process.env.SENDGRID_OTP_EMAIL!,
+      subject: `Confirm Your Email Address - ${otp}`,
+      html: emailConfirmationTemplate(
+        `${process.env.CLIENT_URL}/confirm-identity/${encodedToken}`,
+        otp
+      )
+    });
+
+    const [res] = emailResponse;
+    if (res.statusCode !== 202) {
+      return {
+        status: res.statusCode,
+        message: "Email confirmation failed.",
+        data: emailResponse
+      };
+    }
+
+    await RedisHelper.set({
+      key: hashValue(`otp_key:${email}`),
+      data: { otp: hashValue(`otp_value:${otp}`), retries: 0 },
+      expiration: 60 * 20 // 20 minutes
+    });
+
     return {
       status: 200,
-      message: "Email confirmation sent successfully",
-      data: response
+      message: "Email confirmation sent successfully.",
+      data: emailResponse
     };
-  } catch (error: unknown) {
+  } catch (error) {
     return {
       status: 500,
-      message: "Error sending email",
-      error: error instanceof Error ? error.message : String(error)
+      message:
+        (error as Error).message ||
+        "An unexpected error occurred while sending the email."
     };
   }
 };

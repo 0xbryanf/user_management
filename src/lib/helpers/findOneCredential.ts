@@ -1,4 +1,4 @@
-import { CredentialResponse } from "types/credentialResponse";
+import { CredentialResponse } from "types/credentialInterfaces";
 import { Identifier } from "types/identifier";
 import { loadSchemaModel } from "utils/loadSchemaModel";
 
@@ -22,9 +22,15 @@ export const findOneCredential = async (
   );
   const UsersModel = await loadSchemaModel("User_Management", "Users");
   const UserRolesModel = await loadSchemaModel("User_Management", "UserRoles");
+
   if (!CredentialsModel || !UsersModel || !UserRolesModel) {
     throw new Error("Failed to load models.");
   }
+
+  if (!identifier.email && !identifier.userId) {
+    throw new Error("Either email or userId must be provided.");
+  }
+
   const whereClause: { email?: string; user_id?: string } = {};
   if (identifier.email) whereClause.email = identifier.email;
   if (identifier.userId) whereClause.user_id = identifier.userId;
@@ -42,9 +48,12 @@ export const findOneCredential = async (
           }
         ]
       }
-    ],
-    raw: true
+    ]
   });
 
-  return user as CredentialResponse | null;
+  if (!user) {
+    return null;
+  }
+
+  return user.get({ plain: true }) as CredentialResponse;
 };

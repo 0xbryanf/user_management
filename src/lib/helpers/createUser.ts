@@ -12,6 +12,10 @@ export const createUser = async ({
   user_id,
   created_by
 }: User): Promise<UserResponse> => {
+  if (!user_id) {
+    throw new Error("user_id is required.");
+  }
+
   const UsersModel = await loadSchemaModel("User_Management", "Users");
   if (!UsersModel) {
     throw new Error("Failed to load Users model.");
@@ -20,12 +24,8 @@ export const createUser = async ({
   const user = await UsersModel.create({
     user_id,
     is_active: false,
-    created_by: created_by || user_id
+    created_by: created_by ?? user_id
   });
-
-  if (!user) {
-    throw new Error("Failed to create user.");
-  }
 
   return user.get({ plain: true }) as UserResponse;
 };

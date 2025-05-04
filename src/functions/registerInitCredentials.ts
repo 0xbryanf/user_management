@@ -1,100 +1,93 @@
 import { hashPassword } from "lib/helpers/hashPassword";
-// import { generateToken } from "utils/generateToken";
-import { loadSchemaModel } from "utils/loadSchemaModel";
+import { generateToken } from "utils/generateToken";
 import { v4 as UUIDV4 } from "uuid";
 import { findOneCredential } from "lib/helpers/findOneCredential";
-import { findOneRole } from "lib/helpers/findOneRole";
 import { RolesEnum } from "utils/rolesEnum";
-import { RegisterCredentialsInitUser } from "types/registerCredentialsInitUser";
+import {
+  RegisterInitCredentials,
+  RegisterInitCredentialsResponse
+} from "types/registerInitCredentialInterfaces";
 import { requestEmailConfirmation } from "./requestEmailConfirmation";
 import { createUser } from "lib/helpers/createUser";
-import { UserResponse } from "types/userInterfaces";
+import { createCredentials } from "lib/helpers/createCredentials";
+import { createUserRoles } from "lib/helpers/createUserRoles";
+import { ReturnResponse } from "types/returnResponse";
+import { RoleHelper } from "lib/helpers/Role";
 
+/**
+ * Registers initial user credentials with email and password.
+ *
+ * @param values - Registration details including email and password.
+ * @returns A response with status, message, and user payload if successful.
+ */
 export const registerInitCredentials = async (
-  values: RegisterCredentialsInitUser
-) => {
-  if (!values.email || !values.password) {
+  values: RegisterInitCredentials
+): Promise<ReturnResponse<RegisterInitCredentialsResponse>> => {
+  try {
+    const { email, password, createdBy } = values;
+
+    if (!email || !password) {
+      return {
+        status: 400,
+        message: "Missing information to create a user."
+      };
+    }
+
+    const existingUser = await findOneCredential({ email });
+
+    if (existingUser) {
+      await requestEmailConfirmation({ email });
+      return {
+        status: 409,
+        message: "A user with this email already exists."
+      };
+    }
+
+    const userId = UUIDV4();
+    const password_hash = await hashPassword(password);
+
+    const defaultRole = await RoleHelper.findOne(RolesEnum.READER);
+    if (!defaultRole) {
+      return {
+        status: 404,
+        message: "Default role not found."
+      };
+    }
+
+    const newUser = await createUser({
+      user_id: userId,
+      created_by: createdBy ? createdBy : userId
+    });
+
+    await createCredentials({
+      user_id: newUser.user_id,
+      email,
+      created_by: createdBy ? createdBy : newUser.user_id,
+      password_hash
+    });
+
+    await createUserRoles({
+      user_id: newUser.user_id,
+      role_id: defaultRole.role_id,
+      created_by: createdBy ? createdBy : newUser.user_id
+    });
+
+    const token: string = generateToken(newUser.user_id);
     return {
-      status: 400,
-      message: "All required fields must be provided to create a user."
+      status: 201,
+      message: "User created successfully.",
+      data: {
+        user: newUser.user_id,
+        isActive: newUser.is_active,
+        payloadRef: Buffer.from(token).toString("base64")
+      }
+    };
+  } catch (error) {
+    return {
+      status: 500,
+      message:
+        (error as Error).message ||
+        "An unexpected error occurred during registration."
     };
   }
-  const CredentialsModel = await loadSchemaModel(
-    "User_Management",
-    "Credentials"
-  );
-  const UsersModel = await loadSchemaModel("User_Management", "Users");
-  const UserRolesModel = await loadSchemaModel("User_Management", "UserRoles");
-  if (!CredentialsModel || !UsersModel || !UserRolesModel) {
-    throw new Error("Failed to load models.");
-  }
-  const userId = UUIDV4();
-  const password_hash = await hashPassword(values.password);
-  const defaultRole = await findOneRole(RolesEnum.READER);
-  if (!defaultRole) {
-    return {
-      status: 404,
-      message: "Default role 'reader' not found."
-    };
-  }
-  const existingUser = await findOneCredential({ email: values.email });
-  if (existingUser) {
-    await requestEmailConfirmation({ email: values.email });
-    return {
-      status: 409,
-      message: "User already exists."
-    };
-  }
-  const newUser: UserResponse = await createUser({
-    user_id: userId,
-    created_by: userId
-  });
-
-  await CredentialsModel.create({
-    user_id: newUser.user_id,
-    email: values.email,
-    password_hash: password_hash,
-    created_by: values.createdBy ? values.createdBy : userId
-  });
-
-  // await UserRolesModel.create({
-  //   user_id: newUser.dataValues.user_id,
-  //   role_id: defaultRole.dataValues.role_id,
-  //   created_by: values.createdBy ? values.createdBy : userId
-  // });
-
-  // const token = generateToken(newUser.dataValues.user_id);
-
-  // const userwithToken = await UserRolesModel.findOne({
-  //   where: { user_id: newUser.dataValues.user_id },
-  //   include: [
-  //     {
-  //       attributes: ["user_id", "is_active"],
-  //       model: UsersModel,
-  //       as: "user"
-  //     },
-  //     {
-  //       attributes: ["role_id", "role_name"],
-  //       model: RolesModel,
-  //       as: "role"
-  //     }
-  //   ]
-  // });
-
-  // if (!userwithToken) {
-  //   return {
-  //     status: 404,
-  //     message: "Failed to retrieve user data after creation."
-  //   };
-  // }
-
-  return {
-    status: 201,
-    message: "User created successfully."
-    // data: {
-    //   user: userwithToken.get("user"),
-    //   role: userwithToken.get("role"),
-    //   payloadRef: Buffer.from(token).toString("base64")
-    // }
-  };
 };

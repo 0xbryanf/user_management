@@ -5,8 +5,8 @@ export default {
       model: "Users",
       action: "verifyOTPEmail",
       values: {
-        to: "bjfactor041789@gmail.com",
-        otp: 550551
+        email: "0xbryanf@gmail.com",
+        otp: 902276
       }
     }
   ]

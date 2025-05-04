@@ -1,4 +1,4 @@
-export function generateSignupAttemptEmail(
+export function emailConfirmationTemplate(
   verifyIdentityLink: string,
   otp: string
 ): string {

@@ -1,40 +1,46 @@
 import { findOneCredential } from "lib/helpers/findOneCredential";
-import { CredentialResponse } from "types/credentialResponse";
+import { CredentialResponse } from "types/credentialInterfaces";
 import { ReturnResponse } from "types/returnResponse";
+
 /**
- * Retrieves a user credential by their user ID.
+ * Retrieves a user by their unique user ID.
  *
- * Validates the input, attempts to find the user using the provided user ID,
- * and returns a standardized response containing the result.
- *
- * @param values - An object containing the user ID to search for.
- * @param values.userId - The unique identifier of the user.
- *
- * @returns A `ReturnResponse` object containing:
- * - `status`: HTTP status code (e.g., 200, 400, 404)
- * - `message`: Description of the operation result
- * - `data` (optional): The `CredentialResponse` if the user is found
+ * @param values - An object containing the userId to search for.
+ * @returns A response with the user's credential info or an appropriate error message.
  */
 export const getUserByUserId = async (values: {
   userId: string;
 }): Promise<ReturnResponse<CredentialResponse>> => {
-  const { userId } = values;
-  if (!userId) {
+  try {
+    const { userId } = values;
+
+    if (!userId) {
+      return {
+        status: 400,
+        message: "UserId must be provided."
+      };
+    }
+
+    const user = await findOneCredential({ userId });
+
+    if (!user) {
+      return {
+        status: 404,
+        message: "User not found."
+      };
+    }
+
     return {
-      status: 400,
-      message: "UserId must be provided."
+      status: 200,
+      message: "User found",
+      data: user
+    };
+  } catch (error) {
+    return {
+      status: 500,
+      message:
+        (error as Error).message ||
+        "An unexpected error occurred while retrieving the user."
     };
   }
-  const user: CredentialResponse | null = await findOneCredential({ userId });
-  if (!user) {
-    return {
-      status: 404,
-      message: "User not found."
-    };
-  }
-  return {
-    status: 200,
-    message: "User found",
-    data: user as CredentialResponse
-  };
 };

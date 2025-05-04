@@ -1,49 +1,52 @@
+import { findOneCredential } from "lib/helpers/findOneCredential";
 import { verifyPassword } from "lib/helpers/verifyPassword";
-import { loadSchemaModel } from "utils/loadSchemaModel";
+import { ReturnResponse } from "types/returnResponse";
+import { VerifyUser } from "types/verifyUser";
 
-export interface VerifyUser {
-  email: string;
-  password: string;
-}
+/**
+ * Verifies a user's credentials by checking email and password.
+ *
+ * @param values - Object containing user's email and password.
+ * @returns A response with user ID if credentials are valid, or an error message.
+ */
+export const verifyUser = async (
+  values: VerifyUser
+): Promise<ReturnResponse<string>> => {
+  try {
+    const { email, password } = values;
 
-export const verifyUser = async (values: VerifyUser) => {
-  const { email, password } = values;
+    if (!email || !password) {
+      return {
+        status: 400,
+        message: "Missing email or password."
+      };
+    }
 
-  if (!email || !password) {
+    const user = await findOneCredential({ email });
+    if (!user) {
+      return {
+        status: 404,
+        message: "User not found."
+      };
+    }
+
+    const isPasswordValid = await verifyPassword(user.password_hash, password);
+    if (!isPasswordValid) {
+      return {
+        status: 401,
+        message: "Invalid credentials."
+      };
+    }
+
     return {
-      status: 404,
-      message: "All required fields must be provided to verify a user."
+      status: 200,
+      message: "User verified successfully.",
+      data: user.user_id
+    };
+  } catch (error) {
+    return {
+      status: 500,
+      message: "Error verifying user."
     };
   }
-
-  const UsersModel = await loadSchemaModel("User_Management", "Users");
-
-  const user = await UsersModel.findOne({
-    where: { email }
-  });
-
-  if (!user) {
-    return {
-      status: 404,
-      message: "Invalid credentials"
-    };
-  }
-
-  const isPasswordValid = await verifyPassword(
-    user.dataValues.password_hash,
-    password
-  );
-
-  if (!isPasswordValid) {
-    return {
-      status: 401,
-      message: "Invalid credentials"
-    };
-  }
-
-  return {
-    status: 200,
-    message: "User verified successfully",
-    data: user.dataValues.user_id
-  };
 };

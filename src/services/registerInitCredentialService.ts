@@ -1,10 +1,10 @@
 import { registerInitCredentials } from "functions/registerInitCredentials";
-import { RegisterCredentialsInitUser } from "types/registerCredentialsInitUser";
+import { RegisterInitCredentials } from "types/registerInitCredentialInterfaces";
 
 export default async function registerInitCredentialService({
   email,
   password
-}: RegisterCredentialsInitUser) {
+}: RegisterInitCredentials) {
   if (!email || !password) {
     return {
       status: 400,

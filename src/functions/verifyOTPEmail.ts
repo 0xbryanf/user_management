@@ -1,62 +1,88 @@
 import { hashValue } from "lib/helpers/hashValue";
-import { redisClient } from "utils/redisClient";
+import { RedisHelper } from "lib/helpers/Redis";
+import { ReturnResponse } from "types/returnResponse";
 
-export const verifyOTPEmail = async (values: { to: string; otp: number }) => {
-  if (!values.to || !values.otp) {
-    return {
-      status: 400,
-      message: "OTP and recipient email are required."
-    };
-  }
-
+/**
+ * Verifies an OTP (One-Time Password) for a given email address.
+ *
+ * @param values - Object containing email and OTP to verify.
+ * @returns A response indicating whether the OTP was verified or failed.
+ */
+export const verifyOTPEmail = async (values: {
+  email: string;
+  otp: number;
+}): Promise<ReturnResponse> => {
   try {
-    const redisKey = hashValue(`otp_key:${values.to}`);
-    const storedValueStr = await redisClient.get(redisKey);
-    const storedValue = storedValueStr
-      ? (JSON.parse(storedValueStr) as { otp: string; retries: number })
-      : null;
-    if (!storedValue) {
+    const { email, otp } = values;
+
+    if (!email || !otp) {
       return {
         status: 400,
-        message: "Invalid OTP."
+        message: "OTP and recipient email are required."
       };
     }
 
-    const hashedOtp = hashValue(`otp_value:${values.otp}`);
-    const ttl = await redisClient.ttl(redisKey);
+    const redisKey = hashValue(`otp_key:${email}`);
+    const storedValueStr = await RedisHelper.get(redisKey);
 
-    if (storedValue.otp !== hashedOtp) {
-      if (storedValue.retries >= 3) {
-        await redisClient.del(redisKey);
+    if (!storedValueStr) {
+      return {
+        status: 400,
+        message: "Invalid or expired OTP."
+      };
+    }
+
+    const storedValue: { otp: string; retries: number } =
+      JSON.parse(storedValueStr);
+    const ttl = await RedisHelper.ttl(redisKey);
+
+    if (ttl < 0) {
+      return {
+        status: 400,
+        message: "OTP expired or not found."
+      };
+    }
+
+    const hashedInputOtp = hashValue(`otp_value:${otp}`);
+
+    if (storedValue.otp !== hashedInputOtp) {
+      const updatedRetries = storedValue.retries + 1;
+
+      if (updatedRetries >= 3) {
+        await RedisHelper.del(redisKey);
         return {
           status: 400,
           message: "OTP verification failed too many times."
         };
       }
 
-      const otpData = {
-        otp: storedValue.otp,
-        retries: storedValue.retries + 1
-      };
+      await RedisHelper.set({
+        key: redisKey,
+        data: {
+          otp: storedValue.otp,
+          retries: updatedRetries
+        },
+        expiration: ttl
+      });
 
-      await redisClient.set(redisKey, JSON.stringify(otpData), "EX", ttl);
       return {
         status: 400,
         message: "Invalid OTP."
       };
     }
 
-    await redisClient.del(redisKey);
+    await RedisHelper.del(redisKey);
 
     return {
       status: 200,
       message: "OTP verified successfully."
     };
-  } catch (error: unknown) {
+  } catch (error) {
     return {
       status: 500,
-      message: "Error sending email",
-      error: error instanceof Error ? error.message : String(error)
+      message:
+        (error as Error).message ||
+        "An unexpected error occurred during OTP verification."
     };
   }
 };

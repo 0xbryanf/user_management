@@ -5,7 +5,7 @@ export default {
       model: "Users",
       action: "verifyUser",
       values: {
-        email: "0xbryanf@gmail.com",
+        email: "hello@gmail.com",
         password: "password"
       }
     }

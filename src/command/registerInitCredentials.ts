@@ -5,9 +5,9 @@ export default {
       model: "Credentials",
       action: "registerInitCredentials",
       values: {
-        email: "abcd@gmail.com",
-        password: "password"
-        // createdBy: "da2700ee-7b0f-4ed2-8df7-15f6903b1a2f"
+        email: "hello@gmail.com",
+        password: "password",
+        createdBy: "a5388ee0-e8f5-4843-9223-a30d06a36376"
       }
     }
   ]

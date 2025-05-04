@@ -7,7 +7,7 @@ import { authenticateToken } from "lib/middleware/authenticateToken";
 import { JwtPayload } from "jsonwebtoken";
 import { getUserByUserId } from "functions/getUserByUserId";
 import { authTokenFromHeader } from "lib/middleware/authTokenFromHeader";
-import { RegisterCredentialsInitUser } from "types/registerCredentialsInitUser";
+import { RegisterInitCredentials } from "types/registerInitCredentialInterfaces";
 
 class AppController implements Controller {
   public path = "/api";
@@ -48,7 +48,7 @@ class AppController implements Controller {
     res: Response
   ): Promise<void> {
     try {
-      const userData: RegisterCredentialsInitUser = req.body;
+      const userData: RegisterInitCredentials = req.body;
       const result =
         await this.appServices.registerInitCredentialService(userData);
       res.status(result.status).json(result);
@@ -65,7 +65,7 @@ class AppController implements Controller {
       const { email, password } = req.body;
       const result = await this.appServices.verifyUserService(email, password);
       if (result.status === 200 && "data" in result) {
-        const token = generateToken(result.data);
+        const token = generateToken(result.data as string);
         res.status(result.status).json({
           message: result.message,
           token
