@@ -9,14 +9,14 @@ import jwt, { JwtPayload } from "jsonwebtoken";
  * @param res - Express Response object
  * @returns Decoded JWT payload or sends an HTTP response on error
  */
-export const authTokenFromHeader = (
+export const signedTokenFromHeader = (
   req: Request,
   res: Response
 ): JwtPayload | void => {
   const authHeader = req.headers.authorization;
 
   const signedToken =
-    authHeader?.startsWith("Bearer ") && authHeader.split(" ")[1];
+    authHeader?.startsWith("Sig ") && authHeader.split(" ")[1];
 
   if (!signedToken) {
     res.status(400).json({

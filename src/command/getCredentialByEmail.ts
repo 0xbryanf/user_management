@@ -3,7 +3,7 @@ export default {
     {
       schema: "User_Management",
       model: "Credentials",
-      action: "getUserByEmail",
+      action: "getCredentialByEmail",
       values: {
         email: "0xbryanf@gmail.com"
       }

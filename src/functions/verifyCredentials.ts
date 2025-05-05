@@ -9,7 +9,7 @@ import { VerifyUser } from "types/verifyUser";
  * @param values - Object containing user's email and password.
  * @returns A response with user ID if credentials are valid, or an error message.
  */
-export const verifyUser = async (
+export const verifyCredentials = async (
   values: VerifyUser
 ): Promise<ReturnResponse<string>> => {
   try {

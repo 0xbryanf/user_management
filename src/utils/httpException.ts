@@ -1,23 +1,22 @@
 /**
- * Represents an HTTP error with a status code and message.
+ * Custom HTTP Exception for structured error handling.
  *
- * This class extends the built-in Error class to provide additional context
- * about HTTP errors, including the status code associated with the error.
+ * Extends the native Error class by including an HTTP status code
+ * and optional error payload. Useful for consistent API responses.
  *
- * @class
+ * @class HttpException
  * @extends Error
- *
- * @param {number} status - The HTTP status code representing the error.
- * @param {string} message - A descriptive message explaining the error.
  */
 class HttpException extends Error {
   public status: number;
-  public message: string;
+  public error?: string;
 
-  constructor(status: number, message: string) {
+  constructor(status: number, message: string, error?: unknown) {
     super(message);
     this.status = status;
-    this.message = message;
+    this.name = this.constructor.name;
+    this.error = error instanceof Error ? error.message : String(error);
+    Error.captureStackTrace(this, this.constructor);
   }
 }
 

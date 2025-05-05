@@ -3,26 +3,26 @@ import { CredentialResponse } from "types/credentialInterfaces";
 import { ReturnResponse } from "types/returnResponse";
 
 /**
- * Retrieves a user by their unique user ID.
+ * Retrieves a user's credential information by email.
  *
- * @param values - An object containing the userId to search for.
- * @returns A response with the user's credential info or an appropriate error message.
+ * @param values - Object containing the email address to search for.
+ * @returns A response containing the user data or an error message.
  */
-export const getUserByUserId = async (values: {
-  userId: string;
+export const getCredentialByEmail = async (values: {
+  email: string;
 }): Promise<ReturnResponse<CredentialResponse>> => {
   try {
-    const { userId } = values;
+    const { email } = values;
 
-    if (!userId) {
+    if (!email) {
       return {
         status: 400,
         statusText: "Bad Request",
-        message: "UserId must be provided."
+        message: "Email must be provided."
       };
     }
 
-    const user = await findOneCredential({ userId });
+    const user = await findOneCredential({ email });
 
     if (!user) {
       return {

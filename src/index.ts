@@ -3,7 +3,8 @@ import App from "./app";
 import "dotenv/config";
 import { validateEnv } from "utils/validateEnv";
 import { runCommand } from "utils/runCommand";
-import AppController from "./controller";
+import CredentialsController from "controllers/credentials.controller";
+import UsersController from "controllers/users.controller";
 
 export const main = async () => {
   if (process.argv[2] === "run") {
@@ -19,7 +20,7 @@ export const main = async () => {
         }
         validateEnv();
         const app = new App(
-          [new AppController()],
+          [new CredentialsController(), new UsersController()],
           Number((process.env.PORT as string) || 8080)
         );
         app.listen();

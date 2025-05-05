@@ -4,7 +4,7 @@ import { v4 as UUIDV4 } from "uuid";
 import { findOneCredential } from "lib/helpers/findOneCredential";
 import { RolesEnum } from "utils/rolesEnum";
 import {
-  RegisterInitCredentials,
+  RegisterInit,
   RegisterInitCredentialsResponse
 } from "types/registerInitCredentialInterfaces";
 import { requestEmailConfirmation } from "./requestEmailConfirmation";
@@ -21,7 +21,7 @@ import { RoleHelper } from "lib/helpers/Role";
  * @returns A response with status, message, and user payload if successful.
  */
 export const registerInitCredentials = async (
-  values: RegisterInitCredentials
+  values: RegisterInit
 ): Promise<ReturnResponse<RegisterInitCredentialsResponse>> => {
   try {
     const { email, password, createdBy } = values;

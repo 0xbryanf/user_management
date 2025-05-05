@@ -3,9 +3,10 @@ export default {
     {
       schema: "User_Management",
       model: "Credentials",
-      action: "getUserByUserId",
+      action: "verifyCredentials",
       values: {
-        userId: "a5388ee0-e8f5-4843-9223-a30d06a36376"
+        email: "hello@gmail.com",
+        password: "password"
       }
     }
   ]

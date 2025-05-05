@@ -19,6 +19,8 @@ export function authenticateToken(
     req.user = authTokenFromHeader(req, res) as AuthPayload;
     next();
   } catch (error) {
-    res.status(403).json({ message: "Invalid credentials" });
+    res
+      .status(401)
+      .json({ statusText: "Unauthorized", message: "Invalid credentials" });
   }
 }

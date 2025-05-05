@@ -2,7 +2,7 @@ export default {
   actions: [
     {
       schema: "User_Management",
-      model: "Users",
+      model: "Credentials",
       action: "verifyOTPEmail",
       values: {
         email: "0xbryanf@gmail.com",

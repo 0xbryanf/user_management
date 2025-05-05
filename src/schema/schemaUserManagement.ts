@@ -1,12 +1,12 @@
 import { assignRole } from "functions/assignRole";
 import { createRole } from "functions/createRole";
-import { getUserByEmail } from "functions/getUserByEmail";
-import { getUserByUserId } from "functions/getUserByUserId";
+import { getCredentialByEmail } from "functions/getCredentialByEmail";
+import { getCredentialByUserId } from "functions/getCredentialByUserId";
 import { registerInitCredentials } from "functions/registerInitCredentials";
 import { requestEmailConfirmation } from "functions/requestEmailConfirmation";
 import { sendOTPEmail } from "functions/sendOTPEmail";
+import { verifyCredentials } from "functions/verifyCredentials";
 import { verifyOTPEmail } from "functions/verifyOTPEmail";
-import { verifyUser } from "functions/verifyUser";
 import { DataTypes } from "sequelize";
 
 export const SchemaUserManagement = {
@@ -53,11 +53,7 @@ export const SchemaUserManagement = {
       }
     },
     relation: {},
-    actions: {
-      verifyUser,
-      sendOTPEmail,
-      verifyOTPEmail
-    }
+    actions: {}
   },
   Roles: {
     descriptor: {
@@ -294,9 +290,12 @@ export const SchemaUserManagement = {
     relation: {},
     actions: {
       registerInitCredentials,
-      getUserByEmail,
-      getUserByUserId,
-      requestEmailConfirmation
+      getCredentialByEmail,
+      getCredentialByUserId,
+      requestEmailConfirmation,
+      verifyCredentials,
+      sendOTPEmail,
+      verifyOTPEmail
     }
   },
   PasswordHistory: {

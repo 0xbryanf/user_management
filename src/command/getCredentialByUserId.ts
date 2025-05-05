@@ -3,9 +3,9 @@ export default {
     {
       schema: "User_Management",
       model: "Credentials",
-      action: "sendOTPEmail",
+      action: "getCredentialByUserId",
       values: {
-        email: "0xbryanf@gmail.com"
+        userId: "a5388ee0-e8f5-4843-9223-a30d06a36376"
       }
     }
   ]

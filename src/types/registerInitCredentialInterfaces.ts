@@ -1,4 +1,4 @@
-export interface RegisterInitCredentials {
+export interface RegisterInit {
   email: string;
   password?: string;
   createdBy?: string;
