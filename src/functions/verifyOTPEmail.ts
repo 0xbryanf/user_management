@@ -18,6 +18,7 @@ export const verifyOTPEmail = async (values: {
     if (!email || !otp) {
       return {
         status: 400,
+        statusText: "Bad Request",
         message: "OTP and recipient email are required."
       };
     }
@@ -27,7 +28,8 @@ export const verifyOTPEmail = async (values: {
 
     if (!storedValueStr) {
       return {
-        status: 400,
+        status: 422,
+        statusText: "Unprocessable Entity",
         message: "Invalid or expired OTP."
       };
     }
@@ -38,7 +40,8 @@ export const verifyOTPEmail = async (values: {
 
     if (ttl < 0) {
       return {
-        status: 400,
+        status: 422,
+        statusText: "Unprocessable Entity",
         message: "OTP expired or not found."
       };
     }
@@ -51,7 +54,8 @@ export const verifyOTPEmail = async (values: {
       if (updatedRetries >= 3) {
         await RedisHelper.del(redisKey);
         return {
-          status: 400,
+          status: 429,
+          statusText: "Too Many Requests",
           message: "OTP verification failed too many times."
         };
       }
@@ -66,7 +70,8 @@ export const verifyOTPEmail = async (values: {
       });
 
       return {
-        status: 400,
+        status: 422,
+        statusText: "Unprocessable Entity",
         message: "Invalid OTP."
       };
     }
@@ -74,12 +79,14 @@ export const verifyOTPEmail = async (values: {
     await RedisHelper.del(redisKey);
 
     return {
-      status: 200,
+      status: 202,
+      statusText: "Accepted",
       message: "OTP verified successfully."
     };
   } catch (error) {
     return {
       status: 500,
+      statusText: "Internal Server Error",
       message:
         (error as Error).message ||
         "An unexpected error occurred during OTP verification."

@@ -22,6 +22,7 @@ export const requestEmailConfirmation = async (values: {
     if (!email) {
       return {
         status: 400,
+        statusText: "Bad Request",
         message: "Email destination must be provided."
       };
     }
@@ -30,6 +31,7 @@ export const requestEmailConfirmation = async (values: {
     if (!user) {
       return {
         status: 404,
+        statusText: "Not Found",
         message: "User not found."
       };
     }
@@ -51,7 +53,8 @@ export const requestEmailConfirmation = async (values: {
     const [res] = emailResponse;
     if (res.statusCode !== 202) {
       return {
-        status: res.statusCode,
+        status: 502,
+        statusText: "Bad Gateway",
         message: "Email confirmation failed.",
         data: emailResponse
       };
@@ -65,12 +68,14 @@ export const requestEmailConfirmation = async (values: {
 
     return {
       status: 200,
+      statusText: "OK",
       message: "Email confirmation sent successfully.",
       data: emailResponse
     };
   } catch (error) {
     return {
       status: 500,
+      statusText: "Internal Server Error",
       message:
         (error as Error).message ||
         "An unexpected error occurred while sending the email."

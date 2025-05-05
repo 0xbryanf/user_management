@@ -18,6 +18,7 @@ export const verifyUser = async (
     if (!email || !password) {
       return {
         status: 400,
+        statusText: "Bad Request",
         message: "Missing email or password."
       };
     }
@@ -26,6 +27,7 @@ export const verifyUser = async (
     if (!user) {
       return {
         status: 404,
+        statusText: "Not Found",
         message: "User not found."
       };
     }
@@ -34,18 +36,21 @@ export const verifyUser = async (
     if (!isPasswordValid) {
       return {
         status: 401,
+        statusText: "Unauthorized",
         message: "Invalid credentials."
       };
     }
 
     return {
-      status: 200,
+      status: 202,
+      statusText: "Accepted",
       message: "User verified successfully.",
       data: user.user_id
     };
   } catch (error) {
     return {
       status: 500,
+      statusText: "Internal Server Error",
       message: "Error verifying user."
     };
   }

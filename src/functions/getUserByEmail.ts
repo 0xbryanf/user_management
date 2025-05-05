@@ -17,6 +17,7 @@ export const getUserByEmail = async (values: {
     if (!email) {
       return {
         status: 400,
+        statusText: "Bad Request",
         message: "Email must be provided."
       };
     }
@@ -26,18 +27,21 @@ export const getUserByEmail = async (values: {
     if (!user) {
       return {
         status: 404,
+        statusText: "Not Found",
         message: "User not found."
       };
     }
 
     return {
       status: 200,
+      statusText: "OK",
       message: "User found",
       data: user
     };
   } catch (error) {
     return {
       status: 500,
+      statusText: "Internal Server Error",
       message:
         (error as Error).message ||
         "An unexpected error occurred while retrieving the user."

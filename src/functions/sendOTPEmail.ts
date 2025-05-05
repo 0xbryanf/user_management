@@ -24,6 +24,7 @@ export const sendOTPEmail = async (values: {
     if (!email) {
       return {
         status: 400,
+        statusText: "Bad Request",
         message: "Email destination must be provided."
       };
     }
@@ -41,7 +42,8 @@ export const sendOTPEmail = async (values: {
 
     if (res.statusCode !== 202) {
       return {
-        status: res.statusCode,
+        status: 502,
+        statusText: "Bad Gateway",
         message: "Failed to send OTP email.",
         data: emailResponse
       };
@@ -55,12 +57,14 @@ export const sendOTPEmail = async (values: {
 
     return {
       status: 200,
+      statusText: "OK",
       message: "OTP Email sent successfully.",
       data: emailResponse
     };
   } catch (error) {
     return {
       status: 500,
+      statusText: "Internal Server Error",
       message:
         (error as Error).message ||
         "An unexpected error occurred while sending OTP."

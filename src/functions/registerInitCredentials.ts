@@ -29,6 +29,7 @@ export const registerInitCredentials = async (
     if (!email || !password) {
       return {
         status: 400,
+        statusText: "Bad Request",
         message: "Missing information to create a user."
       };
     }
@@ -39,6 +40,7 @@ export const registerInitCredentials = async (
       await requestEmailConfirmation({ email });
       return {
         status: 409,
+        statusText: "Conflict",
         message: "A user with this email already exists."
       };
     }
@@ -50,6 +52,7 @@ export const registerInitCredentials = async (
     if (!defaultRole) {
       return {
         status: 404,
+        statusText: "Not Found",
         message: "Default role not found."
       };
     }
@@ -75,6 +78,7 @@ export const registerInitCredentials = async (
     const token: string = generateToken(newUser.user_id);
     return {
       status: 201,
+      statusText: "Created",
       message: "User created successfully.",
       data: {
         user: newUser.user_id,
@@ -85,6 +89,7 @@ export const registerInitCredentials = async (
   } catch (error) {
     return {
       status: 500,
+      statusText: "Internal Server Error",
       message:
         (error as Error).message ||
         "An unexpected error occurred during registration."

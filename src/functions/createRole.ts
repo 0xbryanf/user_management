@@ -19,7 +19,8 @@ export const createRole = async (
 
     if (!role_name || !created_by) {
       return {
-        status: 401,
+        status: 400,
+        statusText: "Bad Request",
         message: "Missing information to create a role."
       };
     }
@@ -30,7 +31,8 @@ export const createRole = async (
     );
     if (!UserRolesModel) {
       return {
-        status: 500,
+        status: 503,
+        statusText: "Service Unavailable",
         message: "Failed to load UserRoles model."
       };
     }
@@ -39,6 +41,7 @@ export const createRole = async (
     if (!user) {
       return {
         status: 404,
+        statusText: "Not Found",
         message: "User not found."
       };
     }
@@ -47,6 +50,7 @@ export const createRole = async (
     if (existingRole) {
       return {
         status: 409,
+        statusText: "Conflict",
         message: "Role already exists."
       };
     }
@@ -64,6 +68,7 @@ export const createRole = async (
     if (userHasPermission === 0) {
       return {
         status: 403,
+        statusText: "Forbidden",
         message: "You do not have permission to create roles."
       };
     }
@@ -72,12 +77,14 @@ export const createRole = async (
 
     return {
       status: 201,
+      statusText: "Created",
       message: "Role created successfully.",
       data: newRole
     };
   } catch (error) {
     return {
       status: 500,
+      statusText: "Internal Server Error",
       message:
         (error as Error).message ||
         "An unexpected error occurred during role creation."

@@ -19,7 +19,8 @@ export const assignRole = async (
 
     if (!email || !role_name || !created_by) {
       return {
-        status: 401,
+        status: 400,
+        statusText: "Bad Request",
         message: "All required fields must be provided to assign a role."
       };
     }
@@ -30,7 +31,8 @@ export const assignRole = async (
     );
     if (!UserRolesModel) {
       return {
-        status: 500,
+        status: 503,
+        statusText: "Service Unavailable",
         message: "Failed to load UserRoles model."
       };
     }
@@ -39,6 +41,7 @@ export const assignRole = async (
     if (!user) {
       return {
         status: 404,
+        statusText: "Not Found",
         message: "User not found."
       };
     }
@@ -47,6 +50,7 @@ export const assignRole = async (
     if (!availableRole) {
       return {
         status: 404,
+        statusText: "Not Found",
         message: "Role not found."
       };
     }
@@ -62,6 +66,7 @@ export const assignRole = async (
     if (existingUserRole) {
       return {
         status: 409,
+        statusText: "Conflict",
         message: "User already has the assigned role."
       };
     }
@@ -74,12 +79,14 @@ export const assignRole = async (
 
     return {
       status: 200,
+      statusText: "OK",
       message: "Role assigned successfully.",
       data: newUserRole.get({ plain: true }) as UserRoleResponse
     };
   } catch (error) {
     return {
       status: 500,
+      statusText: "Internal Server Error",
       message:
         (error as Error).message ||
         "An unexpected error occurred during role assignment."
