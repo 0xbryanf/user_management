@@ -1,3 +1,4 @@
+import { activateUser } from "functions/activateUser";
 import { assignRole } from "functions/assignRole";
 import { createRole } from "functions/createRole";
 import { getCredentialByEmail } from "functions/getCredentialByEmail";
@@ -53,7 +54,9 @@ export const SchemaUserManagement = {
       }
     },
     relation: {},
-    actions: {}
+    actions: {
+      activateUser
+    }
   },
   Roles: {
     descriptor: {

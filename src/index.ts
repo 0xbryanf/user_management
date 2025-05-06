@@ -3,8 +3,8 @@ import App from "./app";
 import "dotenv/config";
 import { validateEnv } from "utils/validateEnv";
 import { runCommand } from "utils/runCommand";
-import CredentialsController from "controllers/credentials.controller";
-import UsersController from "controllers/users.controller";
+import CredentialsController from "./controllers/credentials.controller";
+import UsersController from "./controllers/users.controller";
 
 export const main = async () => {
   if (process.argv[2] === "run") {

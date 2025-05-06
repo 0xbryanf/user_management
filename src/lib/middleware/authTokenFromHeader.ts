@@ -1,42 +1,27 @@
 import { Request, Response } from "express";
 import jwt, { JwtPayload } from "jsonwebtoken";
 
-/**
- * Extracts and verifies a signed token from the Authorization header.
- * Expected format: "Authorization: Sig <token>"
- *
- * @param req - Express Request object
- * @param res - Express Response object
- * @returns Decoded JWT payload or sends an HTTP response on error
- */
-export const authTokenFromHeader = (
-  req: Request,
-  res: Response
-): JwtPayload | void => {
+export const authTokenFromHeader = (req: Request, res: Response) => {
   const authHeader = req.headers.authorization;
+  const tokenBase64 = authHeader?.startsWith("Bearer ")
+    ? authHeader.split(" ")[1]
+    : undefined;
 
-  const signedToken =
-    authHeader?.startsWith("Bearer ") && authHeader.split(" ")[1];
-
-  if (!signedToken) {
-    res.status(400).json({
-      statusText: "Bad Request",
-      message: "Missing access token."
-    });
+  if (!tokenBase64) {
+    res.status(401).json({ message: "Access token not provided" });
     return;
   }
 
-  try {
-    const decoded = jwt.verify(
-      signedToken,
-      process.env.JWT_SECRET_KEY!
-    ) as JwtPayload;
+  // Decode base64 token back to original JWT
+  const token = Buffer.from(tokenBase64, "base64").toString("utf-8");
 
-    return decoded;
+  let decoded: JwtPayload;
+  try {
+    decoded = jwt.verify(token, process.env.JWT_SECRET_KEY!) as JwtPayload;
   } catch (err) {
-    res.status(401).json({
-      statusText: "Unauthorized",
-      message: "Invalid or expired token."
-    });
+    res.status(401).json({ message: "Invalid or expired token" });
+    return;
   }
+
+  return decoded;
 };

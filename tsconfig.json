@@ -15,7 +15,7 @@
       "helpers/*": ["lib/helpers/*"],
       "schema/*": ["schema/*"],
       "functions/*": ["functions/*"],
-      "controller/*": ["controller/*"],
+      "controllers/*": ["controllers/*"],
       "services/*": ["services/*"]
     },
     "skipLibCheck": true, // Skips type checking of all declaration files for faster compilation.

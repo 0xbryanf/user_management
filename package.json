@@ -79,6 +79,8 @@
     "helpers": "dist/lib/helpers",
     "utils": "dist/utils",
     "schema": "dist/schema",
-    "functions": "dist/functions"
+    "functions": "dist/functions",
+    "services": "dist/services",
+    "controllers": "dist/controllers"
   }
 }

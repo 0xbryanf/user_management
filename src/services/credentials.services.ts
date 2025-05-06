@@ -12,7 +12,6 @@ import sgMail from "@sendgrid/mail";
 import { sendOTPEmail } from "functions/sendOTPEmail";
 import { verifyOTPEmail } from "functions/verifyOTPEmail";
 import { verifyCredentials } from "functions/verifyCredentials";
-import { JwtPayload } from "jsonwebtoken";
 
 class CredentialsService {
   /**
@@ -43,9 +42,8 @@ class CredentialsService {
   }
 
   static async requestEmailConfirmation(
-    decoded: JwtPayload
+    userId: string
   ): Promise<ReturnResponse<[sgMail.ClientResponse, {}]>> {
-    const userId = decoded.userId;
     const user = await getCredentialByUserId({ userId });
     if (!user.data) {
       return {
@@ -60,27 +58,18 @@ class CredentialsService {
   }
 
   static async sendOTPEmail(
-    decoded: JwtPayload
+    userId: string
   ): Promise<ReturnResponse<[sgMail.ClientResponse, {}]>> {
-    const userId = decoded.userId;
     const user = await getCredentialByUserId({ userId });
-    if (!user.data) {
-      return {
-        status: 404,
-        statusText: "Not Found",
-        message: "User data not found."
-      };
-    }
     const email = (user.data as unknown as { email: string }).email;
     const result = await sendOTPEmail({ email });
     return result;
   }
 
   static async verifyOTPEmail(
-    decoded: JwtPayload,
+    userId: string,
     otp: number
   ): Promise<ReturnResponse> {
-    const userId = decoded.userId;
     const user = await getCredentialByUserId({ userId });
     if (!user.data) {
       return {

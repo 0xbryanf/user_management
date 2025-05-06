@@ -2,6 +2,7 @@ import { findOneCredential } from "lib/helpers/findOneCredential";
 import { verifyPassword } from "lib/helpers/verifyPassword";
 import { ReturnResponse } from "types/returnResponse";
 import { VerifyUser } from "types/verifyUser";
+import { generateToken } from "utils/generateToken";
 
 /**
  * Verifies a user's credentials by checking email and password.
@@ -41,11 +42,13 @@ export const verifyCredentials = async (
       };
     }
 
+    const token: string = generateToken(user.user_id);
+
     return {
       status: 202,
       statusText: "Accepted",
       message: "User verified successfully.",
-      data: user.user_id
+      data: Buffer.from(token).toString("base64")
     };
   } catch (error) {
     return {
