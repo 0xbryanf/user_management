@@ -7,7 +7,6 @@ import {
   RegisterInit,
   RegisterInitCredentialsResponse
 } from "types/registerInitCredentialInterfaces";
-import { requestEmailConfirmation } from "./requestEmailConfirmation";
 import { createUser } from "lib/helpers/createUser";
 import { createCredentials } from "lib/helpers/createCredentials";
 import { createUserRoles } from "lib/helpers/createUserRoles";
@@ -37,7 +36,6 @@ export const registerInitCredentials = async (
     const existingUser = await findOneCredential({ email });
 
     if (existingUser) {
-      await requestEmailConfirmation({ email });
       return {
         status: 409,
         statusText: "Conflict",

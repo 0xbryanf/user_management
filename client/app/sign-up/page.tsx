@@ -11,6 +11,7 @@ import SignUpForm from "@/components/organisms/signUpForm";
 import { calculatePasswordStrength } from "@/lib/calculatePasswordStrength";
 import { validatePasswordLive } from "@/lib/validatePassword";
 import { PasswordValidationResult } from "@/lib/type/passwordValidation";
+import api from "@/lib/api";
 
 export default function SignUpPage() {
   const router = useRouter();
@@ -28,6 +29,16 @@ export default function SignUpPage() {
       hasSpecialChar: false
     });
 
+  /**
+   * Handles OAuth and authentication error handling on the sign-up page.
+   * Checks URL parameters for authentication errors and displays appropriate toast notifications.
+   * Clears error parameters from the URL to prevent repeated error displays.
+   *
+   * @remarks
+   * - Detects specific OAuth errors like "Callback" and "OAuthAccountNotLinked"
+   * - Provides user-friendly error messages based on error type
+   * - Removes error parameters from URL to maintain clean navigation state
+   */
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const callbackUrl = urlParams.get("callbackUrl");
@@ -55,9 +66,20 @@ export default function SignUpPage() {
     }
   }, []);
 
+  /**
+   * Handles user sign-up with email and password credentials.
+   *
+   * @remarks
+   * - Validates that password and confirm password match
+   * - Sends registration request to backend API
+   * - Displays success/error toast notifications
+   * - Redirects to identity verification page on successful registration
+   *
+   * @param event - Form submission event
+   * @throws {AxiosError} Handles potential registration errors with user-friendly messages
+   */
   const handleCredentialsSignUp = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-
     if (password !== confirmPassword) {
       toast.error("Passwords don't match. Please double-check and try again.", {
         duration: 2000,
@@ -69,39 +91,40 @@ export default function SignUpPage() {
     setLoading(true);
 
     try {
-      const response = await axios.post("/api/auth/register", {
+      const registrationResponse = await api.post("/api/auth/register-init", {
         email,
         password
       });
 
-      if (response.status === 200) {
-        toast.success(
-          "Credentials accepted. Let's verify your identity next.",
+      if (registrationResponse.status === 201) {
+        const otpResponse = await api.post("/api/send-otp-email");
+        router.push("/verify-identity");
+        if (otpResponse.status != 200) {
+          toast.error(
+            `Error ${otpResponse.data?.status}: ${otpResponse.data?.message}`,
+            {
+              duration: 1000,
+              style: { fontSize: "14px" }
+            }
+          );
+          setLoading(false);
+        }
+      } else {
+        toast.error(
+          `Error ${registrationResponse.data?.status}: ${registrationResponse.data?.message}`,
           {
-            duration: 1500,
-            style: { fontSize: "16px" },
-            icon: null
+            duration: 1000,
+            style: { fontSize: "14px" }
           }
         );
-
-        setTimeout(() => {
-          router.push("/verify-identity");
-        }, 2500);
-      } else {
-        toast.error("Something went wrong. Please try again.", {
-          duration: 1000,
-          style: { fontSize: "16px" }
-        });
         setLoading(false);
       }
     } catch (error) {
       const err = error as AxiosError<{ error?: string }>;
-      const message =
-        err.response?.data?.error || "An error occurred. Please try again.";
-
+      const message = `Error ${err.response?.status}: ${err.response?.statusText}`;
       toast.error(message, {
-        duration: 1000,
-        style: { fontSize: "16px" }
+        duration: 2500,
+        style: { fontSize: "14px" }
       });
 
       setLoading(false);
@@ -119,7 +142,6 @@ export default function SignUpPage() {
     setPassword(value);
     const strength = calculatePasswordStrength(value);
     setPasswordStrength(strength);
-
     const validation = validatePasswordLive(value);
     setPasswordValidation(validation);
   };

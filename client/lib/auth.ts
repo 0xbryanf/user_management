@@ -11,7 +11,6 @@ import { getServerSession } from "next-auth";
 
 const NEXTAUTH_SECRET = process.env.NEXTAUTH_SECRET as string;
 const VERIFY_USER_URL = `${process.env.BASE_URL}/verify-user`;
-const SEND_OTP_URL = `${process.env.BASE_URL}/send-otp-email`;
 
 export const authOptions: AuthOptions = {
   secret: NEXTAUTH_SECRET,
@@ -22,6 +21,9 @@ export const authOptions: AuthOptions = {
         email: { label: "Email", type: "email" },
         password: { label: "Password", type: "password" }
       },
+      /**
+       * Verifies user credentials against your backend.
+       */
       async authorize(credentials) {
         const { email, password } = credentials || {};
         if (!email || !password) return null;
@@ -33,18 +35,13 @@ export const authOptions: AuthOptions = {
             body: JSON.stringify({ email, password })
           });
 
-          const user = await verifyRes.json();
-          if (!verifyRes.ok || !user.token) return null;
+          if (!verifyRes.ok) return null;
 
-          const token = user.token;
-          await fetch(SEND_OTP_URL, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`
-            }
-          });
-          return { id: token, email };
+          const user = await verifyRes.json();
+          // Expect your backend to return at least an `id` and `email` on success
+          if (!user.id || !user.email) return null;
+
+          return { id: user.id, email: user.email };
         } catch {
           return null;
         }
@@ -80,24 +77,11 @@ export const authOptions: AuthOptions = {
     error: "/login"
   },
   callbacks: {
-    async jwt({ token, user, account }) {
-      if (account && user) {
+    async jwt({ token, user }) {
+      if (user) {
         token.id = user.id;
         token.email = user.email;
-        if (account.provider === "google" && user.email) {
-          try {
-            const verifyRes = await fetch(VERIFY_USER_URL, {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ email: user.email })
-            });
-            if (!verifyRes.ok) {
-              throw new Error("User verification failed");
-            }
-          } catch (error) {
-            return Promise.reject("OAuth user verification failed");
-          }
-        }
+        token.sub = user.id;
       }
       return token;
     },
@@ -106,7 +90,6 @@ export const authOptions: AuthOptions = {
         (session.user as any).id = token.id as string;
         session.user.email = token.email as string;
       }
-      (session as any).accessToken = token.accessToken as string;
       return session;
     }
   }

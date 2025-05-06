@@ -29,8 +29,8 @@ export const verifyOTPEmail = async (values: {
     if (!storedValueStr) {
       return {
         status: 422,
-        statusText: "Unprocessable Entity",
-        message: "Invalid or expired OTP."
+        statusText: "Invalid or expired OTP",
+        message: "Unprocessable Entity"
       };
     }
 
@@ -41,8 +41,8 @@ export const verifyOTPEmail = async (values: {
     if (ttl < 0) {
       return {
         status: 422,
-        statusText: "Unprocessable Entity",
-        message: "OTP expired or not found."
+        statusText: "Invalid or expired OTP",
+        message: "Unprocessable Entity"
       };
     }
 
@@ -71,8 +71,8 @@ export const verifyOTPEmail = async (values: {
 
       return {
         status: 422,
-        statusText: "Unprocessable Entity",
-        message: "Invalid OTP."
+        statusText: "Invalid or expired OTP",
+        message: "Unprocessable Entity"
       };
     }
 

@@ -4,6 +4,7 @@ import "../styles/globals.css";
 import { Providers } from "./providers";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
+import axios from "axios";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -16,7 +17,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Baron",
+  title: "",
   description: ""
 };
 

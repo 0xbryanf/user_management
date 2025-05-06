@@ -90,12 +90,10 @@ export default function SignInPage() {
       }
     } catch (error) {
       const err = error as AxiosError<{ error?: string }>;
-      const message =
-        err.response?.data?.error || "An error occurred. Please try again.";
-
+      const message = `Error ${err.response?.status}: ${err.response?.statusText}`;
       toast.error(message, {
-        duration: 1000,
-        style: { fontSize: "16px" }
+        duration: 2500,
+        style: { fontSize: "14px" }
       });
 
       setLoading(false);
