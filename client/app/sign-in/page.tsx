@@ -145,15 +145,19 @@ export default function SignInPage() {
             csrfToken={csrfToken} // Pass csrfToken to LoginForm
           />
 
-          <p className="mt-10 text-center text-sm text-gray-500">
-            Not a member?{" "}
-            <a
-              href="/sign-up"
-              className="font-semibold text-blue-600 hover:text-blue-500"
+          <div className="mt-14 text-center">
+            <Button
+              disabled={loading}
+              onClick={() => router.push("/sign-up")}
+              className={`flex w-full rounded-full justify-center gap-2 text-sm px-4 py-2 bg-white font-normal border border-gray-300 hover:bg-gray-50 transition ${
+                loading
+                  ? "opacity-50 cursor-not-allowed"
+                  : "hover:bg-opacity-30 hover:cursor-pointer"
+              }`}
             >
-              Sign up now while it's still free!
-            </a>
-          </p>
+              Create new account{" "}
+            </Button>
+          </div>
         </div>
       </div>
       <Toaster position="top-center" />

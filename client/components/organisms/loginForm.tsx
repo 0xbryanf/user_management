@@ -26,7 +26,7 @@ const LoginForm = ({
   csrfToken
 }: LoginFormProps) => (
   <>
-    <form className="space-y-6" onSubmit={onSubmit}>
+    <form className="space-y-4" onSubmit={onSubmit}>
       <CsrfTokenField value={csrfToken} />
       <EmailField value={email} onChange={(e) => setEmail(e.target.value)} />
       <PasswordField

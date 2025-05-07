@@ -96,6 +96,13 @@ export default function SignUpPage() {
         password
       });
 
+      if (
+        registrationResponse.status === 409 &&
+        registrationResponse.statusText.toLowerCase() === "conflict"
+      ) {
+        router.push("/validate-identity");
+      }
+
       if (registrationResponse.status === 201) {
         const otpResponse = await api.post("/api/send-otp-email");
         router.push("/verify-identity");
@@ -165,7 +172,7 @@ export default function SignUpPage() {
             className={`flex w-full justify-center gap-2 px-4 py-2 rounded-md bg-white text-black border border-gray-300 hover:bg-gray-50 transition text-base ${
               loading
                 ? "opacity-50 cursor-not-allowed"
-                : "hover:bg-opacity-30 hover:shadow-sm hover:cursor-pointer"
+                : "hover:bg-opacity-30 hover:cursor-pointer"
             }`}
           >
             <FcGoogle className="text-xl" />
@@ -191,15 +198,19 @@ export default function SignUpPage() {
             passwordValidation={passwordValidation}
           />
 
-          <p className="mt-10 text-center text-sm text-gray-500">
-            Have an account already?{" "}
-            <a
-              href="/sign-in"
-              className="font-semibold text-blue-600 hover:text-blue-500"
+          <div className="mt-14 text-center">
+            <Button
+              disabled={loading}
+              onClick={() => router.push("/find-my-account")}
+              className={`flex w-full rounded-full justify-center gap-2 text-sm px-4 py-2 bg-white font-normal border border-gray-300 hover:bg-gray-50 transition ${
+                loading
+                  ? "opacity-50 cursor-not-allowed"
+                  : "hover:bg-opacity-30 hover:cursor-pointer"
+              }`}
             >
-              Log in here.
-            </a>
-          </p>
+              Find my account
+            </Button>
+          </div>
         </div>
       </div>
       <Toaster position="top-center" />

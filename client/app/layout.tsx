@@ -17,8 +17,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "",
-  description: ""
+  title: "BlueFin",
+  description:
+    "BlueFin is your AI-powered personal assistant that automates tasks, manages your schedule, and delivers real-time insights to boost productivity—anytime, anywhere."
 };
 
 export default async function RootLayout({
