@@ -5,15 +5,15 @@ export async function POST(request: NextRequest) {
   if (!otp) {
     return NextResponse.json({ error: "Bad Request" }, { status: 400 });
   }
+
   const cookie = request.cookies.get("payloadRef");
   if (!cookie) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
+
   const token = cookie.value;
-  if (!token) {
-    return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
-  }
   let remoteRes: Response;
+
   try {
     remoteRes = await fetch(`${process.env.BASE_URL}/verify-otp-email`, {
       method: "POST",
@@ -29,16 +29,17 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Bad Gateway" }, { status: 502 });
   }
 
+  console.log("remoteres", remoteRes);
+
   if (!remoteRes.ok) {
-    const text = await remoteRes.text().catch(() => remoteRes.statusText);
     return NextResponse.json(
-      { error: text || "Request failed." },
+      { error: "Invalid or expired OTP" },
       { status: remoteRes.status }
     );
   }
 
   return NextResponse.json(
-    { status: 200, message: "User Verified" },
+    { status: 200, message: "OTP verified successfully." },
     { status: 200 }
   );
 }

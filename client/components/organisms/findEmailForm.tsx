@@ -27,7 +27,7 @@ const FindEmailForm = ({
         }`}
         type="submit"
       >
-        Sign Up
+        Find my account
       </Button>
     </form>
   </>

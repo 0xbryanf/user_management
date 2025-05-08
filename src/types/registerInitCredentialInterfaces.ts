@@ -5,7 +5,7 @@ export interface RegisterInit {
 }
 
 export interface RegisterInitCredentialsResponse {
-  user: string;
-  isActive: boolean;
+  user?: string;
+  isActive?: boolean;
   payloadRef: string;
 }

@@ -4,10 +4,10 @@ import { FormEvent, useState, useEffect } from "react";
 import axios, { AxiosError } from "axios";
 import { useRouter } from "next/navigation";
 import { toast, Toaster } from "react-hot-toast";
-import LoginForm from "@/components/organisms/loginForm";
 import { signIn } from "next-auth/react";
 import Button from "@/components/atoms/button";
 import { FcGoogle } from "react-icons/fc";
+import SignInForm from "@/components/organisms/signInForm";
 
 export default function SignInPage() {
   const router = useRouter();
@@ -135,7 +135,7 @@ export default function SignInPage() {
             <hr className="flex-grow border-gray-300" />
           </div>
 
-          <LoginForm
+          <SignInForm
             onSubmit={handleCredentialsSignIn}
             loading={loading}
             email={email}

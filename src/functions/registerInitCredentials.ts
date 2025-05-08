@@ -35,11 +35,16 @@ export const registerInitCredentials = async (
 
     const existingUser = await findOneCredential({ email });
 
-    if (existingUser) {
+    if (existingUser && existingUser.user_id) {
+      const token: string = generateToken(existingUser.user_id);
       return {
         status: 409,
         statusText: "Conflict",
-        message: "A user with this email already exists."
+        message: "A user with this email already exists.",
+        data: {
+          user: existingUser.email,
+          payloadRef: Buffer.from(token).toString("base64")
+        }
       };
     }
 

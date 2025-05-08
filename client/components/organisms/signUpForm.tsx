@@ -34,7 +34,7 @@ const SignUpForm = ({
   passwordValidation
 }: SignUpFormProps) => (
   <>
-    <form className="space-y-4" onSubmit={onSubmit}>
+    <form className="space-y-3" onSubmit={onSubmit}>
       <EmailField value={email} onChange={(e) => setEmail(e.target.value)} />
       <PasswordField value={password} onChange={handlePasswordChange} />
       <PasswordRequirements

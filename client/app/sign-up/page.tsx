@@ -66,18 +66,6 @@ export default function SignUpPage() {
     }
   }, []);
 
-  /**
-   * Handles user sign-up with email and password credentials.
-   *
-   * @remarks
-   * - Validates that password and confirm password match
-   * - Sends registration request to backend API
-   * - Displays success/error toast notifications
-   * - Redirects to identity verification page on successful registration
-   *
-   * @param event - Form submission event
-   * @throws {AxiosError} Handles potential registration errors with user-friendly messages
-   */
   const handleCredentialsSignUp = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (password !== confirmPassword) {
@@ -87,54 +75,40 @@ export default function SignUpPage() {
       });
       return;
     }
-
     setLoading(true);
 
     try {
-      const registrationResponse = await api.post("/api/auth/register-init", {
-        email,
-        password
-      });
+      const apiRegistrationResponse = await api.post(
+        "/api/auth/register-init",
+        {
+          email,
+          password
+        }
+      );
 
-      if (
-        registrationResponse.status === 409 &&
-        registrationResponse.statusText.toLowerCase() === "conflict"
-      ) {
-        router.push("/validate-identity");
-      }
-
-      if (registrationResponse.status === 201) {
+      if (apiRegistrationResponse.status === 201) {
         const otpResponse = await api.post("/api/send-otp-email");
-        router.push("/verify-identity");
-        if (otpResponse.status != 200) {
+        if (otpResponse.status === 200) {
+          router.push("/verify-otp");
+        } else {
+          // Handle error from OTP API
           toast.error(
             `Error ${otpResponse.data?.status}: ${otpResponse.data?.message}`,
-            {
-              duration: 1000,
-              style: { fontSize: "14px" }
-            }
+            { duration: 1000, style: { fontSize: "14px" } }
           );
           setLoading(false);
         }
-      } else {
-        toast.error(
-          `Error ${registrationResponse.data?.status}: ${registrationResponse.data?.message}`,
-          {
-            duration: 1000,
-            style: { fontSize: "14px" }
-          }
-        );
-        setLoading(false);
       }
     } catch (error) {
       const err = error as AxiosError<{ error?: string }>;
-      const message = `Error ${err.response?.status}: ${err.response?.statusText}`;
-      toast.error(message, {
-        duration: 2500,
-        style: { fontSize: "14px" }
-      });
-
-      setLoading(false);
+      if (err.response?.status === 409) {
+        router.push("/find-my-account");
+      } else {
+        toast.error("An unexpected error occurred. Please try again later.", {
+          duration: 2000,
+          style: { fontSize: "14px" }
+        });
+      }
     }
   };
 
@@ -201,14 +175,14 @@ export default function SignUpPage() {
           <div className="mt-14 text-center">
             <Button
               disabled={loading}
-              onClick={() => router.push("/find-my-account")}
+              onClick={() => router.push("/sign-in")}
               className={`flex w-full rounded-full justify-center gap-2 text-sm px-4 py-2 bg-white font-normal border border-gray-300 hover:bg-gray-50 transition ${
                 loading
                   ? "opacity-50 cursor-not-allowed"
                   : "hover:bg-opacity-30 hover:cursor-pointer"
               }`}
             >
-              Find my account
+              Already have an account? Sign in
             </Button>
           </div>
         </div>

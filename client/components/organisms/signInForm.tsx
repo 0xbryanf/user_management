@@ -1,12 +1,10 @@
 import React from "react";
 import PasswordField from "@/components/molecules/passwordField";
 import Button from "@/components/atoms/button";
-import { FcGoogle } from "react-icons/fc";
 import EmailField from "../molecules/emailField";
 import CsrfTokenField from "../molecules/csrfTokenField";
-import { signIn } from "next-auth/react";
 
-type LoginFormProps = {
+type SignInFormProps = {
   onSubmit: (event: React.FormEvent<HTMLFormElement>) => void;
   loading: boolean;
   email: string;
@@ -16,7 +14,7 @@ type LoginFormProps = {
   csrfToken: string;
 };
 
-const LoginForm = ({
+const SignInForm = ({
   onSubmit,
   loading,
   email,
@@ -24,9 +22,9 @@ const LoginForm = ({
   password,
   setPassword,
   csrfToken
-}: LoginFormProps) => (
+}: SignInFormProps) => (
   <>
-    <form className="space-y-4" onSubmit={onSubmit}>
+    <form className="space-y-3" onSubmit={onSubmit}>
       <CsrfTokenField value={csrfToken} />
       <EmailField value={email} onChange={(e) => setEmail(e.target.value)} />
       <PasswordField
@@ -48,4 +46,4 @@ const LoginForm = ({
   </>
 );
 
-export default LoginForm;
+export default SignInForm;

@@ -3,13 +3,9 @@ import { NextRequest, NextResponse } from "next/server";
 export async function POST(request: NextRequest) {
   const cookie = request.cookies.get("payloadRef");
   if (!cookie) {
-    return NextResponse.json(
-      { error: "Invalid Credentials.", statusText: "Unauthorized" },
-      { status: 401 }
-    );
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
   const token = cookie.value;
-
   let remoteRes: Response;
   try {
     remoteRes = await fetch(`${process.env.BASE_URL}/send-otp-email`, {
@@ -21,7 +17,7 @@ export async function POST(request: NextRequest) {
     });
   } catch (err) {
     return NextResponse.json(
-      { error: "OTP service unreachable." },
+      { error: "Service unavailable." },
       { status: 502, statusText: "Bad Gateway" }
     );
   }
@@ -30,14 +26,14 @@ export async function POST(request: NextRequest) {
   if (!remoteRes.ok) {
     const text = await remoteRes.text().catch(() => remoteRes.statusText);
     return NextResponse.json(
-      { error: text || "OTP service error" },
+      { error: "Bad Gateway" },
       { status: remoteRes.status }
     );
   }
 
   // 4) Only one successful response
   return NextResponse.json(
-    { status: 200, message: "OTP Sent" },
+    { status: 200, message: "OTP Email sent successfully." },
     { status: 200 }
   );
 }
