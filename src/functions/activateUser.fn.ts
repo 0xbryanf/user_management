@@ -1,6 +1,6 @@
 import { ReturnResponse } from "types/returnResponse";
 import { User, UserResponse } from "types/userInterfaces";
-import { loadSchemaModel } from "utils/loadSchemaModel.utl";
+import { loadSchemaModel } from "schema/loadSchemaModel.utl";
 
 export const activateUser = async (
   values: User

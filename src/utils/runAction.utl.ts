@@ -1,5 +1,5 @@
 import { ActionTree } from "schema";
-import { loadSchemaModel } from "./loadSchemaModel.utl";
+import { loadSchemaModel } from "../schema/loadSchemaModel.utl";
 
 export const runAction = async (
   schema: string,

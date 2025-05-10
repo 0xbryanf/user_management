@@ -3,7 +3,7 @@ import { RoleHelper } from "lib/helpers/Role";
 import { Op } from "sequelize";
 import { ReturnResponse } from "types/returnResponse";
 import { Role, RoleResponse } from "types/roleInterfaces";
-import { loadSchemaModel } from "utils/loadSchemaModel.utl";
+import { loadSchemaModel } from "schema/loadSchemaModel.utl";
 
 /**
  * Creates a new role with specific permissions and validations.

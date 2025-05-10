@@ -9,7 +9,7 @@ import {
   sequelizeConnectionDown,
   sequelizeConnectionUp
 } from "utils/sequelizeConnection.utl";
-import { initializeAssociations } from "utils/initializeAssociations.utl";
+import { initializeAssociations } from "schema/initializeAssociations.utl";
 import {
   redisConnectionDown,
   redisConnectionUp

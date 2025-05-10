@@ -3,7 +3,7 @@ import { RoleHelper } from "lib/helpers/Role";
 import { ReturnResponse } from "types/returnResponse";
 import { Role } from "types/roleInterfaces";
 import { UserRoleResponse } from "types/userRolesInterfaces";
-import { loadSchemaModel } from "utils/loadSchemaModel.utl";
+import { loadSchemaModel } from "schema/loadSchemaModel.utl";
 
 /**
  * Assigns a role to a user based on provided role details.

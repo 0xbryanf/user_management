@@ -1,6 +1,6 @@
 import { Op } from "sequelize";
 import { Role, RoleResponse } from "types/roleInterfaces";
-import { loadSchemaModel } from "utils/loadSchemaModel.utl";
+import { loadSchemaModel } from "schema/loadSchemaModel.utl";
 import { RolesEnum } from "utils/rolesEnum.utl";
 
 /**

@@ -2,7 +2,7 @@ import { camelToSnake } from "lib/helpers/camelToSnake";
 import { ActionTree } from "schema";
 import * as Sequelize from "sequelize";
 import { SchemaModels } from "types/schemaModels";
-import { sequelizeConnectionUp } from "./sequelizeConnection.utl";
+import { sequelizeConnectionUp } from "../utils/sequelizeConnection.utl";
 
 export const schemaModel: {
   [key: string]: { [key: string]: Sequelize.ModelStatic<Sequelize.Model> };
@@ -44,12 +44,12 @@ export const populateDataModel = async (
       tableName: camelToSnake(model as string),
       freezeTableName: true,
       underscored: true,
-      timestamps: options?.timestamps != undefined ? options.timestamps : true
+      timestamps: options?.timestamps ?? true
     };
 
     if (metadata.timestamps) {
-      metadata.createdAt = "created_at";
-      metadata.updatedAt = "updated_at";
+      metadata.createdAt = descriptor.created_at ? "created_at" : undefined;
+      metadata.updatedAt = descriptor.updated_at ? "updated_at" : undefined;
     }
 
     schemaModel[cacheKey][key] = sequelize.define(
@@ -57,6 +57,7 @@ export const populateDataModel = async (
       descriptor,
       metadata
     );
+
     return schemaModel[cacheKey][key];
   } catch (err) {
     console.log("Error while defining model:", err);

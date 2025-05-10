@@ -322,14 +322,22 @@ export const SchemaUserManagement = {
         type: DataTypes.STRING(255),
         allowNull: false
       },
-      changed_by: {
+      created_by: {
         type: DataTypes.UUID,
         allowNull: true
       },
-      changed_at: {
+      created_at: {
         type: DataTypes.DATE,
         allowNull: false,
         defaultValue: DataTypes.NOW
+      },
+      updated_by: {
+        type: DataTypes.UUID,
+        allowNull: true
+      },
+      updated_at: {
+        type: DataTypes.DATE,
+        allowNull: true
       }
     },
     modelOptions: {

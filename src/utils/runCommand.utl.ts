@@ -1,5 +1,5 @@
 import { errorHandlerMiddleware } from "lib/middleware/errorHandlerMiddleware";
-import { initializeAssociations } from "./initializeAssociations.utl";
+import { initializeAssociations } from "../schema/initializeAssociations.utl";
 import { runFunction } from "./runFunction.utl";
 import {
   sequelizeConnectionDown,

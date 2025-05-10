@@ -1,6 +1,6 @@
 import { CredentialResponse } from "types/credentialInterfaces";
 import { Identifier } from "types/identifier";
-import { loadSchemaModel } from "utils/loadSchemaModel.utl";
+import { loadSchemaModel } from "schema/loadSchemaModel.utl";
 
 /**
  * Finds a user credential record by either email or user ID.
