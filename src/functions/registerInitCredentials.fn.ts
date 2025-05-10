@@ -1,4 +1,3 @@
-import { hashPassword } from "lib/helpers/hashPassword";
 import { generateToken } from "utils/generateToken.utl";
 import { v4 as UUIDV4 } from "uuid";
 import { findOneCredential } from "lib/helpers/findOneCredential";
@@ -12,6 +11,7 @@ import { createCredentials } from "lib/helpers/createCredentials";
 import { createUserRoles } from "lib/helpers/createUserRoles";
 import { ReturnResponse } from "types/returnResponse";
 import { RoleHelper } from "lib/helpers/Role";
+import { Passwords } from "lib/helpers/Password";
 
 /**
  * Registers initial user credentials with email and password.
@@ -24,7 +24,6 @@ export const registerInitCredentials = async (
 ): Promise<ReturnResponse<RegisterInitCredentialsResponse>> => {
   try {
     const { email, password, createdBy } = values;
-
     if (!email || !password) {
       return {
         status: 400,
@@ -49,7 +48,7 @@ export const registerInitCredentials = async (
     }
 
     const userId = UUIDV4();
-    const password_hash = await hashPassword(password);
+    const password_hash = await Passwords.createPassword({ password });
 
     const defaultRole = await RoleHelper.findOne(RolesEnum.READER);
     if (!defaultRole) {
@@ -65,7 +64,7 @@ export const registerInitCredentials = async (
       created_by: createdBy ? createdBy : userId
     });
 
-    await createCredentials({
+    const credential = await createCredentials({
       user_id: newUser.user_id,
       email,
       created_by: createdBy ? createdBy : newUser.user_id,
@@ -76,6 +75,13 @@ export const registerInitCredentials = async (
       user_id: newUser.user_id,
       role_id: defaultRole.role_id,
       created_by: createdBy ? createdBy : newUser.user_id
+    });
+
+    await Passwords.storePassword({
+      user_id: credential.user_id,
+      credential_id: credential.credential_id,
+      password_hash,
+      created_by: credential.user_id
     });
 
     const token: string = generateToken(newUser.user_id);

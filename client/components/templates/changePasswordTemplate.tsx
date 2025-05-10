@@ -6,6 +6,8 @@ import ChangePasswordForm from "../organisms/changePasswordForm";
 import { PasswordValidationResult } from "@/lib/type/passwordValidation";
 import { calculatePasswordStrength } from "@/lib/calculatePasswordStrength";
 import { validatePasswordLive } from "@/lib/validatePassword";
+import api from "@/lib/api";
+import { AxiosError } from "axios";
 
 const ChangePasswordTemplate = () => {
   const router = useRouter();
@@ -31,8 +33,6 @@ const ChangePasswordTemplate = () => {
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-
-    // Password Matching Check
     if (password !== confirmPassword) {
       toast.error("Passwords don't match. Please try again.", {
         duration: 2000,
@@ -42,7 +42,6 @@ const ChangePasswordTemplate = () => {
       return;
     }
 
-    // Password Validation Check (Optional: Server-side can re-validate)
     if (
       !passwordValidation.minLength ||
       !passwordValidation.hasLowercase ||
@@ -60,24 +59,27 @@ const ChangePasswordTemplate = () => {
 
     setLoading(true);
     try {
-      // Simulate password change (replace with your API call)
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      const response = await api.post("/api/change-password", { password });
+      if (response.status != 200) {
+        console.log("response password", response);
+      }
       toast.success("Password changed successfully!", {
         duration: 2000,
         style: { fontSize: "16px" }
       });
       router.push("/");
-    } catch (error) {
-      console.error("Password change failed", error);
-      toast.error("An error occurred. Please try again later.", {
-        duration: 2000,
-        style: { fontSize: "16px" }
+    } catch (error: unknown) {
+      const err = error as AxiosError<{ error?: string }>;
+      const message = `${err.response?.status} ${err.response?.data?.error}`;
+      toast.error(message, {
+        duration: 2500,
+        style: { fontSize: "14px" },
+        icon: null
       });
     } finally {
       setLoading(false);
     }
   };
-
   return (
     <>
       <div className="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8">

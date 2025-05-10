@@ -4,8 +4,14 @@ import { toast, Toaster } from "react-hot-toast";
 import ValidationForm from "@/components/organisms/validationForm";
 import api from "@/lib/api";
 import ChangePasswordTemplate from "@/components/templates/changePasswordTemplate";
+import { useRouter } from "next/navigation";
 
-const VerifyOTPTemplate = () => {
+interface VerifyOTPTemplateProps {
+  init: boolean;
+}
+
+const VerifyOTPTemplate = ({ init }: VerifyOTPTemplateProps) => {
+  const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [showChangePassword, setShowChangePassword] = useState(false);
 
@@ -22,16 +28,21 @@ const VerifyOTPTemplate = () => {
       });
 
       if (otpResponse.status != 200) {
-        toast.error(`${otpResponse.status}: ${otpResponse.statusText}`, {
+        toast.error(`${otpResponse.status} ${otpResponse.statusText}`, {
           duration: 2500,
           style: { fontSize: "14px" },
           icon: null
         });
       }
-      setShowChangePassword(true);
+
+      if (init === true) {
+        router.push("/");
+      } else {
+        setShowChangePassword(true);
+      }
     } catch (error) {
       const err = error as AxiosError<{ error?: string }>;
-      const message = `Error ${err.response?.status}: ${err.response?.statusText}`;
+      const message = `${err.response?.status} ${err.response?.data?.error}`;
       toast.error(message, {
         duration: 2500,
         style: { fontSize: "14px" }

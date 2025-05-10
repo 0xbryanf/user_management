@@ -5,51 +5,54 @@ export async function GET(request: NextRequest) {
   if (!cookie) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
+
   const token = cookie.value;
   const email = request.nextUrl.searchParams.get("email");
   if (!email) {
     return NextResponse.json(
-      { error: "Email parameter is required." },
-      { status: 400, statusText: "Bad Request" }
+      { error: "Bad Request: Email must be provided." },
+      { status: 400 }
     );
   }
 
-  let response: Response;
-  let fetchedUser: object | undefined;
-
-  try {
-    response = await fetch(
-      `${process.env.BASE_URL}/get-credential-by-email?email=${encodeURIComponent(email)}`,
-      {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`
-        }
+  const response = await fetch(
+    `${process.env.BASE_URL}/get-credential-by-email?email=${encodeURIComponent(email)}`,
+    {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`
       }
-    );
-
-    if (!response.ok) {
-      return NextResponse.json(
-        { error: "User Not Found" },
-        { status: response.status }
-      );
     }
+  );
 
-    const responseBody = await response.json();
-    fetchedUser = responseBody.data;
-    if (!fetchedUser) {
-      return NextResponse.json({ error: "No user found." }, { status: 404 });
-    }
-  } catch (err) {
+  if (!response.ok) {
     return NextResponse.json(
-      { error: "An unexpected error occurred while retrieving the user." },
-      { status: 500, statusText: "Internal Server Error" }
+      {
+        error:
+          response.status === 404
+            ? "Not Found: Unable to find user."
+            : "Internal Server Error: An unexpected error occurred."
+      },
+      { status: response.status }
+    );
+  }
+
+  const responseBody = await response.json();
+  const fetchedUser = responseBody?.data;
+
+  if (!fetchedUser) {
+    return NextResponse.json(
+      { error: "Not Found: User not found." },
+      { status: 404 }
     );
   }
 
   return NextResponse.json(
-    { status: 200, message: "User Found", data: fetchedUser },
+    {
+      message: "Success: User found.",
+      data: fetchedUser
+    },
     { status: 200 }
   );
 }

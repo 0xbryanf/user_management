@@ -1,6 +1,5 @@
 import Button from "../atoms/button";
 import FindEmailForm from "../organisms/findEmailForm";
-import { ReactNode } from "react";
 import { useRouter } from "next/navigation";
 
 interface FindMyAccountPageTemplateProps {

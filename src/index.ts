@@ -5,6 +5,7 @@ import { validateEnv } from "utils/validateEnv.utl";
 import CredentialsController from "controllers/Credentials.ctrl";
 import UsersController from "controllers/Users.ctrl";
 import { runCommand } from "utils/runCommand.utl";
+import PasswordHistoryController from "controllers/PasswordHistory.ctrl";
 
 export const main = async () => {
   if (process.argv[2] === "run") {
@@ -20,7 +21,11 @@ export const main = async () => {
         }
         validateEnv();
         const app = new App(
-          [new CredentialsController(), new UsersController()],
+          [
+            new CredentialsController(),
+            new UsersController(),
+            new PasswordHistoryController()
+          ],
           Number((process.env.PORT as string) || 8080)
         );
         app.listen();

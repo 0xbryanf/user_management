@@ -13,6 +13,9 @@ import { validatePasswordLive } from "@/lib/validatePassword";
 import { PasswordValidationResult } from "@/lib/type/passwordValidation";
 import api from "@/lib/api";
 import GetCredentialsTemplate from "@/components/templates/getCredentials";
+import VerifyOTPTemplate from "@/components/templates/verifyOTPTemplate";
+
+type ViewState = "FIND_ACCOUNT" | "REGISTER_INIT" | "VERIFY_OTP";
 
 export default function SignUpPage() {
   const router = useRouter();
@@ -21,7 +24,7 @@ export default function SignUpPage() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [passwordStrength, setPasswordStrength] = useState(0);
-  const [showCredentialsTemplate, setShowCredentialsTemplate] = useState(false);
+  const [viewState, setViewState] = useState<ViewState>("REGISTER_INIT");
   const [passwordValidation, setPasswordValidation] =
     useState<PasswordValidationResult>({
       minLength: false,
@@ -60,14 +63,18 @@ export default function SignUpPage() {
 
   const handleCredentialsSignUp = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    setLoading(true);
     if (password !== confirmPassword) {
-      toast.error("Passwords don't match. Please double-check and try again.", {
-        duration: 2000,
-        style: { fontSize: "16px" }
-      });
+      toast.error(
+        "Bad Request: Passwords don't match. Please double-check and try again.",
+        {
+          duration: 2000,
+          style: { fontSize: "16px" },
+          icon: null
+        }
+      );
       return;
     }
-    setLoading(true);
 
     try {
       const apiRegistrationResponse = await api.post(
@@ -77,29 +84,33 @@ export default function SignUpPage() {
           password
         }
       );
-      if (apiRegistrationResponse.status === 201) {
+      if (apiRegistrationResponse && apiRegistrationResponse.status === 201) {
         const otpResponse = await api.post("/api/send-otp-email");
         if (otpResponse.status === 200) {
-          router.push("/verify-otp");
+          setViewState("VERIFY_OTP");
         } else {
-          // Handle error from OTP API
-          toast.error(
-            `Error ${otpResponse.data?.status}: ${otpResponse.data?.message}`,
-            { duration: 1000, style: { fontSize: "14px" } }
-          );
-          setLoading(false);
+          toast.error(`${otpResponse?.data?.message}`, {
+            duration: 2500,
+            style: { fontSize: "14px" },
+            icon: null
+          });
         }
-      }
-    } catch (error) {
-      const err = error as AxiosError<{ error?: string }>;
-      if (err.response?.status === 409) {
-        setShowCredentialsTemplate(true);
       } else {
-        toast.error("An unexpected error occurred. Please try again later.", {
-          duration: 2000,
-          style: { fontSize: "14px" }
+        setViewState("REGISTER_INIT");
+      }
+    } catch (error: unknown) {
+      const err = error as AxiosError<{ error?: string }>;
+      if (err.status === 409) {
+        setViewState("FIND_ACCOUNT");
+      } else {
+        toast.error(`${err.response?.status} ${err.response?.statusText}`, {
+          duration: 2500,
+          style: { fontSize: "14px" },
+          icon: null
         });
       }
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -120,9 +131,9 @@ export default function SignUpPage() {
 
   return (
     <>
-      {showCredentialsTemplate ? (
-        <GetCredentialsTemplate />
-      ) : (
+      {viewState === "FIND_ACCOUNT" && <GetCredentialsTemplate />}
+      {viewState === "VERIFY_OTP" && <VerifyOTPTemplate init={true} />}
+      {viewState === "REGISTER_INIT" && (
         <div className="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8">
           <div className="sm:mx-auto sm:w-full sm:max-w-sm">
             <h2 className="mt-10 text-center text-2xl font-bold tracking-tight text-gray-900">
@@ -182,8 +193,6 @@ export default function SignUpPage() {
           </div>
         </div>
       )}
-
-      <Toaster position="top-center" />
     </>
   );
 }
