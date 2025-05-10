@@ -1,4 +1,4 @@
-import HttpException from "utils/httpException";
+import HttpException from "utils/httpException.utl";
 import { Request, Response, NextFunction } from "express";
 
 /**

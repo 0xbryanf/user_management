@@ -1,5 +1,3 @@
-"use client";
-
 import { FormEvent, useState } from "react";
 import { AxiosError } from "axios";
 import { toast, Toaster } from "react-hot-toast";
@@ -7,9 +5,9 @@ import ValidationForm from "@/components/organisms/validationForm";
 import api from "@/lib/api";
 import ChangePasswordTemplate from "@/components/templates/changePasswordTemplate";
 
-export default function VerifyOTPPage() {
+const VerifyOTPTemplate = () => {
   const [loading, setLoading] = useState(false);
-  const [showChangePassword, setShowChangePassword] = useState(true);
+  const [showChangePassword, setShowChangePassword] = useState(false);
 
   async function handleVerification(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -29,9 +27,8 @@ export default function VerifyOTPPage() {
           style: { fontSize: "14px" },
           icon: null
         });
-
-        setShowChangePassword(true);
       }
+      setShowChangePassword(true);
     } catch (error) {
       const err = error as AxiosError<{ error?: string }>;
       const message = `Error ${err.response?.status}: ${err.response?.statusText}`;
@@ -65,4 +62,6 @@ export default function VerifyOTPPage() {
       <Toaster position="top-center" />
     </>
   );
-}
+};
+
+export default VerifyOTPTemplate;

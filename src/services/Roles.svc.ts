@@ -1,5 +1,5 @@
-import { assignRole } from "functions/assignRole";
-import { createRole } from "functions/createRole";
+import { assignRole } from "functions/assignRole.fn";
+import { createRole } from "functions/createRole.fn";
 import { ReturnResponse } from "types/returnResponse";
 import { Role, RoleResponse } from "types/roleInterfaces";
 import { UserRoleResponse } from "types/userRolesInterfaces";

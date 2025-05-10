@@ -4,13 +4,16 @@ import helmet from "helmet";
 import cors, { CorsOptions } from "cors";
 import "dotenv/config";
 import compression from "compression";
-import { errorHandler } from "helpers/errorHandler";
+import { errorHandler } from "lib/helpers/errorHandler";
 import {
   sequelizeConnectionDown,
   sequelizeConnectionUp
-} from "utils/sequelizeConnection";
-import { initializeAssociations } from "utils/initializeAssociations";
-import { redisConnectionDown, redisConnectionUp } from "utils/redisConnection";
+} from "utils/sequelizeConnection.utl";
+import { initializeAssociations } from "utils/initializeAssociations.utl";
+import {
+  redisConnectionDown,
+  redisConnectionUp
+} from "utils/redisConnection.utl";
 
 const { ORIGIN, MAXAGE } = process.env;
 

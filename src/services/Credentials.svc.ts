@@ -1,7 +1,7 @@
-import { getCredentialByEmail } from "functions/getCredentialByEmail";
-import { getCredentialByUserId } from "functions/getCredentialByUserId";
-import { registerInitCredentials } from "functions/registerInitCredentials";
-import { requestEmailConfirmation } from "functions/requestEmailConfirmation";
+import { getCredentialByEmail } from "functions/getCredentialByEmail.fn";
+import { getCredentialByUserId } from "functions/getCredentialByUserId.fn";
+import { registerInitCredentials } from "functions/registerInitCredentials.fn";
+import { requestEmailConfirmation } from "functions/requestEmailConfirmation.fn";
 import { CredentialResponse } from "types/credentialInterfaces";
 import {
   RegisterInit,
@@ -9,9 +9,9 @@ import {
 } from "types/registerInitCredentialInterfaces";
 import { ReturnResponse } from "types/returnResponse";
 import sgMail from "@sendgrid/mail";
-import { sendOTPEmail } from "functions/sendOTPEmail";
-import { verifyOTPEmail } from "functions/verifyOTPEmail";
-import { verifyCredentials } from "functions/verifyCredentials";
+import { sendOTPEmail } from "functions/sendOneTimePinToEmail.fn";
+import { verifyOTPEmail } from "functions/verifyOTPEmail.fn";
+import { verifyCredentials } from "functions/verifyCredentials.fn";
 
 class CredentialsService {
   /**

@@ -3,8 +3,8 @@ import { Controller } from "types/controller";
 import "dotenv/config";
 import { authenticateToken } from "lib/middleware/authenticateToken";
 import { AuthenticatedRequest } from "types/authenticatedRequest";
-import HttpException from "utils/httpException";
-import { UsersService } from "services/users.service";
+import HttpException from "utils/httpException.utl";
+import { UsersService } from "services/Users.svc";
 
 class UsersController implements Controller {
   public router = Router();

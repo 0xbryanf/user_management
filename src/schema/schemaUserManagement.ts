@@ -1,13 +1,14 @@
-import { activateUser } from "functions/activateUser";
-import { assignRole } from "functions/assignRole";
-import { createRole } from "functions/createRole";
-import { getCredentialByEmail } from "functions/getCredentialByEmail";
-import { getCredentialByUserId } from "functions/getCredentialByUserId";
-import { registerInitCredentials } from "functions/registerInitCredentials";
-import { requestEmailConfirmation } from "functions/requestEmailConfirmation";
-import { sendOTPEmail } from "functions/sendOTPEmail";
-import { verifyCredentials } from "functions/verifyCredentials";
-import { verifyOTPEmail } from "functions/verifyOTPEmail";
+import { activateUser } from "functions/activateUser.fn";
+import { assignRole } from "functions/assignRole.fn";
+import { createRole } from "functions/createRole.fn";
+import { getCredentialByEmail } from "functions/getCredentialByEmail.fn";
+import { getCredentialByUserId } from "functions/getCredentialByUserId.fn";
+import { registerInitCredentials } from "functions/registerInitCredentials.fn";
+import { requestEmailConfirmation } from "functions/requestEmailConfirmation.fn";
+import { sendOTPEmail } from "functions/sendOneTimePinToEmail.fn";
+import { updatePassword } from "functions/updatePassword.fn";
+import { verifyCredentials } from "functions/verifyCredentials.fn";
+import { verifyOTPEmail } from "functions/verifyOTPEmail.fn";
 import { DataTypes } from "sequelize";
 
 export const SchemaUserManagement = {
@@ -346,6 +347,8 @@ export const SchemaUserManagement = {
       ]
     },
     relation: {},
-    actions: {}
+    actions: {
+      updatePassword
+    }
   }
 };

@@ -1,5 +1,5 @@
 import { Credentials, CredentialResponse } from "types/credentialInterfaces";
-import { loadSchemaModel } from "utils/loadSchemaModel";
+import { loadSchemaModel } from "utils/loadSchemaModel.utl";
 
 /**
  * Creates a new user in the database.

@@ -2,7 +2,7 @@ import { camelToSnake } from "lib/helpers/camelToSnake";
 import { ActionTree } from "schema";
 import * as Sequelize from "sequelize";
 import { SchemaModels } from "types/schemaModels";
-import { sequelizeConnectionUp } from "./sequelizeConnection";
+import { sequelizeConnectionUp } from "./sequelizeConnection.utl";
 
 export const schemaModel: {
   [key: string]: { [key: string]: Sequelize.ModelStatic<Sequelize.Model> };

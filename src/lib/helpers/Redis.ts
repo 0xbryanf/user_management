@@ -1,5 +1,5 @@
 import { SetRedis } from "types/setRedis";
-import { redisClient } from "utils/redisClient";
+import { redisClient } from "utils/redisClient.utl";
 
 /**
  * A helper class for interacting with Redis.

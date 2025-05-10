@@ -1,4 +1,4 @@
-import { redisClient } from "utils/redisClient";
+import { redisClient } from "utils/redisClient.utl";
 
 let isInitialized = false;
 

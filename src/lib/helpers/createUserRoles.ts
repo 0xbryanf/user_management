@@ -1,5 +1,5 @@
 import { UserRole, UserRoleResponse } from "types/userRolesInterfaces";
-import { loadSchemaModel } from "utils/loadSchemaModel";
+import { loadSchemaModel } from "utils/loadSchemaModel.utl";
 
 /**
  * Assigns a role to a user in the database.

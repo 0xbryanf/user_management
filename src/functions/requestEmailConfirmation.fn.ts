@@ -1,21 +1,19 @@
+import { emailConfirmationTemplate } from "utils/emails/emailConfirmationTemplate.utl";
+import { generateToken } from "utils/generateToken.utl";
 import { hashValue } from "lib/helpers/hashValue";
+import { findOneCredential } from "lib/helpers/findOneCredential";
 import { sendEmail } from "lib/helpers/sendEmail";
 import { RedisHelper } from "lib/helpers/Redis";
 import { ReturnResponse } from "types/returnResponse";
-import { generateOtpEmailHtml } from "utils/emails/otpTemplate";
 import sgMail from "@sendgrid/mail";
 
 /**
- * Sends a One-Time Password (OTP) to the user's email and stores the OTP in Redis.
+ * Sends a confirmation email with a verification link and one-time password (OTP).
  *
- * @param values - Object containing the user's email.
- * @returns A standardized response object with the status, message, and optional SendGrid response data.
- *
- * @remarks
- * - OTP is 6-digit numeric.
- * - The hashed OTP and retry counter are stored in Redis with a 20-minute expiration.
+ * @param values - Object containing the user's email address.
+ * @returns A standardized response object indicating success or failure.
  */
-export const sendOTPEmail = async (values: {
+export const requestEmailConfirmation = async (values: {
   email: string;
 }): Promise<ReturnResponse<[sgMail.ClientResponse, {}]>> => {
   try {
@@ -29,22 +27,35 @@ export const sendOTPEmail = async (values: {
       };
     }
 
+    const user = await findOneCredential({ email });
+    if (!user) {
+      return {
+        status: 404,
+        statusText: "Not Found",
+        message: "User not found."
+      };
+    }
+
+    const token = generateToken(user.user_id);
+    const encodedToken = Buffer.from(token).toString("base64url");
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
 
     const emailResponse = await sendEmail({
       to: email,
       from: process.env.SENDGRID_OTP_EMAIL!,
-      subject: `Your One Time OTP Code - ${otp}`,
-      html: generateOtpEmailHtml(otp)
+      subject: `Confirm Your Email Address - ${otp}`,
+      html: emailConfirmationTemplate(
+        `${process.env.CLIENT_URL}/confirm-identity/${encodedToken}`,
+        otp
+      )
     });
 
     const [res] = emailResponse;
-
     if (res.statusCode !== 202) {
       return {
         status: 502,
         statusText: "Bad Gateway",
-        message: "Failed to send OTP email.",
+        message: "Email confirmation failed.",
         data: emailResponse
       };
     }
@@ -58,7 +69,7 @@ export const sendOTPEmail = async (values: {
     return {
       status: 200,
       statusText: "OK",
-      message: "OTP Email sent successfully.",
+      message: "Email confirmation sent successfully.",
       data: emailResponse
     };
   } catch (error) {
@@ -67,7 +78,7 @@ export const sendOTPEmail = async (values: {
       statusText: "Internal Server Error",
       message:
         (error as Error).message ||
-        "An unexpected error occurred while sending OTP."
+        "An unexpected error occurred while sending the email."
     };
   }
 };

@@ -1,10 +1,10 @@
 import { errorHandlerMiddleware } from "lib/middleware/errorHandlerMiddleware";
-import { initializeAssociations } from "./initializeAssociations";
-import { runFunction } from "./runFunction";
+import { initializeAssociations } from "./initializeAssociations.utl";
+import { runFunction } from "./runFunction.utl";
 import {
   sequelizeConnectionDown,
   sequelizeConnectionUp
-} from "./sequelizeConnection";
+} from "./sequelizeConnection.utl";
 
 export const command = async () => {
   const flag = process.argv[3];

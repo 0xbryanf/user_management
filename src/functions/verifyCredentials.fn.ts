@@ -2,7 +2,7 @@ import { findOneCredential } from "lib/helpers/findOneCredential";
 import { verifyPassword } from "lib/helpers/verifyPassword";
 import { ReturnResponse } from "types/returnResponse";
 import { VerifyUser } from "types/verifyUser";
-import { generateToken } from "utils/generateToken";
+import { generateToken } from "utils/generateToken.utl";
 
 /**
  * Verifies a user's credentials by checking email and password.

@@ -1,4 +1,4 @@
-import { loadSchemaModel } from "./loadSchemaModel";
+import { loadSchemaModel } from "./loadSchemaModel.utl";
 
 export const initializeAssociations = async () => {
   // load from the lowercase schema (Postgres is case-sensitive for unquoted identifiers)

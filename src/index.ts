@@ -1,10 +1,10 @@
 import "module-alias/register";
 import App from "./app";
 import "dotenv/config";
-import { validateEnv } from "utils/validateEnv";
-import { runCommand } from "utils/runCommand";
-import CredentialsController from "./controllers/credentials.controller";
-import UsersController from "./controllers/users.controller";
+import { validateEnv } from "utils/validateEnv.utl";
+import CredentialsController from "controllers/Credentials.ctrl";
+import UsersController from "controllers/Users.ctrl";
+import { runCommand } from "utils/runCommand.utl";
 
 export const main = async () => {
   if (process.argv[2] === "run") {

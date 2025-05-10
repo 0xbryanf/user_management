@@ -28,12 +28,7 @@
     "noImplicitReturns": true, // Ensures all code paths in a function return a value.
     "forceConsistentCasingInFileNames": true // Ensures consistent file naming.
   },
-  "include": [
-    "**/*.ts",
-    "src/**/*",
-    "client/components/molecules/confirmPasswordField.tsx",
-    "client/components/organisms/signUpForm.tsx"
-  ], // Includes all TypeScript files in the project directory.
+  "include": ["**/*.ts", "src/**/*"], // Includes all TypeScript files in the project directory.
   "exclude": ["node_modules", "dist", "client"], // Excludes the 'node_modules' and 'dist' directories.
   "typeRoots": ["node_modules/@types"] // Specifies directories for type definitions.
 }

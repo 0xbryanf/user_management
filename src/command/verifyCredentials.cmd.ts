@@ -5,8 +5,8 @@ export default {
       model: "Credentials",
       action: "verifyCredentials",
       values: {
-        email: "hello@gmail.com",
-        password: "password"
+        email: "0xbryanf@gmail.com",
+        password: "developer"
       }
     }
   ]

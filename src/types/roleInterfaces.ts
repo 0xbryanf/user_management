@@ -1,4 +1,4 @@
-import { RolesEnum } from "utils/rolesEnum";
+import { RolesEnum } from "utils/rolesEnum.utl";
 
 export interface Role {
   email?: string;

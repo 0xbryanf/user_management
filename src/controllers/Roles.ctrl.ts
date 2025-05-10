@@ -1,9 +1,9 @@
 import { Router, Request, Response, NextFunction } from "express";
 import { Controller } from "types/controller";
 import "dotenv/config";
-import HttpException from "utils/httpException";
+import HttpException from "utils/httpException.utl";
 import { Role } from "types/roleInterfaces";
-import { RolesService } from "services/roles.service";
+import { RolesService } from "services/Roles.svc";
 import { ReturnResponse } from "types/returnResponse";
 import { authenticateToken } from "lib/middleware/authenticateToken";
 

@@ -1,11 +1,11 @@
 import { Router, Request, Response, NextFunction } from "express";
 import { Controller } from "types/controller";
 import { RegisterInit } from "types/registerInitCredentialInterfaces";
-import { CredentialsService } from "services/credentials.services";
-import HttpException from "utils/httpException";
+import HttpException from "utils/httpException.utl";
 import "dotenv/config";
 import { authenticateToken } from "lib/middleware/authenticateToken";
 import { AuthenticatedRequest } from "types/authenticatedRequest";
+import { CredentialsService } from "services/Credentials.svc";
 
 class CredentialsController implements Controller {
   public router = Router();

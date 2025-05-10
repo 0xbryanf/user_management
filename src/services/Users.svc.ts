@@ -1,4 +1,4 @@
-import { activateUser } from "functions/activateUser";
+import { activateUser } from "functions/activateUser.fn";
 
 class UsersService {
   static async activateUser(user_id: string) {

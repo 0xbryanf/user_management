@@ -1,7 +1,7 @@
 import { Op } from "sequelize";
 import { Role, RoleResponse } from "types/roleInterfaces";
-import { loadSchemaModel } from "utils/loadSchemaModel";
-import { RolesEnum } from "utils/rolesEnum";
+import { loadSchemaModel } from "utils/loadSchemaModel.utl";
+import { RolesEnum } from "utils/rolesEnum.utl";
 
 /**
  * Helper class for interacting with Roles.

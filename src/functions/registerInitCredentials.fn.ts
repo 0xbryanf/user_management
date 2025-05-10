@@ -1,13 +1,13 @@
 import { hashPassword } from "lib/helpers/hashPassword";
-import { generateToken } from "utils/generateToken";
+import { generateToken } from "utils/generateToken.utl";
 import { v4 as UUIDV4 } from "uuid";
 import { findOneCredential } from "lib/helpers/findOneCredential";
-import { RolesEnum } from "utils/rolesEnum";
+import { RolesEnum } from "utils/rolesEnum.utl";
 import {
   RegisterInit,
   RegisterInitCredentialsResponse
 } from "types/registerInitCredentialInterfaces";
-import { createUser } from "lib/helpers/createUser";
+import { createUser } from "lib/helpers/create-user";
 import { createCredentials } from "lib/helpers/createCredentials";
 import { createUserRoles } from "lib/helpers/createUserRoles";
 import { ReturnResponse } from "types/returnResponse";
