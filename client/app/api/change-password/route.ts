@@ -1,9 +1,28 @@
 import { NextRequest, NextResponse } from "next/server";
 
+/**
+ * Handles the password change request for an authenticated user.
+ *
+ * @param request - The incoming NextRequest containing authentication token and new password
+ * @returns A NextResponse with the result of the password change operation
+ *
+ * - Checks for valid authentication token
+ * - Validates password is provided
+ * - Sends password update request to backend service
+ * - Handles various response scenarios:
+ *   - 401 if no token
+ *   - 400 if no password provided
+ *   - 409 if password has been previously used
+ *   - 200 on successful password update
+ *   - Fallback error handling for other status codes
+ */
 export async function POST(request: NextRequest) {
   const token = request.cookies.get("payloadRef")?.value;
   if (!token) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    return NextResponse.json(
+      { error: "Unauthorized: Missing authentication credentials." },
+      { status: 401 }
+    );
   }
 
   const { password } = await request.json();
@@ -23,6 +42,8 @@ export async function POST(request: NextRequest) {
     body: JSON.stringify({ password })
   });
 
+  const responseBody = await response.json();
+
   if (response.status === 409) {
     return NextResponse.json(
       {
@@ -33,13 +54,22 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  return response.ok
-    ? NextResponse.json(
-        { message: "Success: Password Updated Successfully." },
-        { status: 200 }
-      )
-    : NextResponse.json(
-        { error: "Internal Server Error: An unexpected error occured." },
-        { status: response.status }
-      );
+  if (response.ok) {
+    return NextResponse.json(
+      {
+        message: "Success: Password Updated Successfully.",
+        data: responseBody.data || null
+      },
+      { status: 200 }
+    );
+  }
+
+  return NextResponse.json(
+    {
+      error:
+        responseBody.error ||
+        "Internal Server Error: An unexpected error occurred."
+    },
+    { status: response.status }
+  );
 }

@@ -1,5 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 
+/**
+ * Handles user registration initialization via POST request
+ *
+ * @param request - The incoming NextRequest containing user registration credentials
+ * @returns A NextResponse with registration status, including potential error handling for email conflicts, invalid inputs, or server errors
+ */
 export async function POST(request: NextRequest) {
   const { email, password } = await request.json();
   if (!email || !password) {
@@ -16,19 +22,20 @@ export async function POST(request: NextRequest) {
   });
 
   const body = await res.json();
-  const token = body.data.payloadRef as string;
+  const token = body.data?.payloadRef as string;
+
   if (res.status === 409) {
     const response = NextResponse.json(
       { error: "Conflict: A user with this email already exists." },
       { status: 409 }
     );
-    response.cookies.set("payloadRef", token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
-      path: "/",
-      maxAge: 15 * 60
-    });
+
+    response.headers.append(
+      "Set-Cookie",
+      `payloadRef=${token}; HttpOnly; Secure=${
+        process.env.NODE_ENV === "production"
+      }; SameSite=Strict; Path=/; Max-Age=${15 * 60}`
+    );
 
     return response;
   }
@@ -50,13 +57,12 @@ export async function POST(request: NextRequest) {
     { status: 201 }
   );
 
-  response.cookies.set("payloadRef", token, {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "lax",
-    path: "/",
-    maxAge: 15 * 60
-  });
+  response.headers.append(
+    "Set-Cookie",
+    `payloadRef=${token}; HttpOnly; Secure=${
+      process.env.NODE_ENV === "production"
+    }; SameSite=Strict; Path=/; Max-Age=${15 * 60}`
+  );
 
   return response;
 }

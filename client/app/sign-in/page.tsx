@@ -1,24 +1,47 @@
 "use client";
 
-import { FormEvent, useState, useEffect } from "react";
+import { FormEvent, useState, useEffect, useContext } from "react";
 import axios, { AxiosError } from "axios";
 import { useRouter } from "next/navigation";
-import { toast, Toaster } from "react-hot-toast";
-import { getSession, signIn } from "next-auth/react";
+import { toast } from "react-hot-toast";
+import { signIn, useSession } from "next-auth/react";
 import Button from "@/components/atoms/button";
 import { FcGoogle } from "react-icons/fc";
 import SignInForm from "@/components/organisms/signInForm";
 import VerifyOTPTemplate from "@/components/templates/verifyOTPTemplate";
 import api from "@/lib/api";
 
+/**
+ * SignInPage component handles user authentication with multiple sign-in methods.
+ *
+ * Supports:
+ * - Credentials-based login with email and password
+ * - Google OAuth login
+ * - OTP verification after successful login
+ *
+ * Manages authentication state, loading states, and handles various authentication scenarios
+ * including error handling and redirection.
+ *
+ * @returns {JSX.Element} Rendered sign-in page with login form and authentication options
+ */
 export default function SignInPage() {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [showVerifyOTPTemplate, setShowVerifyOTPTemplate] = useState(false);
-  const [csrfToken, setCsrfToken] = useState("");
-
+  /**
+   * Handles authentication error handling and callback URL management on component mount.
+   *
+   * Checks URL parameters for authentication errors and displays appropriate toast notifications.
+   * Supports specific error scenarios like login failures and account linking issues.
+   * Optionally removes error-related query parameters from the URL after processing.
+   *
+   * @remarks
+   * - Triggered on component initialization
+   * - Provides user-friendly error messages for different authentication error types
+   * - Cleans up URL by removing error-related query parameters
+   */
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const callbackUrl = urlParams.get("callbackUrl");
@@ -45,19 +68,6 @@ export default function SignInPage() {
       url.searchParams.delete("error");
       window.history.replaceState({}, "", url.toString());
     }
-  }, []);
-
-  useEffect(() => {
-    const fetchCsrfToken = async () => {
-      try {
-        const res = await axios.get("/api/auth/csrf");
-        setCsrfToken(res.data.csrfToken);
-      } catch (error) {
-        throw new Error("Failed to fetch CSRF token");
-      }
-    };
-
-    fetchCsrfToken();
   }, []);
 
   const handleCredentialsSignIn = async (event: FormEvent<HTMLFormElement>) => {
@@ -156,7 +166,6 @@ export default function SignInPage() {
               password={password}
               setEmail={setEmail}
               setPassword={setPassword}
-              csrfToken={csrfToken} // Pass csrfToken to LoginForm
             />
 
             <div className="mt-14 text-center">

@@ -63,7 +63,7 @@ export const requestEmailConfirmation = async (values: {
     await RedisHelper.set({
       key: hashValue(`otp_key:${email}`),
       data: { otp: hashValue(`otp_value:${otp}`), retries: 0 },
-      expiration: 60 * 20 // 20 minutes
+      expiration: 60 * 20
     });
 
     return {

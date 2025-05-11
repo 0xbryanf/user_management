@@ -4,7 +4,6 @@ import "../styles/globals.css";
 import { Providers } from "./providers";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
-import axios from "axios";
 import { Toaster } from "react-hot-toast";
 
 const geistSans = Geist({

@@ -31,7 +31,7 @@ const OtpField = () => {
     <div>
       <div className="flex items-center justify-between">
         <div>
-          <Label htmlFor="otp-0">One-Time Password (OTP)</Label>
+          <Label htmlFor="otp-0">One-Time Pin (OTP)</Label>
           <p className="text-xs text-gray-500 mt-1">
             Please check your email for the verification code.
           </p>

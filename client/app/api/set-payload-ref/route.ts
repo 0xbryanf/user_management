@@ -3,6 +3,14 @@ import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
 import { NextRequest, NextResponse } from "next/server";
 
+/**
+ * Handles POST requests to set a payload reference token as an HTTP-only secure cookie.
+ *
+ * @param request - The incoming NextRequest object
+ * @returns A NextResponse with a 202 Accepted status and a secure, HTTP-only cookie containing the user's token
+ *
+ * @throws {NextResponse} Returns a 400 Bad Request if no authentication token is available
+ */
 export async function POST(request: NextRequest) {
   const session = await getServerSession(authOptions);
   const token = session?.user?.name || session?.user?.email;
@@ -13,14 +21,10 @@ export async function POST(request: NextRequest) {
       { status: 400 }
     );
   }
-
-  // Create a new response and set the cookie directly on it
   const response = NextResponse.json(
     { message: "Accepted: Authentication request set successfully." },
     { status: 202 }
   );
-
-  // Set the payloadRef cookie directly on the response
   response.headers.append(
     "Set-Cookie",
     `payloadRef=${token}; HttpOnly; Secure=${

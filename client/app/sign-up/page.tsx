@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useState, useEffect } from "react";
+import { FormEvent, useState, useEffect, useContext } from "react";
 import { AxiosError } from "axios";
 import { useRouter } from "next/navigation";
 import { toast, Toaster } from "react-hot-toast";
@@ -63,6 +63,7 @@ export default function SignUpPage() {
 
   const handleCredentialsSignUp = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+
     setLoading(true);
     if (password !== confirmPassword) {
       toast.error(

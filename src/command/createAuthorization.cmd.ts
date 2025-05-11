@@ -1,0 +1,20 @@
+export default {
+  actions: [
+    {
+      schema: "User_Management",
+      model: "Users",
+      action: "createAuthorization",
+      values: {
+        authData: {
+          key: "5b68e1f5c9f84b3aa3d7e4f9ab3c3c2f1234567890abcdef1234567890abcdef",
+          userId: "95600494-50d9-4169-9c01-9897382854e3",
+          email: "user@example.com",
+          authorizationToken:
+            "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI5NTYwMDQ5NC01MGQ5LTQxNjktOWMwMS05ODk3MzgyODU0ZTMiLCJpYXQiOjE2ODM4NTUwMDB9.abc123def456ghi789jkl012mno345pqr678stu901vwx234yz56789",
+          isAuthorize: true,
+          expiration: 120
+        }
+      }
+    }
+  ]
+};

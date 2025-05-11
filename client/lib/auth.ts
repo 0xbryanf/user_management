@@ -19,11 +19,11 @@ export const authOptions: AuthOptions = {
       credentials: {
         email: { label: "Email", type: "email" },
         password: { label: "Password", type: "password" }
+        // csrfToken: { label: "CSRF Token", type: "hidden" }
       },
       async authorize(credentials, req) {
         const { email, password } = credentials || {};
         if (!email || !password) {
-          // console.error("Bad Request: Email and password are required.");
           return null;
         }
 
@@ -36,24 +36,15 @@ export const authOptions: AuthOptions = {
         );
 
         if (!credentialResponse.ok || credentialResponse.status !== 202) {
-          // console.error(
-          //   credentialResponse.status === 404
-          //     ? "Not Found: User not found."
-          //     : "Unauthorized: Invalid credentials."
-          // );
           return null;
         }
 
         const body = await credentialResponse.json();
         if (!body.data) {
-          // console.error(
-          //   "Unauthorized: Verification failed. Invalid credentials."
-          // );
           return null;
         }
         const token = body.data;
         if (!token) {
-          // console.error("Unauthorized: User ID is missing in the response.");
           return null;
         }
         return { id: token, name: token, email: token };

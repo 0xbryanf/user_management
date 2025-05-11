@@ -1,4 +1,4 @@
-import { SetRedis } from "types/setRedis";
+import { RedisValue } from "types/redisValue";
 import { redisClient } from "utils/redisClient.utl";
 
 /**
@@ -15,11 +15,20 @@ class RedisHelper {
    * @returns A string response from Redis, typically "OK".
    * @throws Will throw an error if input parameters are invalid or Redis operation fails.
    */
-  static async set({ key, data, expiration }: SetRedis): Promise<string> {
-    if (!key || !data || typeof expiration !== "number") {
+  static async set<T>({
+    key,
+    data,
+    expiration
+  }: RedisValue<T>): Promise<string> {
+    if (!key || typeof expiration !== "number") {
       throw new Error("Missing or invalid parameters for setting Redis value.");
     }
-    return redisClient.set(key, JSON.stringify(data), "EX", expiration);
+
+    // Ensure data is serialized properly
+    const serializedData =
+      typeof data === "object" ? JSON.stringify(data) : String(data);
+
+    return redisClient.set(key, serializedData, "EX", expiration);
   }
 
   /**

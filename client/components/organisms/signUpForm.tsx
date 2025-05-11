@@ -2,7 +2,6 @@ import React from "react";
 import PasswordField from "@/components/molecules/passwordField";
 import Button from "@/components/atoms/button";
 import EmailField from "../molecules/emailField";
-import CsrfTokenField from "../molecules/csrfTokenField";
 import ConfirmPasswordField from "../molecules/confirmPasswordField";
 import { PasswordValidationResult } from "@/lib/type/passwordValidation";
 import PasswordRequirements from "../molecules/passwordRequirements";

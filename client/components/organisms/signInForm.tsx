@@ -2,7 +2,6 @@ import React from "react";
 import PasswordField from "@/components/molecules/passwordField";
 import Button from "@/components/atoms/button";
 import EmailField from "../molecules/emailField";
-import CsrfTokenField from "../molecules/csrfTokenField";
 
 type SignInFormProps = {
   onSubmit: (event: React.FormEvent<HTMLFormElement>) => void;
@@ -11,7 +10,6 @@ type SignInFormProps = {
   setEmail: (value: string) => void;
   password: string;
   setPassword: (value: string) => void;
-  csrfToken: string;
 };
 
 const SignInForm = ({
@@ -20,12 +18,10 @@ const SignInForm = ({
   email,
   setEmail,
   password,
-  setPassword,
-  csrfToken
+  setPassword
 }: SignInFormProps) => (
   <>
     <form className="space-y-3" onSubmit={onSubmit}>
-      <CsrfTokenField value={csrfToken} />
       <EmailField value={email} onChange={(e) => setEmail(e.target.value)} />
       <PasswordField
         value={password}
