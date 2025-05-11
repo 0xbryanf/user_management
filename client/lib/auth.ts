@@ -10,7 +10,6 @@ import type {
 import { getServerSession } from "next-auth";
 
 const NEXTAUTH_SECRET = process.env.NEXTAUTH_SECRET as string;
-const VERIFY_USER_URL = `${process.env.BASE_URL}/verify-user`;
 
 export const authOptions: AuthOptions = {
   secret: NEXTAUTH_SECRET,
@@ -21,30 +20,43 @@ export const authOptions: AuthOptions = {
         email: { label: "Email", type: "email" },
         password: { label: "Password", type: "password" }
       },
-      /**
-       * Verifies user credentials against your backend.
-       */
-      async authorize(credentials) {
+      async authorize(credentials, req) {
         const { email, password } = credentials || {};
-        if (!email || !password) return null;
-
-        try {
-          const verifyRes = await fetch(VERIFY_USER_URL, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ email, password })
-          });
-
-          if (!verifyRes.ok) return null;
-
-          const user = await verifyRes.json();
-          // Expect your backend to return at least an `id` and `email` on success
-          if (!user.id || !user.email) return null;
-
-          return { id: user.id, email: user.email };
-        } catch {
+        if (!email || !password) {
+          // console.error("Bad Request: Email and password are required.");
           return null;
         }
+
+        const credentialResponse = await fetch(
+          `${process.env.BASE_URL}/verify-credential?email=${encodeURIComponent(email)}&password=${encodeURIComponent(password)}`,
+          {
+            method: "GET",
+            headers: { "Content-Type": "application/json" }
+          }
+        );
+
+        if (!credentialResponse.ok || credentialResponse.status !== 202) {
+          // console.error(
+          //   credentialResponse.status === 404
+          //     ? "Not Found: User not found."
+          //     : "Unauthorized: Invalid credentials."
+          // );
+          return null;
+        }
+
+        const body = await credentialResponse.json();
+        if (!body.data) {
+          // console.error(
+          //   "Unauthorized: Verification failed. Invalid credentials."
+          // );
+          return null;
+        }
+        const token = body.data;
+        if (!token) {
+          // console.error("Unauthorized: User ID is missing in the response.");
+          return null;
+        }
+        return { id: token, name: token, email: token };
       }
     }),
     GoogleProvider({
@@ -69,29 +81,12 @@ export const authOptions: AuthOptions = {
     })
   ],
   session: {
-    maxAge: 12 * 60 * 60, // 12 hours in seconds
-    strategy: "jwt"
+    strategy: "jwt",
+    maxAge: 15 * 60 // 15 minutes
   },
   pages: {
-    signIn: "/login",
-    error: "/login"
-  },
-  callbacks: {
-    async jwt({ token, user }) {
-      if (user) {
-        token.id = user.id;
-        token.email = user.email;
-        token.sub = user.id;
-      }
-      return token;
-    },
-    async session({ session, token }) {
-      if (session.user) {
-        (session.user as any).id = token.id as string;
-        session.user.email = token.email as string;
-      }
-      return session;
-    }
+    signIn: "/sign-in",
+    error: "/sign-in"
   }
 };
 
