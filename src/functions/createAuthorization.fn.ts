@@ -19,7 +19,7 @@ export const createAuthorization = async (values: {
       userId: authData.userId,
       authorizationToken: authData.authorizationToken,
       isAuthorize: authData.isAuthorize,
-      expiration: authData.isAuthorize
+      expiration: authData.expiration
     };
 
     const redisResponse = await RedisHelper.set({

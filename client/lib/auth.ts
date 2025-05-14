@@ -19,7 +19,6 @@ export const authOptions: AuthOptions = {
       credentials: {
         email: { label: "Email", type: "email" },
         password: { label: "Password", type: "password" }
-        // csrfToken: { label: "CSRF Token", type: "hidden" }
       },
       async authorize(credentials, req) {
         const { email, password } = credentials || {};

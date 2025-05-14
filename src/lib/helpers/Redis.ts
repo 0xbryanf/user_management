@@ -7,13 +7,7 @@ import { redisClient } from "utils/redisClient.utl";
  */
 class RedisHelper {
   /**
-   * Sets a key-value pair in Redis with an expiration time.
-   *
-   * @param key - The Redis key to store the data under.
-   * @param data - The object data to be stored (e.g., OTP and retry count).
-   * @param expiration - Expiration time in seconds.
-   * @returns A string response from Redis, typically "OK".
-   * @throws Will throw an error if input parameters are invalid or Redis operation fails.
+   * Sets a key-value pair in Redis with an optional expiration.
    */
   static async set<T>({
     key,
@@ -24,7 +18,6 @@ class RedisHelper {
       throw new Error("Missing or invalid parameters for setting Redis value.");
     }
 
-    // Ensure data is serialized properly
     const serializedData =
       typeof data === "object" ? JSON.stringify(data) : String(data);
 
@@ -33,10 +26,6 @@ class RedisHelper {
 
   /**
    * Retrieves the value associated with a Redis key.
-   *
-   * @param key - The Redis key to retrieve.
-   * @returns The stringified data stored in Redis.
-   * @throws Will throw an error if the key is missing or not found in Redis.
    */
   static async get(key: string): Promise<string> {
     if (!key) {

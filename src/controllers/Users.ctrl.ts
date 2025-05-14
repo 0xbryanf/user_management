@@ -27,22 +27,30 @@ class UsersController implements Controller {
       authenticateToken,
       this.createAuthorizationHandler.bind(this)
     );
+
+    this.router.post(
+      `${this.path}/${this.version}/get-authorization`,
+      authenticateToken,
+      this.getAuthorizationHandler.bind(this)
+    );
   }
 
   private async activateUserHandler(
     req: Request,
     res: Response,
     next: NextFunction
-  ) {
+  ): Promise<void> {
+    const user_id = (req as AuthenticatedRequest).user?.userId;
+
+    if (!user_id) {
+      res.status(401).json({
+        statusText: "Unauthorized",
+        message: "Invalid Credentials."
+      });
+      return;
+    }
+
     try {
-      const user_id = (req as AuthenticatedRequest).user?.userId;
-      if (!user_id) {
-        res.status(401).json({
-          statusText: "Unauthorized",
-          message: "Invalid Credentials."
-        });
-        return;
-      }
       const result = await UsersService.activateUserService(user_id);
       res.status(result.status).json(result);
     } catch (error: unknown) {
@@ -50,60 +58,84 @@ class UsersController implements Controller {
     }
   }
 
-  // ✅ Updated createAuthorizationHandler with Promise<void>
   private async createAuthorizationHandler(
     req: Request,
     res: Response
   ): Promise<void> {
-    let responseSent = false;
+    const authHeader = (req as AuthenticatedRequest).headers.authorization;
+    const { session } = req.body;
+    if (!session || !authHeader?.startsWith("Bearer ")) {
+      res.status(401).json({
+        statusText: "Unauthorized",
+        message: "Missing or invalid credentials."
+      });
+      return;
+    }
+
+    const token = authHeader.split(" ")[1];
+    if (!token) {
+      res.status(401).json({
+        statusText: "Unauthorized",
+        message: "Bearer token is missing."
+      });
+      return;
+    }
+
+    const user_id =
+      (req as AuthenticatedRequest).user?.userId || "Unknown User";
+
+    const authData = {
+      key: session,
+      userId: user_id,
+      authorizationToken: token,
+      isAuthorize: false,
+      expiration: 900 // 15 minutes
+    };
 
     try {
-      const authHeader = (req as AuthenticatedRequest).headers.authorization;
-      if (!authHeader || !authHeader.startsWith("Bearer ")) {
-        res.status(401).json({
-          statusText: "Unauthorized",
-          message: "Missing or invalid Authorization header."
-        });
-        responseSent = true;
-        return;
-      }
-
-      const token = authHeader.split(" ")[1];
-      if (!token) {
-        res.status(401).json({
-          statusText: "Unauthorized",
-          message: "Bearer token is missing."
-        });
-        responseSent = true;
-        return;
-      }
-
-      const user_id =
-        (req as AuthenticatedRequest).user?.userId || "Unknown User";
-
-      let authData = {
-        key: "5b68e1f5c9f84b3aa3d7e4f9ab3c3c2f1234567890abcdef1234567890abcdef",
-        userId: user_id,
-        email: "user@example.com",
-        authorizationToken:
-          "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI5NTYwMDQ5NC01MGQ5LTQxNjktOWMwMS05ODk3MzgyODU0ZTMiLCJpYXQiOjE2ODM4NTUwMDB9.abc123def456ghi789jkl012mno345pqr678stu901vwx234yz56789",
-        isAuthorize: true,
-        expiration: 120
-      };
-
       const result = await UsersService.createAuthorizationService(authData);
-      if (!responseSent) {
-        res.status(result.status).json(result);
-        responseSent = true;
-      }
+      res.status(result.status).json(result);
     } catch (error: unknown) {
-      if (!responseSent) {
-        res.status(500).json({
-          statusText: "Internal Server Error",
-          message: "Failed to create authorization.",
-          error: (error as Error).message
-        });
-      }
+      res.status(500).json({
+        statusText: "Internal Server Error",
+        message: "Failed to create authorization.",
+        error: (error as Error).message
+      });
+    }
+  }
+
+  private async getAuthorizationHandler(
+    req: Request,
+    res: Response
+  ): Promise<void> {
+    const authHeader = (req as AuthenticatedRequest).headers.authorization;
+    const { key } = req.body;
+    if (!key || !authHeader?.startsWith("Bearer ")) {
+      res.status(401).json({
+        statusText: "Unauthorized",
+        message: "Missing or invalid credentials."
+      });
+      return;
+    }
+
+    const token = authHeader.split(" ")[1];
+    if (!token) {
+      res.status(401).json({
+        statusText: "Unauthorized",
+        message: "Bearer token is missing."
+      });
+      return;
+    }
+
+    try {
+      const result = await UsersService.getAuthorizationService(key);
+      res.status(result.status).json(result);
+    } catch (error: unknown) {
+      res.status(500).json({
+        statusText: "Internal Server Error",
+        message: "Failed to retrieve authorization.",
+        error: (error as Error).message
+      });
     }
   }
 }

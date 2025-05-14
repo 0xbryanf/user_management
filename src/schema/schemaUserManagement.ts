@@ -2,6 +2,7 @@ import { activateUser } from "functions/activateUser.fn";
 import { assignRole } from "functions/assignRole.fn";
 import { createAuthorization } from "functions/createAuthorization.fn";
 import { createRole } from "functions/createRole.fn";
+import { getAuthorization } from "functions/getAuthorization.fn";
 import { getCredentialByEmail } from "functions/getCredentialByEmail.fn";
 import { getCredentialByUserId } from "functions/getCredentialByUserId.fn";
 import { registerInitCredentials } from "functions/registerInitCredentials.fn";
@@ -58,7 +59,8 @@ export const SchemaUserManagement = {
     relation: {},
     actions: {
       activateUser,
-      createAuthorization
+      createAuthorization,
+      getAuthorization
     }
   },
   Roles: {

@@ -1,56 +1,41 @@
+// pages/api/send-otp-email.ts
+import api from "@/lib/api";
+import { fetchAuthorization } from "@/lib/fetchAuthorization";
+import { getAuthTokens } from "@/lib/getAuthTokens";
 import { NextRequest, NextResponse } from "next/server";
 
-/**
- * Handles the POST request to send an OTP email.
- *
- * @param request - The incoming Next.js server request
- * @returns A JSON response indicating the status of the OTP email sending process
- *
- * @throws {NextResponse} Returns an error response if:
- * - Authentication token is missing (401)
- * - Email sending service encounters an error (502 or other status)
- * - An unexpected internal server error occurs (500)
- */
 export async function POST(request: NextRequest) {
   try {
-    const token = request.cookies.get("payloadRef")?.value;
-    if (!token) {
-      return NextResponse.json(
-        { error: "Unauthorized: Missing authentication token." },
-        { status: 401 }
-      );
-    }
-
-    const response = await fetch(`${process.env.BASE_URL}/send-otp-email`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`
+    let { token, sessionToken } = await getAuthTokens(request);
+    await fetchAuthorization(sessionToken, token);
+    const { status, data } = await api.post(
+      `${process.env.BASE_URL}/send-otp-email`,
+      {},
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`
+        }
       }
-    });
+    );
 
-    if (!response.ok) {
-      const responseBody = await response.json().catch(() => ({})); // Avoid crashing on invalid JSON
+    if (status !== 200) {
       return NextResponse.json(
         {
           error:
-            response.status === 502
+            status === 502
               ? "Bad Gateway: Failed to send OTP Email."
-              : responseBody.error ||
+              : data.error ||
                 "Internal Server Error: An unexpected error occurred."
         },
-        { status: response.status }
+        { status }
       );
     }
-
     return NextResponse.json(
       { message: "Success: OTP Email sent successfully." },
       { status: 200 }
     );
   } catch (error) {
-    return NextResponse.json(
-      { error: "Internal Server Error: An unexpected error occurred." },
-      { status: 500 }
-    );
+    return new NextResponse(null, { status: 500 });
   }
 }

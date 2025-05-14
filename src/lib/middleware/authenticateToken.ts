@@ -30,9 +30,11 @@ export async function authenticateToken(
 
     next();
   } catch (error) {
-    res
-      .status(403)
-      .json({ statusText: "Forbidden", message: "Invalid credentials" });
-    return;
+    if (!res.headersSent) {
+      res
+        .status(403)
+        .json({ statusText: "Forbidden", message: "Invalid credentials" });
+      return;
+    }
   }
 }

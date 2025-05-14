@@ -1,4 +1,10 @@
-import { Router, Request, Response, NextFunction } from "express";
+import {
+  Router,
+  Request,
+  Response,
+  NextFunction,
+  RequestHandler
+} from "express";
 import { Controller } from "types/controller";
 import { RegisterInit } from "types/registerInitCredentialInterfaces";
 import HttpException from "utils/httpException.utl";
@@ -19,42 +25,42 @@ class CredentialsController implements Controller {
   private initializeRoutes() {
     this.router.post(
       `${this.path}/${this.version}/register-init-credentials`,
-      this.registerInitCredentialsHandler.bind(this)
+      this.registerInitCredentialsHandler as RequestHandler
     );
 
     this.router.post(
       `${this.path}/${this.version}/request-email-confirmation`,
       authenticateToken,
-      this.requestEmailConfirmationHandler.bind(this)
+      this.requestEmailConfirmationHandler as RequestHandler
     );
 
     this.router.post(
       `${this.path}/${this.version}/send-otp-email`,
       authenticateToken,
-      this.sendOTPEmailHandler.bind(this)
+      this.sendOTPEmailHandler as RequestHandler
     );
 
     this.router.post(
       `${this.path}/${this.version}/verify-otp-email`,
       authenticateToken,
-      this.verifyOTPEmailHandler.bind(this)
+      this.verifyOTPEmailHandler as RequestHandler
     );
 
-    this.router.get(
+    this.router.post(
       `${this.path}/${this.version}/verify-credential`,
-      this.verifyCredentialHandler.bind(this)
+      this.verifyCredentialHandler as RequestHandler
     );
 
     this.router.get(
       `${this.path}/${this.version}/get-credential-by-email`,
       authenticateToken,
-      this.getCredentialByEmailHandler.bind(this)
+      this.getCredentialByEmailHandler as RequestHandler
     );
 
     this.router.get(
       `${this.path}/${this.version}/get-credential-by-user-id`,
       authenticateToken,
-      this.getCredentialByUserIdHandler.bind(this)
+      this.getCredentialByUserIdHandler as RequestHandler
     );
   }
 
@@ -62,13 +68,13 @@ class CredentialsController implements Controller {
     req: Request,
     res: Response,
     next: NextFunction
-  ) {
+  ): Promise<Response | void> {
     try {
       const userData: RegisterInit = req.body;
       const result = await CredentialsService.registerInit(userData);
-      res.status(result.status).json(result);
-    } catch (error: unknown) {
-      next(
+      return res.status(result.status).json(result); // Using return
+    } catch (error) {
+      return next(
         new HttpException(500, "Error initial registration of user.", error)
       );
     }
@@ -78,19 +84,19 @@ class CredentialsController implements Controller {
     req: Request,
     res: Response,
     next: NextFunction
-  ): Promise<void> {
+  ): Promise<Response | void> {
     try {
       const userId = (req as AuthenticatedRequest).user?.userId;
       if (!userId) {
-        res.status(401).json({
+        return res.status(401).json({
           statusText: "Unauthorized",
           message: "Invalid Credentials."
         });
-        return;
       }
+
       const result = await CredentialsService.requestEmailConfirmation(userId);
-      res.status(result.status).json(result);
-    } catch (error: unknown) {
+      return res.status(result.status).json(result); // Using return
+    } catch (error) {
       next(new HttpException(500, "Failed to send email confirmation.", error));
     }
   }
@@ -99,19 +105,19 @@ class CredentialsController implements Controller {
     req: Request,
     res: Response,
     next: NextFunction
-  ) {
+  ): Promise<Response | void> {
     try {
       const userId = (req as AuthenticatedRequest).user?.userId;
       if (!userId) {
-        res.status(401).json({
+        return res.status(401).json({
           statusText: "Unauthorized",
           message: "Invalid Credentials."
         });
-        return;
       }
+
       const result = await CredentialsService.sendOTPEmail(userId);
-      res.status(result.status).json(result);
-    } catch (error: unknown) {
+      return res.status(result.status).json(result); // Using return
+    } catch (error) {
       next(new HttpException(500, "Failed to send One-Time Pin.", error));
     }
   }
@@ -120,23 +126,23 @@ class CredentialsController implements Controller {
     req: Request,
     res: Response,
     next: NextFunction
-  ) {
+  ): Promise<Response | void> {
     try {
       const { otp } = req.body;
       const userId = (req as AuthenticatedRequest).user?.userId;
       if (!userId) {
-        res.status(401).json({
+        return res.status(401).json({
           statusText: "Unauthorized",
           message: "Invalid Credentials."
         });
-        return;
       }
+
       const result = await CredentialsService.verifyOTPEmail(
         userId,
         parseInt(otp)
       );
-      res.status(result.status).json(result);
-    } catch (error: unknown) {
+      return res.status(result.status).json(result); // Using return
+    } catch (error) {
       next(new HttpException(500, "Failed to verify One-Time Pin.", error));
     }
   }
@@ -145,17 +151,15 @@ class CredentialsController implements Controller {
     req: Request,
     res: Response,
     next: NextFunction
-  ) {
+  ): Promise<Response | void> {
     try {
-      const email = req.query.email as string;
-      const password = req.query.password as string;
+      const { email, password } = req.body;
       const result = await CredentialsService.verifyCredentials(
         email,
         password
       );
-      res.status(result.status).json(result);
-      return;
-    } catch (error: unknown) {
+      return res.status(result.status).json(result); // Using return
+    } catch (error) {
       next(new HttpException(500, "Failed to verify credential.", error));
     }
   }
@@ -164,12 +168,12 @@ class CredentialsController implements Controller {
     req: Request,
     res: Response,
     next: NextFunction
-  ) {
+  ): Promise<Response | void> {
     try {
       const email = req.query.email as string;
       const result = await CredentialsService.getCredentialByEmail(email);
-      res.status(result.status).json(result);
-    } catch (error: unknown) {
+      return res.status(result.status).json(result); // Using return
+    } catch (error) {
       next(
         new HttpException(
           500,
@@ -184,12 +188,12 @@ class CredentialsController implements Controller {
     req: Request,
     res: Response,
     next: NextFunction
-  ) {
+  ): Promise<Response | void> {
     try {
       const userId = req.query.id as string;
       const result = await CredentialsService.getCredentialByUserId(userId);
-      res.status(result.status).json(result);
-    } catch (error: unknown) {
+      return res.status(result.status).json(result); // Using return
+    } catch (error) {
       next(
         new HttpException(
           500,

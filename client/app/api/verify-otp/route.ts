@@ -1,3 +1,6 @@
+import api from "@/lib/api";
+import { fetchAuthorization } from "@/lib/fetchAuthorization";
+import { getAuthTokens } from "@/lib/getAuthTokens";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(request: NextRequest) {
@@ -8,31 +11,25 @@ export async function POST(request: NextRequest) {
       { status: 400 }
     );
   }
-
-  const cookie = request.cookies.get("payloadRef");
-  if (!cookie) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-  const token = cookie.value;
+  let { token, sessionToken } = await getAuthTokens(request);
+  await fetchAuthorization(sessionToken, token);
   let response: Response;
-  response = await fetch(`${process.env.BASE_URL}/verify-otp-email`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`
-    },
-    body: JSON.stringify({
-      otp: otp
-    })
-  });
-
+  response = await api.post(
+    `${process.env.BASE_URL}/verify-otp-email`,
+    { otp: otp },
+    {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`
+      }
+    }
+  );
   if (response.status === 422) {
     return NextResponse.json(
       { error: "Unprocessable Entity: Invalid or expired OTP." },
       { status: 400 }
     );
   }
-
   if (response.status === 429) {
     return NextResponse.json(
       {
@@ -42,7 +39,7 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  if (!response.ok) {
+  if (!response || response.status !== 200) {
     return NextResponse.json(
       {
         error:

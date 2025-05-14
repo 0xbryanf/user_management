@@ -1,10 +1,10 @@
 "use client";
 
-import { FormEvent, useState, useEffect, useContext } from "react";
+import { FormEvent, useState, useEffect } from "react";
 import axios, { AxiosError } from "axios";
 import { useRouter } from "next/navigation";
 import { toast } from "react-hot-toast";
-import { signIn, useSession } from "next-auth/react";
+import { signIn } from "next-auth/react";
 import Button from "@/components/atoms/button";
 import { FcGoogle } from "react-icons/fc";
 import SignInForm from "@/components/organisms/signInForm";
@@ -15,14 +15,9 @@ import api from "@/lib/api";
  * SignInPage component handles user authentication with multiple sign-in methods.
  *
  * Supports:
- * - Credentials-based login with email and password
- * - Google OAuth login
- * - OTP verification after successful login
- *
- * Manages authentication state, loading states, and handles various authentication scenarios
- * including error handling and redirection.
- *
- * @returns {JSX.Element} Rendered sign-in page with login form and authentication options
+ * - Credentials-based sign-in with email and password
+ * - Google OAuth sign-in
+ * - Two-factor authentication via OTP
  */
 export default function SignInPage() {
   const router = useRouter();
@@ -30,57 +25,17 @@ export default function SignInPage() {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [showVerifyOTPTemplate, setShowVerifyOTPTemplate] = useState(false);
-  /**
-   * Handles authentication error handling and callback URL management on component mount.
-   *
-   * Checks URL parameters for authentication errors and displays appropriate toast notifications.
-   * Supports specific error scenarios like login failures and account linking issues.
-   * Optionally removes error-related query parameters from the URL after processing.
-   *
-   * @remarks
-   * - Triggered on component initialization
-   * - Provides user-friendly error messages for different authentication error types
-   * - Cleans up URL by removing error-related query parameters
-   */
-  useEffect(() => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const callbackUrl = urlParams.get("callbackUrl");
-    const error = urlParams.get("error");
-
-    if (error) {
-      let message = "Something went wrong. Please try again.";
-
-      if (error === "Callback") {
-        message = "Login failed. Please verify your account.";
-      } else if (error === "OAuthAccountNotLinked") {
-        message = "Email already exists. Please sign in using the same method.";
-      }
-
-      toast.error(message, {
-        duration: 2000,
-        style: { fontSize: "16px" }
-      });
-    }
-
-    // Optionally, remove query params if needed
-    if (callbackUrl) {
-      const url = new URL(window.location.href);
-      url.searchParams.delete("error");
-      window.history.replaceState({}, "", url.toString());
-    }
-  }, []);
 
   const handleCredentialsSignIn = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setLoading(true);
 
     try {
-      const response = await signIn("credentials", {
+      const response = await api.post("/api/auth/sign-in", {
         email,
-        password,
-        redirect: false
+        password
       });
-      if (!response || !response?.ok) {
+      if (response.status === 404) {
         toast.error(`404 Not Found: Credential not found.`, {
           duration: 2500,
           style: { fontSize: "14px" },
@@ -88,16 +43,7 @@ export default function SignInPage() {
         });
         return;
       }
-      const payloadRefResponse = await api.post("api/set-payload-ref");
-      if (!payloadRefResponse || payloadRefResponse.status != 202) {
-        const message = `${payloadRefResponse.status} ${payloadRefResponse.data.message}`;
-        toast.error(message, {
-          duration: 2500,
-          style: { fontSize: "14px" },
-          icon: null
-        });
-        return;
-      }
+
       const otpResponse = await api.post("/api/send-otp-email");
       if (!otpResponse || otpResponse.status != 200) {
         const message = `${otpResponse.status} ${otpResponse.data.message}`;
@@ -121,6 +67,11 @@ export default function SignInPage() {
       setLoading(false);
     }
   };
+
+  /**
+   * Initiates Google OAuth sign-in process with a redirect to the home page after successful authentication.
+   * Uses NextAuth's signIn method with the "google" provider.
+   */
   const handleGoogleLogin = () => {
     signIn("google", {
       callbackUrl: "/"
