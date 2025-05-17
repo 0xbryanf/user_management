@@ -1,3 +1,4 @@
+import { activateAuthorization } from "functions/activateAuthorization.fn";
 import { activateUser } from "functions/activateUser.fn";
 import { createAuthorization } from "functions/createAuthorization.fn";
 import { getAuthorization } from "functions/getAuthorization.fn";
@@ -29,6 +30,11 @@ class UsersService {
 
   static async getAuthorizationService(key: string) {
     const result = await getAuthorization({ key });
+    return result;
+  }
+
+  static async activateAuthorization(key: string) {
+    const result = await activateAuthorization({ key });
     return result;
   }
 }

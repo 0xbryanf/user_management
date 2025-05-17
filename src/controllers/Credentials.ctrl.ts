@@ -72,11 +72,9 @@ class CredentialsController implements Controller {
     try {
       const userData: RegisterInit = req.body;
       const result = await CredentialsService.registerInit(userData);
-      return res.status(result.status).json(result); // Using return
+      return res.status(result.status).json(result);
     } catch (error) {
-      return next(
-        new HttpException(500, "Error initial registration of user.", error)
-      );
+      return next(new HttpException(500, "Internal Server Error.", error));
     }
   }
 
@@ -95,9 +93,9 @@ class CredentialsController implements Controller {
       }
 
       const result = await CredentialsService.requestEmailConfirmation(userId);
-      return res.status(result.status).json(result); // Using return
+      return res.status(result.status).json(result);
     } catch (error) {
-      next(new HttpException(500, "Failed to send email confirmation.", error));
+      return next(new HttpException(500, "Internal Server Error.", error));
     }
   }
 
@@ -107,18 +105,11 @@ class CredentialsController implements Controller {
     next: NextFunction
   ): Promise<Response | void> {
     try {
-      const userId = (req as AuthenticatedRequest).user?.userId;
-      if (!userId) {
-        return res.status(401).json({
-          statusText: "Unauthorized",
-          message: "Invalid Credentials."
-        });
-      }
-
+      const userId = (req as AuthenticatedRequest).user?.userId as string;
       const result = await CredentialsService.sendOTPEmail(userId);
-      return res.status(result.status).json(result); // Using return
+      return res.status(result.status).json(result);
     } catch (error) {
-      next(new HttpException(500, "Failed to send One-Time Pin.", error));
+      return next(new HttpException(500, "Internal Server Error.", error));
     }
   }
 
@@ -129,21 +120,14 @@ class CredentialsController implements Controller {
   ): Promise<Response | void> {
     try {
       const { otp } = req.body;
-      const userId = (req as AuthenticatedRequest).user?.userId;
-      if (!userId) {
-        return res.status(401).json({
-          statusText: "Unauthorized",
-          message: "Invalid Credentials."
-        });
-      }
-
+      const userId = (req as AuthenticatedRequest).user?.userId as string;
       const result = await CredentialsService.verifyOTPEmail(
         userId,
         parseInt(otp)
       );
-      return res.status(result.status).json(result); // Using return
+      return res.status(result.status).json(result);
     } catch (error) {
-      next(new HttpException(500, "Failed to verify One-Time Pin.", error));
+      return next(new HttpException(500, "Internal Server Error.", error));
     }
   }
 
@@ -160,7 +144,7 @@ class CredentialsController implements Controller {
       );
       return res.status(result.status).json(result); // Using return
     } catch (error) {
-      next(new HttpException(500, "Failed to verify credential.", error));
+      return next(new HttpException(500, "Internal Server Error.", error));
     }
   }
 
@@ -172,15 +156,9 @@ class CredentialsController implements Controller {
     try {
       const email = req.query.email as string;
       const result = await CredentialsService.getCredentialByEmail(email);
-      return res.status(result.status).json(result); // Using return
+      return res.status(result.status).json(result);
     } catch (error) {
-      next(
-        new HttpException(
-          500,
-          "Error retrieving user credential by email.",
-          error
-        )
-      );
+      return next(new HttpException(500, "Internal Server Error.", error));
     }
   }
 
@@ -194,13 +172,7 @@ class CredentialsController implements Controller {
       const result = await CredentialsService.getCredentialByUserId(userId);
       return res.status(result.status).json(result); // Using return
     } catch (error) {
-      next(
-        new HttpException(
-          500,
-          "Error retrieving user credential by userid.",
-          error
-        )
-      );
+      return next(new HttpException(500, "Internal Server Error.", error));
     }
   }
 }

@@ -18,9 +18,7 @@ export async function authenticateToken(
 ): Promise<void> {
   try {
     req.user = authTokenFromHeader(req, res) as AuthPayload;
-
     const user = await findOneCredential({ userId: req.user?.userId });
-
     if (!user) {
       res
         .status(401)

@@ -1,4 +1,10 @@
-import { NextFunction, Request, Response, Router } from "express";
+import {
+  Router,
+  Request,
+  Response,
+  NextFunction,
+  RequestHandler
+} from "express";
 import { Controller } from "types/controller";
 import "dotenv/config";
 import { authenticateToken } from "lib/middleware/authenticateToken";
@@ -19,19 +25,25 @@ class UsersController implements Controller {
     this.router.post(
       `${this.path}/${this.version}/activate-user`,
       authenticateToken,
-      this.activateUserHandler.bind(this)
+      this.activateUserHandler as RequestHandler
     );
 
     this.router.post(
       `${this.path}/${this.version}/create-authorization`,
       authenticateToken,
-      this.createAuthorizationHandler.bind(this)
+      this.createAuthorizationHandler as RequestHandler
     );
 
     this.router.post(
       `${this.path}/${this.version}/get-authorization`,
       authenticateToken,
-      this.getAuthorizationHandler.bind(this)
+      this.getAuthorizationHandler as RequestHandler
+    );
+
+    this.router.post(
+      `${this.path}/${this.version}/activate-authorization`,
+      authenticateToken,
+      this.activateAuthorizationHandler as RequestHandler
     );
   }
 
@@ -39,52 +51,29 @@ class UsersController implements Controller {
     req: Request,
     res: Response,
     next: NextFunction
-  ): Promise<void> {
-    const user_id = (req as AuthenticatedRequest).user?.userId;
-
-    if (!user_id) {
-      res.status(401).json({
-        statusText: "Unauthorized",
-        message: "Invalid Credentials."
-      });
-      return;
-    }
-
+  ): Promise<Response | void> {
     try {
+      const user_id = (req as AuthenticatedRequest).user?.userId as string;
       const result = await UsersService.activateUserService(user_id);
-      res.status(result.status).json(result);
-    } catch (error: unknown) {
-      next(new HttpException(500, "Failed to send email confirmation.", error));
+      return res.status(result.status).json(result);
+    } catch (error) {
+      return next(new HttpException(500, "Internal Server Error.", error));
     }
   }
 
   private async createAuthorizationHandler(
     req: Request,
-    res: Response
-  ): Promise<void> {
-    const authHeader = (req as AuthenticatedRequest).headers.authorization;
-    const { session } = req.body;
-    if (!session || !authHeader?.startsWith("Bearer ")) {
-      res.status(401).json({
-        statusText: "Unauthorized",
-        message: "Missing or invalid credentials."
-      });
-      return;
-    }
-
-    const token = authHeader.split(" ")[1];
-    if (!token) {
-      res.status(401).json({
-        statusText: "Unauthorized",
-        message: "Bearer token is missing."
-      });
-      return;
-    }
-
-    const user_id =
-      (req as AuthenticatedRequest).user?.userId || "Unknown User";
-
+    res: Response,
+    next: NextFunction
+  ): Promise<Response | void> {
     try {
+      const authHeader = (req as AuthenticatedRequest).headers
+        .authorization as string;
+      const { session } = req.body;
+      const token = authHeader.split(" ")[1];
+      const user_id =
+        (req as AuthenticatedRequest).user?.userId || "Unknown User";
+
       const result = await UsersService.createAuthorizationService(
         session,
         token,
@@ -92,48 +81,37 @@ class UsersController implements Controller {
         false,
         900
       );
-      res.status(result.status).json(result);
-    } catch (error: unknown) {
-      res.status(500).json({
-        statusText: "Internal Server Error",
-        message: "Failed to create authorization.",
-        error: (error as Error).message
-      });
+      return res.status(result.status).json(result);
+    } catch (error) {
+      return next(new HttpException(500, "Internal Server Error.", error));
     }
   }
 
   private async getAuthorizationHandler(
     req: Request,
-    res: Response
-  ): Promise<void> {
-    const authHeader = (req as AuthenticatedRequest).headers.authorization;
-    const { key } = req.body;
-    if (!key || !authHeader?.startsWith("Bearer ")) {
-      res.status(401).json({
-        statusText: "Unauthorized",
-        message: "Missing or invalid credentials."
-      });
-      return;
-    }
-
-    const token = authHeader.split(" ")[1];
-    if (!token) {
-      res.status(401).json({
-        statusText: "Unauthorized",
-        message: "Bearer token is missing."
-      });
-      return;
-    }
-
+    res: Response,
+    next: NextFunction
+  ): Promise<Response | void> {
     try {
+      const { key } = req.body;
       const result = await UsersService.getAuthorizationService(key);
-      res.status(result.status).json(result);
-    } catch (error: unknown) {
-      res.status(500).json({
-        statusText: "Internal Server Error",
-        message: "Failed to retrieve authorization.",
-        error: (error as Error).message
-      });
+      return res.status(result.status).json(result);
+    } catch (error) {
+      return next(new HttpException(500, "Internal Server Error.", error));
+    }
+  }
+
+  private async activateAuthorizationHandler(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<Response | void> {
+    try {
+      const { key } = req.body;
+      const result = await UsersService.activateAuthorization(key);
+      return res.status(result.status).json(result);
+    } catch (error) {
+      return next(new HttpException(500, "Internal Server Error.", error));
     }
   }
 }
