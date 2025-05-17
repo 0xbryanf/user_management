@@ -78,19 +78,20 @@ export default function SignUpPage() {
     }
 
     try {
-      const apiRegistrationResponse = await api.post(
+      const registrationInitresponse = await api.post(
         "/api/auth/register-init",
         {
           email,
           password
         }
       );
-      if (apiRegistrationResponse && apiRegistrationResponse.status === 201) {
-        const otpResponse = await api.post("/api/send-otp-email");
-        if (otpResponse.status === 200) {
+
+      if (registrationInitresponse && registrationInitresponse.status === 201) {
+        const otpEmailResponse = await api.post("/api/send-otp-email");
+        if (otpEmailResponse.status === 200) {
           setViewState("VERIFY_OTP");
         } else {
-          toast.error(`${otpResponse?.data?.message}`, {
+          toast.error(`${otpEmailResponse?.data?.message}`, {
             duration: 2500,
             style: { fontSize: "14px" },
             icon: null

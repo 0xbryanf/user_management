@@ -1,68 +1,79 @@
+import api from "@/lib/api";
+import { createSessionToken } from "@/lib/setJwtCookie";
 import { NextRequest, NextResponse } from "next/server";
 
-/**
- * Handles user registration initialization via POST request
- *
- * @param request - The incoming NextRequest containing user registration credentials
- * @returns A NextResponse with registration status, including potential error handling for email conflicts, invalid inputs, or server errors
- */
 export async function POST(request: NextRequest) {
-  const { email, password } = await request.json();
-  if (!email || !password) {
-    return NextResponse.json(
-      { error: "Bad Request: Email and password are required." },
-      { status: 400 }
+  try {
+    const { email, password } = await request.json();
+    if (!email || !password) {
+      return NextResponse.json(
+        { error: "Bad Request: Email and password are required." },
+        { status: 400 }
+      );
+    }
+
+    const registerResponse = await api.post(
+      `${process.env.BASE_URL}/register-init-credentials`,
+      { email, password },
+      { headers: { "Content-Type": "application/json" } }
     );
-  }
 
-  const res = await fetch(`${process.env.BASE_URL}/register-init-credentials`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ email, password })
-  });
+    const token = registerResponse?.data?.data?.payloadRef;
+    if (!token) {
+      return NextResponse.json(
+        { error: "Unauthorized: Invalid registration response." },
+        { status: 401 }
+      );
+    }
 
-  const body = await res.json();
-  const token = body.data?.payloadRef as string;
+    const sessionToken = await createSessionToken(token, email);
+    if (!sessionToken) {
+      return NextResponse.json(
+        { error: "Internal Server Error: Session token generation failed." },
+        { status: 500 }
+      );
+    }
 
-  if (res.status === 409) {
+    const authResponse = await api.post(
+      `${process.env.BASE_URL}/create-authorization`,
+      { session: sessionToken },
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`
+        }
+      }
+    );
+
+    if (authResponse.status !== 201) {
+      return NextResponse.json(
+        { error: "Unauthorized: Invalid credentials." },
+        { status: 401 }
+      );
+    }
+
     const response = NextResponse.json(
-      { error: "Conflict: A user with this email already exists." },
-      { status: 409 }
+      { message: "Accepted: Authentication request set successfully." },
+      { status: 201 }
     );
 
-    response.headers.append(
+    response.headers.set(
       "Set-Cookie",
-      `payloadRef=${token}; HttpOnly; Secure=${
-        process.env.NODE_ENV === "production"
-      }; SameSite=Strict; Path=/; Max-Age=${15 * 60}`
+      `auth.session_token=${sessionToken}; HttpOnly; ${
+        process.env.NODE_ENV === "production" ? "Secure; " : ""
+      }SameSite=Strict; Path=/; Max-Age=${15 * 60}`
     );
 
     return response;
-  }
-
-  if (!res.ok) {
+  } catch (error) {
+    console.error("Error in Authentication:", error);
     return NextResponse.json(
       {
         error:
-          res.status === 404
-            ? "Not Found: Default role not found."
-            : "Internal Server Error: An unexpected error occurred."
+          "Internal Server Error: Unable to process the authentication request.",
+        details: error instanceof Error ? error.message : "Unknown error"
       },
-      { status: res.status }
+      { status: 500 }
     );
   }
-
-  const response = NextResponse.json(
-    { message: "Created: Credential successfully created." },
-    { status: 201 }
-  );
-
-  response.headers.append(
-    "Set-Cookie",
-    `payloadRef=${token}; HttpOnly; Secure=${
-      process.env.NODE_ENV === "production"
-    }; SameSite=Strict; Path=/; Max-Age=${15 * 60}`
-  );
-
-  return response;
 }
