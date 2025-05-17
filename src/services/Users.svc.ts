@@ -9,7 +9,20 @@ class UsersService {
     return result;
   }
 
-  static async createAuthorizationService(authData: Authorization) {
+  static async createAuthorizationService(
+    session: string,
+    token: string,
+    user_id: string,
+    isAuthorize = false,
+    expiration: number
+  ) {
+    const authData: Authorization = {
+      key: session,
+      userId: user_id,
+      authorizationToken: token,
+      isAuthorize,
+      expiration
+    };
     const result = await createAuthorization({ authData });
     return result;
   }

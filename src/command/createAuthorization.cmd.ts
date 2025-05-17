@@ -11,8 +11,8 @@ export default {
           email: "user@example.com",
           authorizationToken:
             "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI5NTYwMDQ5NC01MGQ5LTQxNjktOWMwMS05ODk3MzgyODU0ZTMiLCJpYXQiOjE2ODM4NTUwMDB9.abc123def456ghi789jkl012mno345pqr678stu901vwx234yz56789",
-          isAuthorize: true,
-          expiration: 120
+          isAuthorize: false,
+          expiration: 900
         }
       }
     }

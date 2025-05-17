@@ -1,3 +1,4 @@
+import { activateAuthorization } from "functions/activateAuthorization.fn";
 import { activateUser } from "functions/activateUser.fn";
 import { assignRole } from "functions/assignRole.fn";
 import { createAuthorization } from "functions/createAuthorization.fn";
@@ -60,7 +61,8 @@ export const SchemaUserManagement = {
     actions: {
       activateUser,
       createAuthorization,
-      getAuthorization
+      getAuthorization,
+      activateAuthorization
     }
   },
   Roles: {

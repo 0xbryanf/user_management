@@ -84,16 +84,14 @@ class UsersController implements Controller {
     const user_id =
       (req as AuthenticatedRequest).user?.userId || "Unknown User";
 
-    const authData = {
-      key: session,
-      userId: user_id,
-      authorizationToken: token,
-      isAuthorize: false,
-      expiration: 900 // 15 minutes
-    };
-
     try {
-      const result = await UsersService.createAuthorizationService(authData);
+      const result = await UsersService.createAuthorizationService(
+        session,
+        token,
+        user_id,
+        false,
+        900
+      );
       res.status(result.status).json(result);
     } catch (error: unknown) {
       res.status(500).json({
