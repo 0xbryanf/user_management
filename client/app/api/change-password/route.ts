@@ -1,3 +1,5 @@
+import { fetchAuthorization } from "@/lib/fetchAuthorization";
+import { getAuthTokens } from "@/lib/getAuthTokens";
 import { NextRequest, NextResponse } from "next/server";
 
 /**
@@ -17,13 +19,8 @@ import { NextRequest, NextResponse } from "next/server";
  *   - Fallback error handling for other status codes
  */
 export async function POST(request: NextRequest) {
-  const token = request.cookies.get("payloadRef")?.value;
-  if (!token) {
-    return NextResponse.json(
-      { error: "Unauthorized: Missing authentication credentials." },
-      { status: 401 }
-    );
-  }
+  const { token, sessionToken } = await getAuthTokens(request);
+  await fetchAuthorization(sessionToken, token);
 
   const { password } = await request.json();
   if (!password) {

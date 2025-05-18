@@ -1,3 +1,5 @@
+import { fetchAuthorization } from "@/lib/fetchAuthorization";
+import { getAuthTokens } from "@/lib/getAuthTokens";
 import { NextRequest, NextResponse } from "next/server";
 
 /**
@@ -13,14 +15,8 @@ import { NextRequest, NextResponse } from "next/server";
  * - Handles various error scenarios including unauthorized, bad request, and not found
  */
 export async function GET(request: NextRequest) {
-  const token = request.cookies.get("payloadRef")?.value;
-  if (!token) {
-    return NextResponse.json(
-      { error: "Unauthorized: Missing authentication credentials." },
-      { status: 401 }
-    );
-  }
-
+  const { token, sessionToken } = await getAuthTokens(request);
+  await fetchAuthorization(sessionToken, token);
   const email = request.nextUrl.searchParams.get("email");
   if (!email) {
     return NextResponse.json(
@@ -28,7 +24,6 @@ export async function GET(request: NextRequest) {
       { status: 400 }
     );
   }
-
   try {
     const response = await fetch(
       `${process.env.BASE_URL}/get-credential-by-email?email=${encodeURIComponent(email)}`,
