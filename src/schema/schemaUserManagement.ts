@@ -12,6 +12,7 @@ import { sendOTPEmail } from "functions/sendOneTimePinToEmail.fn";
 import { updatePassword } from "functions/updatePassword.fn";
 import { verifyCredentials } from "functions/verifyCredentials.fn";
 import { verifyOTPEmail } from "functions/verifyOTPEmail.fn";
+import { verifyUserActivation } from "functions/verifyUserActivation.fn";
 import { DataTypes } from "sequelize";
 
 export const SchemaUserManagement = {
@@ -62,7 +63,8 @@ export const SchemaUserManagement = {
       activateUser,
       createAuthorization,
       getAuthorization,
-      activateAuthorization
+      activateAuthorization,
+      verifyUserActivation
     }
   },
   Roles: {

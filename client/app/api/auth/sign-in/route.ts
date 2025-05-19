@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import api from "@/lib/api";
 import { createSessionToken } from "@/lib/setJwtCookie";
+import { AxiosError } from "axios";
 
 export async function POST(request: NextRequest) {
   const { email, password } = await request.json();
@@ -56,7 +57,22 @@ export async function POST(request: NextRequest) {
     );
 
     return response;
-  } catch (error) {
-    return new NextResponse(null, { status: 500 });
+  } catch (error: unknown) {
+    const err = error as AxiosError<{
+      data?: { status?: number; statusText?: string; message?: string };
+    }>;
+    const status = err.response?.status ?? err.response?.data?.data?.status;
+    if (status === 401) {
+      return NextResponse.json(
+        { error: "Unauthorized: Invalid Credentials" },
+        { status: 401 }
+      );
+    }
+    return NextResponse.json(
+      {
+        error: "Internal Server Error: Unable to process the request."
+      },
+      { status: 500 }
+    );
   }
 }

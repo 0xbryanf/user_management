@@ -8,15 +8,15 @@
   "license": "MIT",
   "private": true,
   "scripts": {
-    "start": "tsc-watch --onSuccess \"node ./dist/index.js\"",
-    "dev": "rimraf ./dist && npx tsc && node ./dist/index.js",
-    "build": "rimraf ./dist && npx tsc",
+    "start": "node ./dist/index.js",
+    "dev": "ts-node --transpile-only src/index.ts",
+    "build": "rimraf ./dist && tsc",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "clean": "rimraf node_modules"
+    "clean": "rimraf node_modules dist"
   },
   "engines": {
-    "node": "22.14.0",
-    "npm": "10.9.2"
+    "node": ">=18.0.0",
+    "npm": ">=8.0.0"
   },
   "dependencies": {
     "@sendgrid/mail": "^8.1.5",

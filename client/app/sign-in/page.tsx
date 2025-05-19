@@ -57,7 +57,7 @@ export default function SignInPage() {
       setShowVerifyOTPTemplate(true);
     } catch (error) {
       const err = error as AxiosError<{ error?: string }>;
-      const message = `${err.response?.status} ${err.response?.statusText}`;
+      const message = `${err.response?.data?.error}`;
       toast.error(message, {
         duration: 2500,
         style: { fontSize: "16px" },

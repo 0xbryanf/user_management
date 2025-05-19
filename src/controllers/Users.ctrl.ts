@@ -45,6 +45,12 @@ class UsersController implements Controller {
       authenticateToken,
       this.activateAuthorizationHandler as RequestHandler
     );
+
+    this.router.post(
+      `${this.path}/${this.version}/verify-user-activation`,
+      authenticateToken,
+      this.verifyUserActivationHandler as RequestHandler
+    );
   }
 
   private async activateUserHandler(
@@ -109,6 +115,20 @@ class UsersController implements Controller {
     try {
       const { key } = req.body;
       const result = await UsersService.activateAuthorization(key);
+      return res.status(result.status).json(result);
+    } catch (error) {
+      return next(new HttpException(500, "Internal Server Error.", error));
+    }
+  }
+
+  private async verifyUserActivationHandler(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<Response | void> {
+    try {
+      const user_id = (req as AuthenticatedRequest).user?.userId as string;
+      const result = await UsersService.verifyUserActivation(user_id);
       return res.status(result.status).json(result);
     } catch (error) {
       return next(new HttpException(500, "Internal Server Error.", error));
