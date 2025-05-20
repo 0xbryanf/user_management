@@ -9,6 +9,7 @@ import { getCredentialByUserId } from "functions/getCredentialByUserId.fn";
 import { registerInitCredentials } from "functions/registerInitCredentials.fn";
 import { requestEmailConfirmation } from "functions/requestEmailConfirmation.fn";
 import { sendOTPEmail } from "functions/sendOneTimePinToEmail.fn";
+import { updateAuthorization } from "functions/updateAuthorization.fn";
 import { updatePassword } from "functions/updatePassword.fn";
 import { verifyCredentials } from "functions/verifyCredentials.fn";
 import { verifyOTPEmail } from "functions/verifyOTPEmail.fn";
@@ -64,7 +65,8 @@ export const SchemaUserManagement = {
       createAuthorization,
       getAuthorization,
       activateAuthorization,
-      verifyUserActivation
+      verifyUserActivation,
+      updateAuthorization
     }
   },
   Roles: {

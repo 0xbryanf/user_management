@@ -2,6 +2,7 @@ import { activateAuthorization } from "functions/activateAuthorization.fn";
 import { activateUser } from "functions/activateUser.fn";
 import { createAuthorization } from "functions/createAuthorization.fn";
 import { getAuthorization } from "functions/getAuthorization.fn";
+import { updateAuthorization } from "functions/updateAuthorization.fn";
 import { verifyUserActivation } from "functions/verifyUserActivation.fn";
 import { Authorization } from "types/authorization";
 
@@ -41,6 +42,11 @@ class UsersService {
 
   static async verifyUserActivation(user_id: string) {
     const result = await verifyUserActivation({ user_id });
+    return result;
+  }
+
+  static async updateAuthorization(authData: Authorization) {
+    const result = await updateAuthorization({ authData });
     return result;
   }
 }

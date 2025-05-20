@@ -5,5 +5,6 @@ export interface Authorization {
   authorizationToken: string;
   isAuthorize: boolean;
   expiration: number;
-  payloadRef?: string;
+  isActive?: string;
+  roles?: string[];
 }

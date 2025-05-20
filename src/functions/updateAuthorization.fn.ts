@@ -2,9 +2,9 @@ import { RedisHelper } from "lib/helpers/Redis";
 import { Authorization } from "types/authorization";
 import { ReturnResponse } from "types/returnResponse";
 
-export const createAuthorization = async (values: {
+export const updateAuthorization = async (values: {
   authData: Authorization;
-}): Promise<ReturnResponse<string>> => {
+}): Promise<ReturnResponse> => {
   const { authData } = values;
   if (!authData) {
     return {
@@ -18,7 +18,9 @@ export const createAuthorization = async (values: {
     userId: authData.userId,
     authorizationToken: authData.authorizationToken,
     isAuthorize: authData.isAuthorize,
-    expiration: authData.expiration
+    expiration: authData.expiration,
+    isActive: authData.isActive,
+    roles: authData.roles
   };
 
   try {
@@ -32,14 +34,14 @@ export const createAuthorization = async (values: {
       return {
         status: 503,
         statusText: "Service Unavailable",
-        message: "Failed to create authorization in Redis."
+        message: "Failed to update authorization in Redis."
       };
     }
 
     return {
-      status: 201,
-      statusText: "Created",
-      message: "Authorization created successfully."
+      status: 202,
+      statusText: "Updated",
+      message: "Authorization updated successfully."
     };
   } catch (error: unknown) {
     return {
