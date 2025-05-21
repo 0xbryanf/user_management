@@ -12,7 +12,9 @@ import sgMail from "@sendgrid/mail";
 import { sendOTPEmail } from "functions/sendOneTimePinToEmail.fn";
 import { verifyOTPEmail } from "functions/verifyOTPEmail.fn";
 import { verifyCredentials } from "functions/verifyCredentials.fn";
-
+/**
+ * Service class for managing user credentials and email verification.
+ */
 class CredentialsService {
   /**
    * Registers initial credentials for a user
@@ -27,6 +29,11 @@ class CredentialsService {
     return result;
   }
 
+  /**
+   * Retrieves credentials by email.
+   * @param email - The user's email.
+   * @returns Promise resolving to the credential details.
+   */
   static async getCredentialByEmail(
     email: string
   ): Promise<ReturnResponse<CredentialResponse>> {
@@ -34,6 +41,11 @@ class CredentialsService {
     return result;
   }
 
+  /**
+   * Retrieves credentials by user ID.
+   * @param userId - The user's unique ID.
+   * @returns Promise resolving to the credential details.
+   */
   static async getCredentialByUserId(
     userId: string
   ): Promise<ReturnResponse<CredentialResponse>> {
@@ -41,6 +53,11 @@ class CredentialsService {
     return result;
   }
 
+  /**
+   * Requests an email confirmation for the specified user.
+   * @param userId - The user's unique ID.
+   * @returns Promise resolving to the email confirmation result.
+   */
   static async requestEmailConfirmation(
     userId: string
   ): Promise<ReturnResponse<[sgMail.ClientResponse, {}]>> {
@@ -57,6 +74,11 @@ class CredentialsService {
     return result;
   }
 
+  /**
+   * Sends an OTP email to the specified user.
+   * @param userId - The user's unique ID.
+   * @returns Promise resolving to the OTP email result.
+   */
   static async sendOTPEmail(
     userId: string
   ): Promise<ReturnResponse<[sgMail.ClientResponse, {}]>> {
@@ -66,6 +88,12 @@ class CredentialsService {
     return result;
   }
 
+  /**
+   * Verifies the OTP email for the specified user.
+   * @param userId - The user's unique ID.
+   * @param otp - The OTP code.
+   * @returns Promise resolving to the verification result.
+   */
   static async verifyOTPEmail(
     userId: string,
     otp: number
@@ -83,6 +111,12 @@ class CredentialsService {
     return result;
   }
 
+  /**
+   * Verifies user credentials by email and password.
+   * @param email - The user's email.
+   * @param password - The user's password.
+   * @returns Promise resolving to the verification result (JWT token or similar).
+   */
   static async verifyCredentials(
     email: string,
     password: string

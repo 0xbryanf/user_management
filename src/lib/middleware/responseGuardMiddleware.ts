@@ -1,5 +1,8 @@
 import { NextFunction, Request, Response } from "express";
-
+/**
+ * Express middleware to prevent multiple responses from being sent for a single request.
+ * Logs an error if res.send, res.json, or res.end are called more than once.
+ */
 export const responseGuardMiddleware = (
   _req: Request,
   res: Response,

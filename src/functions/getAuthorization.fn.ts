@@ -1,7 +1,12 @@
 import { RedisHelper } from "lib/helpers/Redis";
 import { Authorization } from "types/authorization";
 import { ReturnResponse } from "types/returnResponse";
-
+/**
+ * Retrieves authorization data from Redis using the provided key.
+ *
+ * @param key - The Redis key for the authorization record.
+ * @returns Promise resolving to a standardized response with the authorization data or an error.
+ */
 export const getAuthorization = async ({
   key
 }: {

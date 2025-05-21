@@ -1,11 +1,14 @@
 import { UniqueConstraintError, ValidationError } from "sequelize";
+import { ErrorResponse } from "types/errorResponse";
 
-type ErrorResponse = {
-  status: number;
-  message: string;
-  error?: unknown;
-};
-
+/**
+ * Wraps an async function and handles Sequelize and general errors,
+ * returning standardized error responses with status codes and messages.
+ *
+ * @template T - Function type to wrap.
+ * @param fn - The async function to wrap.
+ * @returns A wrapped function that returns either the original result or an error response.
+ */
 export const errorHandlerMiddleware = <T extends (...args: any[]) => any>(
   fn: T
 ) => {

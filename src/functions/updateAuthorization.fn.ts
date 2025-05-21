@@ -1,7 +1,12 @@
 import { RedisHelper } from "lib/helpers/Redis";
 import { Authorization } from "types/authorization";
 import { ReturnResponse } from "types/returnResponse";
-
+/**
+ * Updates an existing authorization record in Redis.
+ *
+ * @param values - Object containing `authData` with updated authorization info.
+ * @returns Promise resolving to a standardized response indicating update status or error.
+ */
 export const updateAuthorization = async (values: {
   authData: Authorization;
 }): Promise<ReturnResponse> => {

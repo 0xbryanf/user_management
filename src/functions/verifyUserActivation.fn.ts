@@ -1,6 +1,11 @@
 import { UserHelper } from "lib/helpers/Users";
 import { ReturnResponse } from "types/returnResponse";
-
+/**
+ * Verifies if a user is active based on their user ID.
+ *
+ * @param values - Object containing the `user_id`.
+ * @returns Promise resolving to a standardized response with activation status or error.
+ */
 export const verifyUserActivation = async (values: {
   user_id: string;
 }): Promise<ReturnResponse<boolean>> => {

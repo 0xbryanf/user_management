@@ -6,12 +6,27 @@ import { updateAuthorization } from "functions/updateAuthorization.fn";
 import { verifyUserActivation } from "functions/verifyUserActivation.fn";
 import { Authorization } from "types/authorization";
 
+/**
+ * Service class for user and authorization-related operations.
+ */
 class UsersService {
+  /**
+   * Activates the specified user.
+   * @param user_id - The user's unique identifier.
+   */
   static async activateUserService(user_id: string) {
     const result = await activateUser({ user_id });
     return result;
   }
 
+  /**
+   * Creates a new authorization record.
+   * @param session - Session key.
+   * @param token - Authorization token.
+   * @param user_id - User's unique identifier.
+   * @param isAuthorize - Authorization status.
+   * @param expiration - Expiration timestamp.
+   */
   static async createAuthorizationService(
     session: string,
     token: string,
@@ -30,21 +45,37 @@ class UsersService {
     return result;
   }
 
+  /**
+   * Retrieves an authorization record by its key.
+   * @param key - Authorization key.
+   */
   static async getAuthorizationService(key: string) {
     const result = await getAuthorization({ key });
     return result;
   }
 
+  /**
+   * Activates the specified authorization.
+   * @param key - Authorization key.
+   */
   static async activateAuthorization(key: string) {
     const result = await activateAuthorization({ key });
     return result;
   }
 
+  /**
+   * Verifies whether the user has been activated.
+   * @param user_id - User's unique identifier.
+   */
   static async verifyUserActivation(user_id: string) {
     const result = await verifyUserActivation({ user_id });
     return result;
   }
 
+  /**
+   * Updates an authorization record.
+   * @param authData - Authorization data to update.
+   */
   static async updateAuthorization(authData: Authorization) {
     const result = await updateAuthorization({ authData });
     return result;

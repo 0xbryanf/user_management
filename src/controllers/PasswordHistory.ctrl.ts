@@ -4,7 +4,11 @@ import { PasswordHistoryService } from "services/PasswordHistory.svc";
 import { AuthenticatedRequest } from "types/authenticatedRequest";
 import { Controller } from "types/controller";
 import HttpException from "utils/httpException.utl";
-
+/**
+ * Controller for password history management API endpoints (v1).
+ *
+ * Handles password update requests. All routes require authentication.
+ */
 class PasswordHistoryController implements Controller {
   public router = Router();
   public path = "/api";
@@ -13,7 +17,10 @@ class PasswordHistoryController implements Controller {
   constructor() {
     this.initializeRoutes();
   }
-
+  /**
+   * Registers the password update route and its handler.
+   * Endpoint is protected by `authenticateToken` middleware.
+   */
   private initializeRoutes() {
     this.router.post(
       `${this.path}/${this.version}/update-password`,
@@ -21,7 +28,9 @@ class PasswordHistoryController implements Controller {
       this.updatePasswordHandler.bind(this)
     );
   }
-
+  /**
+   * Handles password update requests.
+   */
   private async updatePasswordHandler(
     req: Request,
     res: Response,

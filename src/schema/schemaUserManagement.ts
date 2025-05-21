@@ -15,7 +15,16 @@ import { verifyCredentials } from "functions/verifyCredentials.fn";
 import { verifyOTPEmail } from "functions/verifyOTPEmail.fn";
 import { verifyUserActivation } from "functions/verifyUserActivation.fn";
 import { DataTypes } from "sequelize";
-
+/**
+ * Schema definitions for user management entities, including
+ * Users, Roles, UserRoles, OAuthProviders, Credentials, and PasswordHistory.
+ *
+ * Each schema contains:
+ *  - descriptor: Field definitions and types
+ *  - actions: Available data operations for the schema
+ *  - modelOptions: Table options (if applicable)
+ *  - relation: Entity relationships (currently empty)
+ */
 export const SchemaUserManagement = {
   Users: {
     descriptor: {

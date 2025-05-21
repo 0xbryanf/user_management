@@ -1,7 +1,12 @@
 import { ReturnResponse } from "types/returnResponse";
 import { User, UserResponse } from "types/userInterfaces";
 import { loadSchemaModel } from "schema/loadSchemaModel.utl";
-
+/**
+ * Activates a user account by setting `is_active` to true.
+ *
+ * @param values - The user object containing at least `user_id`.
+ * @returns Promise resolving to a standardized response with the updated user data or an error.
+ */
 export const activateUser = async (
   values: User
 ): Promise<ReturnResponse<UserResponse>> => {

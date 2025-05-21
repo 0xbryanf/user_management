@@ -1,6 +1,14 @@
 import { Request, Response } from "express";
 import jwt, { JwtPayload } from "jsonwebtoken";
 
+/**
+ * Extracts and decodes a base64-encoded Bearer JWT from the request's Authorization header.
+ * Returns the decoded JWT payload or sends a 401 response if missing/invalid.
+ *
+ * @param req - Express request object
+ * @param res - Express response object
+ * @returns Decoded JWT payload, or sends a 401 response on error
+ */
 export const authTokenFromHeader = (req: Request, res: Response) => {
   const authHeader = req.headers.authorization;
   const tokenBase64 = authHeader?.startsWith("Bearer ")

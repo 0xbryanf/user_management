@@ -6,7 +6,12 @@ import { Role } from "types/roleInterfaces";
 import { RolesService } from "services/Roles.svc";
 import { ReturnResponse } from "types/returnResponse";
 import { authenticateToken } from "lib/middleware/authenticateToken";
-
+/**
+ * Controller for role management API endpoints (v1).
+ *
+ * Handles role assignment and role creation.
+ * All routes require authentication.
+ */
 class RolesController implements Controller {
   public router = Router();
   public path = "/api";
@@ -15,7 +20,10 @@ class RolesController implements Controller {
   constructor() {
     this.initializeRoutes();
   }
-
+  /**
+   * Registers role management routes and handlers.
+   * Endpoints are protected by `authenticateToken` middleware.
+   */
   private initializeRoutes() {
     this.router.post(
       `${this.path}/${this.version}/assign-role`,
@@ -33,7 +41,9 @@ class RolesController implements Controller {
       }
     );
   }
-
+  /**
+   * Handles role assignment requests.
+   */
   private async assignRoleHandler(
     req: Request,
     res: Response,
@@ -49,7 +59,9 @@ class RolesController implements Controller {
       );
     }
   }
-
+  /**
+   * Handles role creation requests.
+   */
   private async createRoleHandler(
     req: Request,
     res: Response,

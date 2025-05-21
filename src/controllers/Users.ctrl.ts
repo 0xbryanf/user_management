@@ -12,6 +12,14 @@ import { AuthenticatedRequest } from "types/authenticatedRequest";
 import HttpException from "utils/httpException.utl";
 import { UsersService } from "services/Users.svc";
 
+/**
+ * Controller for user and authorization-related API endpoints (v1).
+ *
+ * Handles user activation, authorization creation/activation,
+ * retrieval, user activation verification, and authorization updates.
+ *
+ * All routes require authentication.
+ */
 class UsersController implements Controller {
   public router = Router();
   public path = "/api";
@@ -21,37 +29,54 @@ class UsersController implements Controller {
     this.initializeRoutes();
   }
 
+  /**
+   * Registers all user management routes and handlers.
+   * All endpoints are protected by `authenticateToken` middleware.
+   */
   private initializeRoutes() {
+    /**
+     * Handles user activation requests.
+     */
     this.router.post(
       `${this.path}/${this.version}/activate-user`,
       authenticateToken,
       this.activateUserHandler as RequestHandler
     );
-
+    /**
+     * Handles authorization creation requests.
+     */
     this.router.post(
       `${this.path}/${this.version}/create-authorization`,
       authenticateToken,
       this.createAuthorizationHandler as RequestHandler
     );
-
+    /**
+     * Handles retrieval of authorization data.
+     */
     this.router.post(
       `${this.path}/${this.version}/get-authorization`,
       authenticateToken,
       this.getAuthorizationHandler as RequestHandler
     );
-
+    /**
+     * Handles authorization activation requests.
+     */
     this.router.post(
       `${this.path}/${this.version}/activate-authorization`,
       authenticateToken,
       this.activateAuthorizationHandler as RequestHandler
     );
-
+    /**
+     * Handles user activation verification requests.
+     */
     this.router.post(
       `${this.path}/${this.version}/verify-user-activation`,
       authenticateToken,
       this.verifyUserActivationHandler as RequestHandler
     );
-
+    /**
+     * Handles updates to user authorization.
+     */
     this.router.post(
       `${this.path}/${this.version}/update-user-authorization`,
       authenticateToken,

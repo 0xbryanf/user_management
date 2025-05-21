@@ -5,7 +5,16 @@ import { ReturnResponse } from "types/returnResponse";
 import * as argon2 from "argon2";
 import { Op } from "sequelize";
 
+/**
+ * Utility class for password creation, storage, and verification.
+ */
 class Passwords {
+  /**
+   * Hashes and returns a new password string.
+   * @param password - The plain text password.
+   * @returns Promise resolving to the hashed password.
+   * @throws If password is missing or model fails to load.
+   */
   static async createPassword({ password }: Password): Promise<string> {
     if (!password) {
       throw new Error(`Missing information to create password.`);
@@ -22,6 +31,15 @@ class Passwords {
     return password_hash;
   }
 
+  /**
+   * Stores a hashed password in the password history.
+   * @param user_id - The user's unique identifier.
+   * @param credential_id - The related credential ID.
+   * @param password_hash - The hashed password.
+   * @param created_by - The user who created the password.
+   * @returns Promise resolving to a response indicating result.
+   * @throws If required information is missing or model fails to load.
+   */
   static async storePassword({
     user_id,
     credential_id,
@@ -38,7 +56,6 @@ class Passwords {
     if (!PasswordHistoryModel) {
       throw new Error("Failed to load Credentials model.");
     }
-
     const storedPassword = await PasswordHistoryModel.create({
       user_id,
       credential_id,
@@ -57,6 +74,13 @@ class Passwords {
     };
   }
 
+  /**
+   * Checks if the given password matches any recent passwords for the user.
+   * @param user_id - The user's unique identifier.
+   * @param password - The plain text password to check.
+   * @returns Promise resolving to true if a match is found, otherwise false.
+   * @throws If required information is missing or model fails to load.
+   */
   static async findMatchingPassword({
     user_id,
     password

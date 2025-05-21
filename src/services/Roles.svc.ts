@@ -3,7 +3,9 @@ import { createRole } from "functions/createRole.fn";
 import { ReturnResponse } from "types/returnResponse";
 import { Role, RoleResponse } from "types/roleInterfaces";
 import { UserRoleResponse } from "types/userRolesInterfaces";
-
+/**
+ * Service class for role management operations.
+ */
 class RolesService {
   /**
    * Creates a new role

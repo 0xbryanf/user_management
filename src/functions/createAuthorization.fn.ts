@@ -1,7 +1,12 @@
 import { RedisHelper } from "lib/helpers/Redis";
 import { Authorization } from "types/authorization";
 import { ReturnResponse } from "types/returnResponse";
-
+/**
+ * Creates a new authorization record in Redis.
+ *
+ * @param values - Object containing `authData` for authorization.
+ * @returns Promise resolving to a standardized response indicating success or error.
+ */
 export const createAuthorization = async (values: {
   authData: Authorization;
 }): Promise<ReturnResponse<string>> => {

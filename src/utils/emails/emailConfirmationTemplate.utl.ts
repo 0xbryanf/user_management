@@ -1,3 +1,10 @@
+/**
+ * Generates the HTML template for an email confirmation, including a verification link and OTP.
+ *
+ * @param verifyIdentityLink - URL for the user to confirm their identity.
+ * @param otp - The One-Time Passcode to display in the email.
+ * @returns Formatted HTML string for the confirmation email.
+ */
 export function emailConfirmationTemplate(
   verifyIdentityLink: string,
   otp: string

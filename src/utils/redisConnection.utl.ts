@@ -2,6 +2,11 @@ import { redisClient } from "utils/redisClient.utl";
 
 let isInitialized = false;
 
+/**
+ * Checks the current connection status of the Redis client.
+ *
+ * @returns {Promise<boolean>} A promise that resolves to true if the Redis client successfully responds to a ping, false otherwise.
+ */
 export const checkRedisConnection = async (): Promise<boolean> => {
   try {
     const result = await redisClient.ping();
@@ -11,6 +16,15 @@ export const checkRedisConnection = async (): Promise<boolean> => {
   }
 };
 
+/**
+ * Establishes a connection to the Redis server and sets up event listeners.
+ *
+ * This function attempts to connect to the Redis server if not already initialized.
+ * It sets up event listeners for connection, error, and ready states.
+ * Once the connection is successfully established, it marks the connection as initialized.
+ *
+ * @returns {Promise<void>} A promise that resolves when the Redis connection is ready.
+ */
 export const redisConnectionUp = async (): Promise<void> => {
   if (isInitialized) return;
 
@@ -30,6 +44,10 @@ export const redisConnectionUp = async (): Promise<void> => {
   });
 };
 
+/**
+ * Gracefully closes the Redis connection if initialized.
+ * Sets isInitialized to false after disconnecting.
+ */
 export const redisConnectionDown = async (): Promise<void> => {
   if (!isInitialized) return;
 

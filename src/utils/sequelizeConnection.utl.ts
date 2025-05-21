@@ -89,7 +89,7 @@ export const sequelizeConnectionDown = async (): Promise<void> => {
     await Promise.all(
       Object.values(SQL_CONNECTION).map((connection) => connection.close())
     );
-    console.log("Database connections closed");
+    console.info("Database connections closed");
   } catch (error) {
     console.error("Error closing database connections:", error);
     throw error;

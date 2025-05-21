@@ -1,5 +1,12 @@
 import { runAction } from "./runAction.utl";
 
+/**
+ * Runs a command function dynamically by importing a module and executing its actions.
+ *
+ * @param filename - The name of the command file to be executed (expected format: 'actionName.cmd.ts')
+ * @returns A promise resolving to an array of action responses or error messages
+ * @throws Will return an array with error information if module import or action execution fails
+ */
 export const runFunction = async (filename: string): Promise<string[]> => {
   try {
     // Extracting the action name before ".cmd.ts"

@@ -1,7 +1,12 @@
 import { RedisHelper } from "lib/helpers/Redis";
 import { Authorization } from "types/authorization";
 import { ReturnResponse } from "types/returnResponse";
-
+/**
+ * Activates authorization data stored in Redis by setting `isAuthorize` to true.
+ *
+ * @param key - The Redis key for the authorization record.
+ * @returns Promise resolving to a standardized response with updated authorization data or an error.
+ */
 export const activateAuthorization = async ({
   key
 }: {

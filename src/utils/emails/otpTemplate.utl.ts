@@ -1,4 +1,9 @@
-// utils/otpEmailTemplate.ts
+/**
+ * Generates HTML content for an OTP email using the provided code.
+ *
+ * @param otp - The One-Time Passcode to display in the email.
+ * @returns A formatted HTML string for the OTP email.
+ */
 export function generateOtpEmailHtml(otp: string): string {
   return `<!doctype html>
   <html>

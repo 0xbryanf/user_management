@@ -1,6 +1,14 @@
 import { loadSchemaModel } from "schema/loadSchemaModel.utl";
-
+/**
+ * Helper class for user-related utilities.
+ */
 class UserHelper {
+  /**
+   * Checks if the user with the given ID is active.
+   * @param user_id - The user's unique identifier.
+   * @returns Promise resolving to true if active, false otherwise.
+   * @throws If user_id is missing or UsersModel cannot be loaded.
+   */
   static async VerifyIsActive(user_id: string): Promise<boolean> {
     if (!user_id) {
       throw new Error(`Missing information to verify user is active.`);
@@ -19,4 +27,5 @@ class UserHelper {
     return user?.is_active ?? false;
   }
 }
+
 export { UserHelper };

@@ -6,6 +6,20 @@ import {
   sequelizeConnectionUp
 } from "./sequelizeConnection.utl";
 
+/**
+ * Executes a command-line function with Sequelize database connection management.
+ *
+ * @description Handles command execution with the following workflow:
+ * - Validates command-line arguments
+ * - Establishes Sequelize database connection
+ * - Initializes model associations
+ * - Runs specified function dynamically
+ * - Logs function responses or errors
+ * - Ensures database connection is closed
+ *
+ * @remarks Supports only '-c' flag for command execution
+ * @throws Will exit process with error code if invalid arguments are provided
+ */
 export const command = async () => {
   const flag = process.argv[3];
   const commandName = process.argv[4];
@@ -27,10 +41,15 @@ export const command = async () => {
     } finally {
       await sequelizeConnectionDown();
     }
+  } else if (flag && flag !== "-c") {
+    console.error(`Invalid flag: ${flag}. Only '-c' is supported.`);
+    process.exit(1);
+  } else if (!commandName) {
+    console.error("Command name not provided.");
+    process.exit(1);
   } else {
-    console.log(
-      commandName ? "Command name not provided." : "Invalid flag or command."
-    );
+    console.error("Invalid flag or command.");
+    process.exit(1);
   }
 };
 

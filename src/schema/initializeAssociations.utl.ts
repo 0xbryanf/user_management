@@ -1,7 +1,13 @@
 import { loadSchemaModel } from "./loadSchemaModel.utl";
-
+/**
+ * Initializes and defines associations between user management models,
+ * such as Users, Credentials, OAuthProviders, PasswordHistory, Roles, and UserRoles.
+ * Sets up all necessary Sequelize relationships (1:N, M:N).
+ *
+ * @returns Promise resolving to all initialized models.
+ * @throws If any model fails to load.
+ */
 export const initializeAssociations = async () => {
-  // load from the lowercase schema (Postgres is case-sensitive for unquoted identifiers)
   const schema = "User_Management";
 
   const UsersModel = await loadSchemaModel(schema, "Users");

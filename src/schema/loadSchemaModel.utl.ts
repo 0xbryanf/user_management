@@ -3,21 +3,35 @@ import { ActionTree } from "schema";
 import * as Sequelize from "sequelize";
 import { SchemaModels } from "types/schemaModels";
 import { sequelizeConnectionUp } from "../utils/sequelizeConnection.utl";
-
+/**
+ * Utilities for dynamically loading and caching Sequelize models
+ * from schema/action tree definitions.
+ */
 export const schemaModel: {
   [key: string]: { [key: string]: Sequelize.ModelStatic<Sequelize.Model> };
 } = {};
 
+/**
+ * Generates a unique key for a schema-model pair.
+ */
 export const getModelKey = (schema: string, model: string) => {
   return `${schema}_${model}`;
 };
 
+/**
+ * Returns the model cache key based on remoteUrl (or "default").
+ */
 export const getModelCacheKey = (
   options: { remoteUrl?: string; timestamps?: boolean } = {}
 ) => {
   return options?.remoteUrl ? options.remoteUrl : "default";
 };
 
+/**
+ * Defines and caches a Sequelize model for the given schema and model.
+ * @throws If the model definition is not found in ActionTree.
+ * @returns The Sequelize model.
+ */
 export const populateDataModel = async (
   schema: string,
   model: string,
@@ -65,6 +79,10 @@ export const populateDataModel = async (
   }
 };
 
+/**
+ * Loads a Sequelize model for the given schema and model from cache,
+ * or defines it if not already cached.
+ */
 export const loadSchemaModel = async <
   S extends keyof SchemaModels,
   M extends keyof SchemaModels[S]

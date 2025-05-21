@@ -7,35 +7,50 @@ import UsersController from "controllers/Users.ctrl";
 import { runCommand } from "utils/runCommand.utl";
 import PasswordHistoryController from "controllers/PasswordHistory.ctrl";
 
+/**
+ * Main entry point for the application, handling different command-line arguments.
+ *
+ * @remarks
+ * Supports different runtime modes:
+ * - When run with "run -c", executes a command
+ * - When run without specific options, validates environment and starts the application server
+ *
+ * @throws {Error} If there are issues during application initialization or command execution
+ */
 export const main = async () => {
+  validateEnv();
   if (process.argv[2] === "run") {
-    switch (process.argv[3]) {
-      case "-c":
-        await runCommand();
-        break;
-      default:
-        if (process.argv[3]) {
-          console.log(
-            `The command option '${process.argv[3]}' is not recognized.`
-          );
-        }
-        validateEnv();
-        const app = new App(
-          [
-            new CredentialsController(),
-            new UsersController(),
-            new PasswordHistoryController()
-          ],
-          Number((process.env.PORT as string) || 8080)
-        );
-        app.listen();
-        break;
+    const flag = process.argv[3];
+    if (flag === "-c") {
+      await runCommand();
+    } else if (flag) {
+      console.error(`The command option '${flag}' is not recognized.`);
+      process.exit(1);
+    } else {
+      const app = new App(
+        [
+          new CredentialsController(),
+          new UsersController(),
+          new PasswordHistoryController()
+        ],
+        Number(process.env.PORT || 8080)
+      );
+      app.listen();
     }
   } else {
-    console.log(`The command '${process.argv[2]}' is not recognized.`);
+    console.error(`The command '${process.argv[2]}' is not recognized.`);
+    process.exit(1);
   }
 };
 
+/**
+ * Ensures the main function is only executed when the script is run directly,
+ * not when imported as a module. Provides error handling for main function execution.
+ *
+ * @remarks
+ * Wraps the main() function call in a try-catch block to gracefully handle
+ * and log any errors that occur during application startup.
+ */
 if (require.main === module) {
   try {
     main();
