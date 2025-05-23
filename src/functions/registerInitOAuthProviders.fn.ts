@@ -1,34 +1,29 @@
-import { generateToken } from "utils/generateToken.utl";
-import { v4 as UUIDV4 } from "uuid";
-import { RolesEnum } from "utils/rolesEnum.utl";
-import {
-  RegisterInit,
-  RegisterInitCredentialsResponse
-} from "types/registerInitCredentialInterfaces";
 import { createUser } from "lib/helpers/create-user";
-import { createCredentials } from "lib/helpers/createCredentials";
-import { ReturnResponse } from "types/returnResponse";
-import { RoleHelper } from "lib/helpers/Role";
-import { Passwords } from "lib/helpers/Password";
+import { createOAuthAccount } from "lib/helpers/createOauthAccount";
 import { findUserAcrossEntities } from "lib/helpers/findUserAcrossEntities";
+import { RoleHelper } from "lib/helpers/Role";
 import { loadSchemaModel } from "schema/loadSchemaModel.utl";
+import { RegisterInitOAuthResponse } from "types/oAuthAccount";
+import { RegisterInit } from "types/registerInitCredentialInterfaces";
+import { ReturnResponse } from "types/returnResponse";
+import { generateToken } from "utils/generateToken.utl";
+import { RolesEnum } from "utils/rolesEnum.utl";
+import { v4 as UUIDV4 } from "uuid";
 
-export const registerInitCredentials = async (
+export const registerInitOAuthProviders = async (
   values: RegisterInit
-): Promise<ReturnResponse<RegisterInitCredentialsResponse>> => {
+): Promise<ReturnResponse<RegisterInitOAuthResponse>> => {
   try {
-    const { email, password, createdBy } = values;
-
-    if (!email || !password) {
+    const { email, provider, provider_user_id, email_verified } = values;
+    if (!email || !provider || !provider_user_id || !email_verified) {
       return {
         status: 400,
         statusText: "Bad Request",
-        message: "Missing information to create a user."
+        message: "Missing or invalid parameters."
       };
     }
 
-    const [password_hash, existingUser, defaultRole] = await Promise.all([
-      Passwords.createPassword({ password }),
+    const [existingUser, defaultRole] = await Promise.all([
       findUserAcrossEntities({ email }),
       RoleHelper.findOne(RolesEnum.READER)
     ]);
@@ -41,7 +36,7 @@ export const registerInitCredentials = async (
       };
     }
 
-    if (existingUser?.user_id && existingUser?.credential_id) {
+    if (existingUser?.user_id && existingUser?.oauth_provider_id) {
       const token = Buffer.from(generateToken(existingUser.user_id)).toString(
         "base64"
       );
@@ -57,7 +52,7 @@ export const registerInitCredentials = async (
     }
 
     const user_id = existingUser?.user_id ?? UUIDV4();
-    const creator_id = createdBy ?? user_id;
+    const creator_id = user_id;
 
     let user;
     if (!existingUser?.user_id) {
@@ -70,17 +65,19 @@ export const registerInitCredentials = async (
 
     const userData = "get" in user ? user.get({ plain: true }) : user;
 
-    const [credential, UserRolesModel] = await Promise.all([
-      createCredentials({
-        user_id: userData.user_id,
-        email,
-        created_by: creator_id,
-        password_hash
-      }),
-      loadSchemaModel("User_Management", "UserRoles")
-    ]);
+    await createOAuthAccount({
+      user_id: userData.user_id,
+      email,
+      provider,
+      provider_user_id,
+      email_verified
+    });
 
-    // Use findOrCreate to safely assign the role without duplicate error
+    const UserRolesModel = await loadSchemaModel(
+      "User_Management",
+      "UserRoles"
+    );
+
     await UserRolesModel.findOrCreate({
       where: {
         user_id: userData.user_id,
@@ -92,17 +89,10 @@ export const registerInitCredentials = async (
       }
     });
 
-    await Passwords.storePassword({
-      user_id: credential.user_id,
-      credential_id: credential.credential_id,
-      password_hash,
-      created_by: credential.user_id
-    });
-
     const token = Buffer.from(generateToken(userData.user_id)).toString(
       "base64"
     );
-
+    console.log("token", token);
     return {
       status: 201,
       statusText: "Created",
@@ -114,6 +104,7 @@ export const registerInitCredentials = async (
       }
     };
   } catch (error) {
+    console.error("error", error);
     return {
       status: 500,
       statusText: "Internal Server Error",

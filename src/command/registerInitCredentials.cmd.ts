@@ -5,7 +5,7 @@ export default {
       model: "Credentials",
       action: "registerInitCredentials",
       values: {
-        email: "hello@gmail.com",
+        email: "0xbryanf@gmail.com",
         password: "password",
         createdBy: "a5388ee0-e8f5-4843-9223-a30d06a36376"
       }

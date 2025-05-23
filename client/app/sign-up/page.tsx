@@ -2,7 +2,7 @@
 
 import { FormEvent, useState, useEffect, useContext } from "react";
 import { AxiosError } from "axios";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { toast, Toaster } from "react-hot-toast";
 import { signIn } from "next-auth/react";
 import Button from "@/components/atoms/button";
@@ -25,6 +25,7 @@ export default function SignUpPage() {
   const [loading, setLoading] = useState(false);
   const [passwordStrength, setPasswordStrength] = useState(0);
   const [viewState, setViewState] = useState<ViewState>("REGISTER_INIT");
+  const searchParams = useSearchParams();
   const [passwordValidation, setPasswordValidation] =
     useState<PasswordValidationResult>({
       minLength: false,
@@ -35,31 +36,70 @@ export default function SignUpPage() {
     });
 
   useEffect(() => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const callbackUrl = urlParams.get("callbackUrl");
-    const error = urlParams.get("error");
+    const code = searchParams.get("code");
+    if (!code) return;
 
-    if (error) {
-      let message = "Something went wrong. Please try again.";
+    const handleAuthFlow = async () => {
+      setLoading(true);
+      try {
+        // 1) exchange code for whatever the OAuth handler returns
+        const response = await api.post(
+          "/api/auth/googleOauth2",
+          { code },
+          { headers: { "Content-Type": "application/json" } }
+        );
 
-      if (error === "Callback") {
-        message = "Login failed. Please verify your account.";
-      } else if (error === "OAuthAccountNotLinked") {
-        message = "Email already exists. Please sign in using the same method.";
+        // 2) normalize: some endpoints return { data: { … } }, some just return { … }
+        const payload = response.data?.user;
+        // 3) pick off exactly what you need
+        const { email, provider, provider_user_id, email_verified } =
+          payload as {
+            email?: string;
+            provider?: string;
+            provider_user_id?: string;
+            email_verified?: boolean;
+          };
+
+        // 4) if any of these are missing, stop now
+        if (
+          !email ||
+          !provider ||
+          !provider_user_id ||
+          email_verified == null
+        ) {
+          throw new Error("Missing fields in OAuth response");
+        }
+
+        // 5) register/init
+        const regRes = await api.post(
+          "/api/auth/register-init-oauth",
+          { email, provider, provider_user_id, email_verified },
+          { headers: { "Content-Type": "application/json" } }
+        );
+
+        if (regRes.status === 201) {
+          const otpRes = await api.post("/api/send-otp-email");
+          if (otpRes.status === 200) {
+            setViewState("VERIFY_OTP");
+          } else {
+            throw new Error(otpRes.data?.message ?? "Failed to send OTP");
+          }
+        } else {
+          setViewState("REGISTER_INIT");
+        }
+      } catch (err: any) {
+        toast.error(err.message, {
+          duration: 2500,
+          style: { fontSize: "14px" },
+          icon: null
+        });
+      } finally {
+        setLoading(false);
       }
+    };
 
-      toast.error(message, {
-        duration: 2000,
-        style: { fontSize: "16px" }
-      });
-    }
-
-    if (callbackUrl) {
-      const url = new URL(window.location.href);
-      url.searchParams.delete("error");
-      window.history.replaceState({}, "", url.toString());
-    }
-  }, []);
+    handleAuthFlow();
+  }, [searchParams]);
 
   const handleCredentialsSignUp = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -79,7 +119,7 @@ export default function SignUpPage() {
 
     try {
       const registrationInitresponse = await api.post(
-        "/api/auth/register-init",
+        "/api/auth/register-init-credentials",
         {
           email,
           password
@@ -116,12 +156,6 @@ export default function SignUpPage() {
     }
   };
 
-  const handleGoogleSignUp = () => {
-    signIn("google", {
-      callbackUrl: "/"
-    });
-  };
-
   const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setPassword(value);
@@ -149,7 +183,9 @@ export default function SignUpPage() {
           <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-sm">
             <Button
               disabled={loading}
-              onClick={() => handleGoogleSignUp()}
+              onClick={() => {
+                window.location.href = "/api/auth/googleOauth2";
+              }}
               className={`flex w-full justify-center gap-2 px-4 py-2 rounded-md bg-white text-black border border-gray-300 hover:bg-gray-50 transition text-base ${
                 loading
                   ? "opacity-50 cursor-not-allowed"

@@ -7,6 +7,7 @@ import { getAuthorization } from "functions/getAuthorization.fn";
 import { getCredentialByEmail } from "functions/getCredentialByEmail.fn";
 import { getCredentialByUserId } from "functions/getCredentialByUserId.fn";
 import { registerInitCredentials } from "functions/registerInitCredentials.fn";
+import { registerInitOAuthProviders } from "functions/registerInitOAuthProviders.fn";
 import { requestEmailConfirmation } from "functions/requestEmailConfirmation.fn";
 import { sendOTPEmail } from "functions/sendOneTimePinToEmail.fn";
 import { updateAuthorization } from "functions/updateAuthorization.fn";
@@ -233,6 +234,7 @@ export const SchemaUserManagement = {
     },
     modelOptions: {
       tableName: "oauth_providers",
+      schema: "user_management",
       underscored: true,
       indexes: [
         {
@@ -247,7 +249,9 @@ export const SchemaUserManagement = {
       ]
     },
     relation: {},
-    actions: {}
+    actions: {
+      registerInitOAuthProviders
+    }
   },
   Credentials: {
     descriptor: {

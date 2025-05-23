@@ -6,6 +6,7 @@ import CredentialsController from "controllers/Credentials.ctrl";
 import UsersController from "controllers/Users.ctrl";
 import { runCommand } from "utils/runCommand.utl";
 import PasswordHistoryController from "controllers/PasswordHistory.ctrl";
+import OAuthProviderController from "controllers/OauthProviders.ctrl";
 
 /**
  * Main entry point for the application, handling different command-line arguments.
@@ -31,7 +32,8 @@ export const main = async () => {
         [
           new CredentialsController(),
           new UsersController(),
-          new PasswordHistoryController()
+          new PasswordHistoryController(),
+          new OAuthProviderController()
         ],
         Number(process.env.PORT || 8080)
       );

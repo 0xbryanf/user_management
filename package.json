@@ -1,7 +1,7 @@
 {
-  "name": "intellebeast",
+  "name": "user_management",
   "version": "1.0.0",
-  "description": "Intellebeast is an innovative project blending the captivating world of monster creation with cutting-edge artificial intelligence.",
+  "description": "A modular, secure, and scalable user management system built with TypeScript, Express, Sequelize (PostgreSQL), and Redis. This system provides APIs for registration, authentication, role management, password policies, email/OTP verification, and robust audit/compliance support.",
   "main": "index.ts",
   "repository": "https://github.com/0xbryanf/intellebeast.git",
   "author": "Bryan Factor <0xbryanf@gmail.com>",
@@ -9,7 +9,7 @@
   "private": true,
   "scripts": {
     "start": "node ./dist/index.js",
-    "dev": "ts-node --transpile-only src/index.ts",
+    "dev": "yarn build && ts-node --transpile-only src/index.ts",
     "build": "rimraf ./dist && tsc",
     "test": "echo \"Error: no test specified\" && exit 1",
     "clean": "rimraf node_modules dist"
