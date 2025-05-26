@@ -82,6 +82,26 @@ class UsersController implements Controller {
       authenticateToken,
       this.updateAuthorizationHandler as RequestHandler
     );
+
+    this.router.get(
+      `${this.path}/${this.version}/get-user-accross-entities`,
+      authenticateToken,
+      this.getUserAcrossEntitiesHandler as RequestHandler
+    );
+  }
+
+  private async getUserAcrossEntitiesHandler(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<Response | void> {
+    try {
+      const email = req.query.email as string;
+      const result = await UsersService.getUserAcrossEntitiesService(email);
+      return res.status(result.status).json(result);
+    } catch (error) {
+      return next(new HttpException(500, "Internal Server Error.", error));
+    }
   }
 
   private async activateUserHandler(
@@ -110,7 +130,6 @@ class UsersController implements Controller {
       const token = authHeader.split(" ")[1];
       const user_id =
         (req as AuthenticatedRequest).user?.userId || "Unknown User";
-
       const result = await UsersService.createAuthorizationService(
         session,
         token,
@@ -145,7 +164,7 @@ class UsersController implements Controller {
   ): Promise<Response | void> {
     try {
       const { key } = req.body;
-      const result = await UsersService.activateAuthorization(key);
+      const result = await UsersService.activateAuthorizationService(key);
       return res.status(result.status).json(result);
     } catch (error) {
       return next(new HttpException(500, "Internal Server Error.", error));
@@ -159,7 +178,7 @@ class UsersController implements Controller {
   ): Promise<Response | void> {
     try {
       const user_id = (req as AuthenticatedRequest).user?.userId as string;
-      const result = await UsersService.verifyUserActivation(user_id);
+      const result = await UsersService.verifyUserActivationService(user_id);
       return res.status(result.status).json(result);
     } catch (error) {
       return next(new HttpException(500, "Internal Server Error.", error));
@@ -173,7 +192,7 @@ class UsersController implements Controller {
   ): Promise<Response | void> {
     try {
       const { authData } = req.body;
-      const result = await UsersService.updateAuthorization(authData);
+      const result = await UsersService.updateAuthorizationService(authData);
       return res.status(result.status).json(result);
     } catch (error) {
       return next(new HttpException(500, "Internal Server Error.", error));

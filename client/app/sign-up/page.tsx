@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useState, useEffect, useContext } from "react";
+import { FormEvent, useState, useEffect, useContext, useRef } from "react";
 import { AxiosError } from "axios";
 import { useRouter, useSearchParams } from "next/navigation";
 import { toast, Toaster } from "react-hot-toast";
@@ -25,7 +25,6 @@ export default function SignUpPage() {
   const [loading, setLoading] = useState(false);
   const [passwordStrength, setPasswordStrength] = useState(0);
   const [viewState, setViewState] = useState<ViewState>("REGISTER_INIT");
-  const searchParams = useSearchParams();
   const [passwordValidation, setPasswordValidation] =
     useState<PasswordValidationResult>({
       minLength: false,
@@ -35,32 +34,30 @@ export default function SignUpPage() {
       hasSpecialChar: false
     });
 
+  const searchParams = useSearchParams();
+  const code = searchParams.get("code") ?? "";
+  const ranOnce = useRef(false);
+
   useEffect(() => {
-    const code = searchParams.get("code");
-    if (!code) return;
+    // only run once when a code appears
+    if (!code || ranOnce.current) return;
+    ranOnce.current = true;
+
+    // as soon as code is detected, show spinner
+    setLoading(true);
 
     const handleAuthFlow = async () => {
-      setLoading(true);
       try {
-        // 1) exchange code for whatever the OAuth handler returns
-        const response = await api.post(
+        // 1) Exchange code
+        const { data: oauthPayload } = await api.post(
           "/api/auth/googleOauth2",
           { code },
           { headers: { "Content-Type": "application/json" } }
         );
-
-        // 2) normalize: some endpoints return { data: { … } }, some just return { … }
-        const payload = response.data?.user;
-        // 3) pick off exactly what you need
         const { email, provider, provider_user_id, email_verified } =
-          payload as {
-            email?: string;
-            provider?: string;
-            provider_user_id?: string;
-            email_verified?: boolean;
-          };
+          oauthPayload.user ?? {};
 
-        // 4) if any of these are missing, stop now
+        // 2) Validate
         if (
           !email ||
           !provider ||
@@ -70,36 +67,49 @@ export default function SignUpPage() {
           throw new Error("Missing fields in OAuth response");
         }
 
-        // 5) register/init
+        // 3) Register
         const regRes = await api.post(
           "/api/auth/register-init-oauth",
           { email, provider, provider_user_id, email_verified },
           { headers: { "Content-Type": "application/json" } }
         );
-
-        if (regRes.status === 201) {
-          const otpRes = await api.post("/api/send-otp-email");
-          if (otpRes.status === 200) {
-            setViewState("VERIFY_OTP");
-          } else {
-            throw new Error(otpRes.data?.message ?? "Failed to send OTP");
-          }
-        } else {
+        if (regRes.status !== 201) {
+          // registration was not needed or failed → go back to form
           setViewState("REGISTER_INIT");
+          setLoading(false);
+          return;
         }
-      } catch (err: any) {
-        toast.error(err.message, {
-          duration: 2500,
-          style: { fontSize: "14px" },
-          icon: null
-        });
-      } finally {
+
+        // 4) Activate & redirect
+        const activation = await api.post("/api/activate-oauth");
+        if (activation.status === 200) {
+          // keep loading spinner until we navigate away
+          router.replace("/");
+          return;
+        }
+
+        // any other status is an error
+        throw new Error(`Activation failed: ${activation.status}`);
+      } catch (unknownError: unknown) {
+        const err = unknownError as AxiosError;
+        const statusCode = err.response?.status;
+
+        if (statusCode === 409) {
+          setViewState("FIND_ACCOUNT");
+        } else {
+          toast.error(
+            `${statusCode ?? ""} ${err.response?.statusText ?? err.message}`,
+            { duration: 2500, style: { fontSize: "14px" }, icon: null }
+          );
+        }
+
+        // stop spinner on error
         setLoading(false);
       }
     };
 
     handleAuthFlow();
-  }, [searchParams]);
+  }, [code]);
 
   const handleCredentialsSignUp = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();

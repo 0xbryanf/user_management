@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import { JwtPayload } from "jsonwebtoken";
 import { authTokenFromHeader } from "./authTokenFromHeader";
-import { findOneCredential } from "lib/helpers/findOneCredential";
+import { findUserAcrossEntities } from "lib/helpers/findUserAcrossEntities";
 
 /**
  * Interface for JWT payload with userId.
@@ -34,7 +34,7 @@ export async function authenticateToken(
 ): Promise<void> {
   try {
     req.user = authTokenFromHeader(req, res) as AuthPayload;
-    const user = await findOneCredential({ userId: req.user?.userId });
+    const user = await findUserAcrossEntities({ userId: req.user?.userId });
     if (!user) {
       res
         .status(401)

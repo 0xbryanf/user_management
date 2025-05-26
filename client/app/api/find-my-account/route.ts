@@ -26,7 +26,7 @@ export async function GET(request: NextRequest) {
   }
   try {
     const response = await fetch(
-      `${process.env.BASE_URL}/get-credential-by-email?email=${encodeURIComponent(email)}`,
+      `${process.env.BASE_URL}/get-user-accross-entities?email=${encodeURIComponent(email)}`,
       {
         method: "GET",
         headers: {

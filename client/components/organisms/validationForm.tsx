@@ -33,7 +33,6 @@ const ValidationForm = ({
     </div>
     <Button
       disabled={loading}
-      // onClick={() => signIn("google")}
       className={`flex w-full justify-center gap-2 px-4 py-2 rounded-md bg-white text-black border border-gray-300 hover:bg-gray-100 transition text-base ${
         loading
           ? "opacity-50 cursor-not-allowed"
