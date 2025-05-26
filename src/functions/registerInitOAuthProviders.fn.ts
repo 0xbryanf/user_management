@@ -6,7 +6,6 @@ import { loadSchemaModel } from "schema/loadSchemaModel.utl";
 import { RegisterInitOAuthResponse } from "types/oAuthAccount";
 import { RegisterInit } from "types/registerInitCredentialInterfaces";
 import { ReturnResponse } from "types/returnResponse";
-import { generateToken } from "utils/generateToken.utl";
 import { RolesEnum } from "utils/rolesEnum.utl";
 import { v4 as uuidv4 } from "uuid";
 import { UniqueConstraintError, ValidationError } from "sequelize";

@@ -1,10 +1,9 @@
 "use client";
 
-import { FormEvent, useState, useEffect, useContext, useRef } from "react";
+import { FormEvent, useState, useEffect, useRef } from "react";
 import { AxiosError } from "axios";
 import { useRouter, useSearchParams } from "next/navigation";
-import { toast, Toaster } from "react-hot-toast";
-import { signIn } from "next-auth/react";
+import { toast } from "react-hot-toast";
 import Button from "@/components/atoms/button";
 import { FcGoogle } from "react-icons/fc";
 import SignUpForm from "@/components/organisms/signUpForm";
@@ -14,11 +13,16 @@ import { PasswordValidationResult } from "@/lib/type/passwordValidation";
 import api from "@/lib/api";
 import GetCredentialsTemplate from "@/components/templates/getCredentials";
 import VerifyOTPTemplate from "@/components/templates/verifyOTPTemplate";
+import Spinner from "@/lib/spinner";
 
 type ViewState = "FIND_ACCOUNT" | "REGISTER_INIT" | "VERIFY_OTP";
 
 export default function SignUpPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const code = searchParams.get("code") ?? "";
+  const ranOnce = useRef(false);
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -34,30 +38,25 @@ export default function SignUpPage() {
       hasSpecialChar: false
     });
 
-  const searchParams = useSearchParams();
-  const code = searchParams.get("code") ?? "";
-  const ranOnce = useRef(false);
-
+  // === OAuth code flow ===
   useEffect(() => {
-    // only run once when a code appears
     if (!code || ranOnce.current) return;
     ranOnce.current = true;
 
-    // as soon as code is detected, show spinner
-    setLoading(true);
+    let didRedirectHome = false;
 
     const handleAuthFlow = async () => {
       try {
-        // 1) Exchange code
+        setLoading(true);
+        // 1) Exchange code for OAuth data
         const { data: oauthPayload } = await api.post(
           "/api/auth/googleOauth2",
           { code },
           { headers: { "Content-Type": "application/json" } }
         );
-        const { email, provider, provider_user_id, email_verified } =
-          oauthPayload.user ?? {};
+        const payload = oauthPayload.user ?? {};
+        const { email, provider, provider_user_id, email_verified } = payload;
 
-        // 2) Validate
         if (
           !email ||
           !provider ||
@@ -67,33 +66,29 @@ export default function SignUpPage() {
           throw new Error("Missing fields in OAuth response");
         }
 
-        // 3) Register
+        // 2) Register OAuth user
         const regRes = await api.post(
           "/api/auth/register-init-oauth",
           { email, provider, provider_user_id, email_verified },
           { headers: { "Content-Type": "application/json" } }
         );
         if (regRes.status !== 201) {
-          // registration was not needed or failed → go back to form
           setViewState("REGISTER_INIT");
-          setLoading(false);
           return;
         }
 
-        // 4) Activate & redirect
+        // 3) Activate OAuth account
         const activation = await api.post("/api/activate-oauth");
         if (activation.status === 200) {
-          // keep loading spinner until we navigate away
-          router.replace("/");
+          didRedirectHome = true;
+          router.push("/");
           return;
         }
 
-        // any other status is an error
         throw new Error(`Activation failed: ${activation.status}`);
       } catch (unknownError: unknown) {
         const err = unknownError as AxiosError;
         const statusCode = err.response?.status;
-
         if (statusCode === 409) {
           setViewState("FIND_ACCOUNT");
         } else {
@@ -102,46 +97,44 @@ export default function SignUpPage() {
             { duration: 2500, style: { fontSize: "14px" }, icon: null }
           );
         }
-
-        // stop spinner on error
+      } finally {
         setLoading(false);
+        // clear the code param so the UI returns to normal
+        if (!didRedirectHome) {
+          setLoading(true);
+        }
       }
     };
 
     handleAuthFlow();
-  }, [code]);
+  }, [code, router]);
 
+  // === Credentials sign-up ===
   const handleCredentialsSignUp = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-
     setLoading(true);
+
     if (password !== confirmPassword) {
       toast.error(
         "Bad Request: Passwords don't match. Please double-check and try again.",
-        {
-          duration: 2000,
-          style: { fontSize: "16px" },
-          icon: null
-        }
+        { duration: 2000, style: { fontSize: "16px" }, icon: null }
       );
+      setLoading(false);
       return;
     }
 
     try {
-      const registrationInitresponse = await api.post(
-        "/api/auth/register-init-credentials",
-        {
-          email,
-          password
-        }
-      );
+      const initRes = await api.post("/api/auth/register-init-credentials", {
+        email,
+        password
+      });
 
-      if (registrationInitresponse && registrationInitresponse.status === 201) {
-        const otpEmailResponse = await api.post("/api/send-otp-email");
-        if (otpEmailResponse.status === 200) {
+      if (initRes.status === 201) {
+        const otpEmailRes = await api.post("/api/send-otp-email");
+        if (otpEmailRes.status === 200) {
           setViewState("VERIFY_OTP");
         } else {
-          toast.error(`${otpEmailResponse?.data?.message}`, {
+          toast.error(`${otpEmailRes.data?.message}`, {
             duration: 2500,
             style: { fontSize: "14px" },
             icon: null
@@ -151,30 +144,39 @@ export default function SignUpPage() {
         setViewState("REGISTER_INIT");
       }
     } catch (error: unknown) {
-      const err = error as AxiosError<{ error?: string }>;
-      if (err.status === 409) {
+      const err = error as AxiosError;
+      const statusCode = err.response?.status;
+      if (statusCode === 409) {
         setViewState("FIND_ACCOUNT");
       } else {
-        toast.error(`${err.response?.status} ${err.response?.statusText}`, {
-          duration: 2500,
-          style: { fontSize: "14px" },
-          icon: null
-        });
+        toast.error(
+          `${statusCode ?? ""} ${err.response?.statusText ?? err.message}`,
+          { duration: 2500, style: { fontSize: "14px" }, icon: null }
+        );
       }
     } finally {
       setLoading(false);
     }
   };
 
+  // === Password live-validation ===
   const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setPassword(value);
-    const strength = calculatePasswordStrength(value);
-    setPasswordStrength(strength);
-    const validation = validatePasswordLive(value);
-    setPasswordValidation(validation);
+    setPasswordStrength(calculatePasswordStrength(value));
+    setPasswordValidation(validatePasswordLive(value));
   };
 
+  // === Loading spinner ===
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-white">
+        <Spinner />
+      </div>
+    );
+  }
+
+  // === Main UI ===
   return (
     <>
       {viewState === "FIND_ACCOUNT" && <GetCredentialsTemplate />}
@@ -185,22 +187,16 @@ export default function SignUpPage() {
             <h2 className="mt-10 text-center text-2xl font-bold tracking-tight text-gray-900">
               Create Your Account!
             </h2>
-            <div className="text-center text-sm tracking-tight text-gray-600">
-              It's free and take only a minute.
-            </div>
+            <p className="text-center text-sm text-gray-600">
+              It's free and takes only a minute.
+            </p>
           </div>
 
           <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-sm">
             <Button
-              disabled={loading}
-              onClick={() => {
-                window.location.href = "/api/auth/googleOauth2";
-              }}
-              className={`flex w-full justify-center gap-2 px-4 py-2 rounded-md bg-white text-black border border-gray-300 hover:bg-gray-50 transition text-base ${
-                loading
-                  ? "opacity-50 cursor-not-allowed"
-                  : "hover:bg-opacity-30 hover:cursor-pointer"
-              }`}
+              disabled={false}
+              onClick={() => (window.location.href = "/api/auth/googleOauth2")}
+              className="flex w-full justify-center gap-2 px-4 py-2 rounded-md bg-white text-black border border-gray-300 hover:bg-gray-50 hover:cursor-pointer transition text-base"
             >
               <FcGoogle className="text-xl" />
               <span>Sign-up with Google</span>
@@ -214,7 +210,7 @@ export default function SignUpPage() {
 
             <SignUpForm
               onSubmit={handleCredentialsSignUp}
-              loading={loading}
+              loading={false}
               email={email}
               password={password}
               confirmPassword={confirmPassword}
@@ -227,13 +223,9 @@ export default function SignUpPage() {
 
             <div className="mt-14 text-center">
               <Button
-                disabled={loading}
+                disabled={false}
                 onClick={() => router.push("/sign-in")}
-                className={`flex w-full rounded-full justify-center gap-2 text-sm px-4 py-2 bg-white font-normal border border-gray-300 hover:bg-gray-50 transition ${
-                  loading
-                    ? "opacity-50 cursor-not-allowed"
-                    : "hover:bg-opacity-30 hover:cursor-pointer"
-                }`}
+                className="flex w-full justify-center gap-2 text-sm px-4 py-2 bg-white font-normal border border-gray-300 hover:bg-gray-50 transition"
               >
                 Already have an account? Sign in
               </Button>

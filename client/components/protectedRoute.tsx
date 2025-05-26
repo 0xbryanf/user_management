@@ -1,6 +1,6 @@
 "use client";
-import { usePathname, useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useState, useRef } from "react";
 import api from "@/lib/api";
 import Spinner from "@/lib/spinner";
 
@@ -13,10 +13,15 @@ const publicPaths = ["/sign-in", "/sign-up", "/api/auth", "/public"];
 export default function ProtectedRoute({ children }: ProtectedRouteProps) {
   const pathname = usePathname();
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const code = searchParams.get("code");
   const [checking, setChecking] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
+  // Only run session check if there's no `code` in the URL
   useEffect(() => {
+    if (code) return;
+
     const checkSession = async () => {
       try {
         const response = await api.post("/api/get-session");
@@ -24,14 +29,12 @@ export default function ProtectedRoute({ children }: ProtectedRouteProps) {
           setIsAuthenticated(true);
         } else {
           setIsAuthenticated(false);
-          // If not 202, redirect to a public path
           if (!publicPaths.includes(pathname)) {
             router.replace("/sign-in");
           }
         }
       } catch {
         setIsAuthenticated(false);
-        // On error, redirect to public path if not already there
         if (!publicPaths.includes(pathname)) {
           router.replace("/sign-in");
         }
@@ -39,25 +42,25 @@ export default function ProtectedRoute({ children }: ProtectedRouteProps) {
         setChecking(false);
       }
     };
-    checkSession();
-  }, [pathname, router]);
 
+    checkSession();
+  }, [pathname, router, code]);
+
+  // Redirect authenticated users away from public pages
   useEffect(() => {
-    // If authenticated and on a public path, redirect to home
     if (!checking && isAuthenticated && publicPaths.includes(pathname)) {
       router.replace("/");
     }
   }, [checking, isAuthenticated, pathname, router]);
 
-  if (checking) {
-    return (
-      <div className="flex items-center justify-center min-h-screen bg-white">
-        <Spinner />
-      </div>
-    );
-  }
+  // If we're still checking *or* there's an OAuth code in the URL, show spinner
+  // if (checking || code) {
+  //   return (
 
-  // Prevent flashing the public page content while redirecting
+  //   );
+  // }
+
+  // Prevent flashing of the public page if already authenticated
   if (isAuthenticated && publicPaths.includes(pathname)) {
     return null;
   }
