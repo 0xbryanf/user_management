@@ -9,9 +9,8 @@ import {
 } from "types/registerInitCredentialInterfaces";
 import { ReturnResponse } from "types/returnResponse";
 import sgMail from "@sendgrid/mail";
-import { sendOTPEmail } from "functions/sendOneTimePinToEmail.fn";
-import { verifyOTPEmail } from "functions/verifyOTPEmail.fn";
 import { verifyCredentials } from "functions/verifyCredentials.fn";
+
 /**
  * Service class for managing user credentials and email verification.
  */
@@ -71,43 +70,6 @@ class CredentialsService {
     }
     const email = (user.data as unknown as { email: string }).email;
     const result = await requestEmailConfirmation({ email });
-    return result;
-  }
-
-  /**
-   * Sends an OTP email to the specified user.
-   * @param userId - The user's unique ID.
-   * @returns Promise resolving to the OTP email result.
-   */
-  static async sendOTPEmail(
-    userId: string
-  ): Promise<ReturnResponse<[sgMail.ClientResponse, {}]>> {
-    const user = await getCredentialByUserId({ userId });
-    const email = (user.data as unknown as { email: string }).email;
-    const result = await sendOTPEmail({ email });
-    return result;
-  }
-
-  /**
-   * Verifies the OTP email for the specified user.
-   * @param userId - The user's unique ID.
-   * @param otp - The OTP code.
-   * @returns Promise resolving to the verification result.
-   */
-  static async verifyOTPEmail(
-    userId: string,
-    otp: number
-  ): Promise<ReturnResponse> {
-    const user = await getCredentialByUserId({ userId });
-    if (!user.data) {
-      return {
-        status: 404,
-        statusText: "Not Found",
-        message: "User data not found."
-      };
-    }
-    const email = (user.data as unknown as { email: string }).email;
-    const result = await verifyOTPEmail({ email, otp });
     return result;
   }
 

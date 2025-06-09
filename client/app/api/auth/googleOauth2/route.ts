@@ -24,6 +24,8 @@ export async function POST(request: NextRequest) {
   const { code } = (await request.json().catch(() => ({}))) as {
     code?: string;
   };
+
+  console.log("code", code);
   if (!code) {
     return NextResponse.json(
       { error: "Missing code in the request body" },

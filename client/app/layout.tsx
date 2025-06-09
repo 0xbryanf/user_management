@@ -6,6 +6,8 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { Toaster } from "react-hot-toast";
 import ProtectedRoute from "@/components/protectedRoute";
+import { AuthMethodContextProvider } from "./contexts/AuthMethodContext";
+import { OAuthCodeProvider } from "./contexts/OAuthCodeContext";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -36,7 +38,11 @@ export default async function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <Providers session={session}>
-          <ProtectedRoute>{children}</ProtectedRoute>
+          <ProtectedRoute>
+            <AuthMethodContextProvider>
+              <OAuthCodeProvider>{children}</OAuthCodeProvider>
+            </AuthMethodContextProvider>
+          </ProtectedRoute>
         </Providers>
         <Toaster position="top-center" />
       </body>

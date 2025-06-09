@@ -5,15 +5,17 @@ import ValidationForm from "@/components/organisms/validationForm";
 import api from "@/lib/api";
 import ChangePasswordTemplate from "@/components/templates/changePasswordTemplate";
 import { useRouter } from "next/navigation";
+import { useAuthMethod } from "@/app/contexts/AuthMethodContext";
 
-interface VerifyOTPTemplateProps {
-  init: boolean;
-}
+// interface VerifyOTPTemplateProps {
+//   init: boolean;
+// }
 
-const VerifyOTPTemplate = ({ init }: VerifyOTPTemplateProps) => {
+const VerifyOTPTemplate = () => {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [showChangePassword, setShowChangePassword] = useState(false);
+  const { isOauthLogin } = useAuthMethod();
 
   async function handleVerification(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -35,7 +37,7 @@ const VerifyOTPTemplate = ({ init }: VerifyOTPTemplateProps) => {
         });
       }
 
-      if (init === true) {
+      if (isOauthLogin === true) {
         router.push("/");
       } else {
         setShowChangePassword(true);

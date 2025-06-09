@@ -6,6 +6,11 @@ import { getUserAcrossEntities } from "functions/getUserAcrossEntities.fn";
 import { updateAuthorization } from "functions/updateAuthorization.fn";
 import { verifyUserActivation } from "functions/verifyUserActivation.fn";
 import { Authorization } from "types/authorization";
+import { ReturnResponse } from "types/returnResponse";
+import { sendOTPEmail } from "functions/sendOneTimePinToEmail.fn";
+import { verifyOTPEmail } from "functions/verifyOTPEmail.fn";
+import { findUserAcrossEntities } from "lib/helpers/findUserAcrossEntities";
+import sgMail from "@sendgrid/mail";
 
 /**
  * Service class for user and authorization-related operations.
@@ -84,6 +89,34 @@ class UsersService {
 
   static async getUserAcrossEntitiesService(email: string) {
     const result = await getUserAcrossEntities({ email });
+    return result;
+  }
+
+  /**
+   * Sends an OTP email to the specified user.
+   * @param userId - The user's unique ID.
+   * @returns Promise resolving to the OTP email result.
+   */
+  static async sendOTPEmail(
+    userId: string
+  ): Promise<ReturnResponse<[sgMail.ClientResponse, {}]>> {
+    const user = await findUserAcrossEntities({ userId });
+    const result = await sendOTPEmail({ email: user.email as string });
+    return result;
+  }
+
+  /**
+   * Verifies the OTP email for the specified user.
+   * @param userId - The user's unique ID.
+   * @param otp - The OTP code.
+   * @returns Promise resolving to the verification result.
+   */
+  static async verifyOTPEmail(
+    userId: string,
+    otp: number
+  ): Promise<ReturnResponse> {
+    const user = await findUserAcrossEntities({ userId });
+    const result = await verifyOTPEmail({ email: user.email, otp });
     return result;
   }
 }

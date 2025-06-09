@@ -88,6 +88,52 @@ class UsersController implements Controller {
       authenticateToken,
       this.getUserAcrossEntitiesHandler as RequestHandler
     );
+
+    this.router.post(
+      `${this.path}/${this.version}/send-otp-email`,
+      authenticateToken,
+      this.sendOTPEmailHandler as RequestHandler
+    );
+
+    this.router.post(
+      `${this.path}/${this.version}/verify-otp-email`,
+      authenticateToken,
+      this.verifyOTPEmailHandler as RequestHandler
+    );
+  }
+
+  /**
+   * Sends an OTP email to the user.
+   */
+  private async sendOTPEmailHandler(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<Response | void> {
+    try {
+      const userId = (req as AuthenticatedRequest).user?.userId as string;
+      const result = await UsersService.sendOTPEmail(userId);
+      return res.status(result.status).json(result);
+    } catch (error) {
+      return next(new HttpException(500, "Internal Server Error.", error));
+    }
+  }
+  /**
+   * Verifies the OTP from the user's email.
+   */
+  private async verifyOTPEmailHandler(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<Response | void> {
+    try {
+      const { otp } = req.body;
+      const userId = (req as AuthenticatedRequest).user?.userId as string;
+      const result = await UsersService.verifyOTPEmail(userId, parseInt(otp));
+      return res.status(result.status).json(result);
+    } catch (error) {
+      return next(new HttpException(500, "Internal Server Error.", error));
+    }
   }
 
   private async getUserAcrossEntitiesHandler(

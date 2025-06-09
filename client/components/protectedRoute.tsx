@@ -1,14 +1,19 @@
 "use client";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import api from "@/lib/api";
-import Spinner from "@/lib/spinner";
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
 }
 
-const publicPaths = ["/sign-in", "/sign-up", "/api/auth", "/public"];
+const publicPaths = [
+  "/sign-in",
+  "/sign-up",
+  "/api/auth",
+  "/public",
+  "/callback"
+];
 
 export default function ProtectedRoute({ children }: ProtectedRouteProps) {
   const pathname = usePathname();

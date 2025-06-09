@@ -2,12 +2,13 @@
 import api from "@/lib/api";
 import { fetchAuthorization } from "@/lib/fetchAuthorization";
 import { getAuthTokens } from "@/lib/getAuthTokens";
+import { AxiosError } from "axios";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(request: NextRequest) {
+  let { token, sessionToken } = await getAuthTokens(request);
+  await fetchAuthorization(sessionToken, token);
   try {
-    let { token, sessionToken } = await getAuthTokens(request);
-    await fetchAuthorization(sessionToken, token);
     const { status, data } = await api.post(
       `${process.env.BASE_URL}/send-otp-email`,
       {},
@@ -35,7 +36,8 @@ export async function POST(request: NextRequest) {
       { message: "Success: OTP Email sent successfully." },
       { status: 200 }
     );
-  } catch (error) {
+  } catch (error: unknown) {
+    console.log("error", (error as AxiosError).response);
     return new NextResponse(null, { status: 500 });
   }
 }
